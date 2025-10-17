@@ -1,0 +1,29 @@
+version: "3.9"
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: gympro_mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root123
+      MYSQL_DATABASE: gympro
+      MYSQL_USER: gympro_app
+      MYSQL_PASSWORD: gympro123
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./db/data:/var/lib/mysql
+      - ./db/migration:/docker-entrypoint-initdb.d
+    networks:
+      - gympro-net 
+  adminer:
+    image: adminer
+    container_name: gympro_adminer
+    restart: always
+    ports:
+      - "8080:8080"
+    networks:
+      - gympro-net
+networks:
+  gympro-net:
+    driver: bridge
