@@ -1,0 +1,192 @@
+-- GymPro - Initial Schema (MySQL 8)
+-- Charset & collation
+SET NAMES utf8mb4;
+SET collation_connection = 'utf8mb4_0900_ai_ci';
+
+-- MASTER TABLES
+CREATE TABLE branches (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  code VARCHAR(32) NOT NULL UNIQUE,
+  name VARCHAR(255) NOT NULL,
+  address VARCHAR(500),
+  phone VARCHAR(30),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE roles (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  name VARCHAR(50) NOT NULL UNIQUE,
+  description VARCHAR(255)
+);
+
+CREATE TABLE payment_methods (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  code VARCHAR(32) NOT NULL UNIQUE,
+  display_name VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE settings (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  key_name VARCHAR(100) NOT NULL UNIQUE,
+  value_str VARCHAR(255),
+  value_num DECIMAL(18,6),
+  value_json JSON,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE counters (
+  counter_key VARCHAR(64) PRIMARY KEY,
+  current_value BIGINT NOT NULL
+);
+
+-- CORE TABLES
+CREATE TABLE users (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  branch_id BIGINT NOT NULL,
+  username VARCHAR(50) NOT NULL UNIQUE,
+  full_name VARCHAR(255) NOT NULL,
+  email VARCHAR(255),
+  phone VARCHAR(30),
+  password_hash VARCHAR(255) NOT NULL,
+  is_active TINYINT(1) DEFAULT 1,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (branch_id) REFERENCES branches(id)
+);
+
+CREATE TABLE user_roles (
+  user_id BIGINT NOT NULL,
+  role_id BIGINT NOT NULL,
+  PRIMARY KEY(user_id, role_id),
+  FOREIGN KEY (user_id) REFERENCES users(id),
+  FOREIGN KEY (role_id) REFERENCES roles(id)
+);
+
+CREATE TABLE plans (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  branch_id BIGINT NOT NULL,
+  code VARCHAR(32) NOT NULL UNIQUE,
+  name VARCHAR(255) NOT NULL,
+  description VARCHAR(500),
+  price DECIMAL(12,2) NOT NULL,
+  duration_days INT NOT NULL,
+  is_active TINYINT(1) DEFAULT 1,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (branch_id) REFERENCES branches(id)
+);
+
+CREATE TABLE members (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  branch_id BIGINT NOT NULL,
+  member_code VARCHAR(32) NOT NULL UNIQUE,
+  full_name VARCHAR(255) NOT NULL,
+  phone VARCHAR(30) NOT NULL,
+  email VARCHAR(255),
+  gender ENUM('MALE','FEMALE','OTHER') DEFAULT 'OTHER',
+  dob DATE,
+  address VARCHAR(500),
+  status ENUM('PENDING','ACTIVE','EXPIRED','PAUSED','RENEWED') DEFAULT 'PENDING',
+  note VARCHAR(500),
+  is_deleted TINYINT(1) DEFAULT 0,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (branch_id) REFERENCES branches(id)
+);
+
+CREATE TABLE subscriptions (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  member_id BIGINT NOT NULL,
+  plan_id BIGINT NOT NULL,
+  start_date DATE NOT NULL,
+  end_date DATE NOT NULL,
+  status ENUM('PENDING','ACTIVE','EXPIRED','CANCELLED') DEFAULT 'PENDING',
+  note VARCHAR(500),
+  created_by BIGINT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (member_id) REFERENCES members(id),
+  FOREIGN KEY (plan_id) REFERENCES plans(id),
+  FOREIGN KEY (created_by) REFERENCES users(id)
+);
+
+CREATE TABLE invoices (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  member_id BIGINT NOT NULL,
+  subscription_id BIGINT,
+  invoice_no VARCHAR(50) NOT NULL UNIQUE,
+  issue_date DATE DEFAULT (CURRENT_DATE),
+  subtotal_amount DECIMAL(12,2) NOT NULL,
+  discount_type ENUM('NONE','PERCENT','AMOUNT') DEFAULT 'NONE',
+  discount_value DECIMAL(12,2) DEFAULT 0,
+  total_amount DECIMAL(12,2) NOT NULL,
+  created_by BIGINT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (member_id) REFERENCES members(id),
+  FOREIGN KEY (subscription_id) REFERENCES subscriptions(id),
+  FOREIGN KEY (created_by) REFERENCES users(id)
+);
+
+CREATE TABLE invoice_items (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  invoice_id BIGINT NOT NULL,
+  item_type ENUM('PLAN','PRODUCT','SERVICE') DEFAULT 'PLAN',
+  ref_id BIGINT,
+  description VARCHAR(255) NOT NULL,
+  qty INT DEFAULT 1,
+  unit_price DECIMAL(12,2) NOT NULL,
+  line_total DECIMAL(12,2) NOT NULL,
+  FOREIGN KEY (invoice_id) REFERENCES invoices(id)
+);
+
+CREATE TABLE payments (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  invoice_id BIGINT NOT NULL,
+  method_id BIGINT NOT NULL,
+  paid_amount DECIMAL(12,2) NOT NULL,
+  paid_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  reference_code VARCHAR(100),
+  created_by BIGINT,
+  FOREIGN KEY (invoice_id) REFERENCES invoices(id),
+  FOREIGN KEY (method_id) REFERENCES payment_methods(id),
+  FOREIGN KEY (created_by) REFERENCES users(id)
+);
+
+-- SUPPORT TABLES
+CREATE TABLE reminders (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  member_id BIGINT NOT NULL,
+  subscription_id BIGINT NOT NULL,
+  reminder_date DATE NOT NULL,
+  channel ENUM('NONE','EMAIL','ZALO','SMS') DEFAULT 'NONE',
+  status ENUM('PENDING','SENT','FAILED') DEFAULT 'PENDING',
+  payload JSON,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (member_id) REFERENCES members(id),
+  FOREIGN KEY (subscription_id) REFERENCES subscriptions(id)
+);
+
+CREATE TABLE backup_logs (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  file_path VARCHAR(500) NOT NULL,
+  started_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  finished_at TIMESTAMP NULL,
+  status ENUM('SUCCESS','FAILED') NOT NULL,
+  message VARCHAR(500)
+);
+
+CREATE TABLE audit_logs (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  table_name VARCHAR(64) NOT NULL,
+  action_type ENUM('INSERT','UPDATE','DELETE') NOT NULL,
+  row_pk BIGINT,
+  before_data JSON,
+  after_data JSON,
+  actor_user_id BIGINT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (actor_user_id) REFERENCES users(id)
+);

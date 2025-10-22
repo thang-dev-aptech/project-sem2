@@ -78,7 +78,7 @@ app/
 | M05 | Nhắc hạn | Gửi cảnh báo khi còn ≤5 ngày hết hạn | Cấu hình được |
 | M06 | Báo cáo | Doanh thu tháng, số hội viên, xuất Excel | Core |
 | M07 | Cấu hình & Backup | GRACE_DAYS, RENEW_RULE, sao lưu DB | Optional |
-| M08 | Người dùng & Vai trò | Phân quyền: Owner, Manager, Staff, PT | Bảo mật |
+| M08 | Người dùng & Vai trò | Phân quyền: Manager, Staff | Bảo mật |
 
 ---
 
@@ -120,7 +120,7 @@ app/
 ---
 
 ## 🔐 8. Bảo mật
-- Đăng nhập người dùng (Owner, Manager, Staff).
+- Đăng nhập người dùng (Manager, Staff).
 - Mã hoá mật khẩu bằng **bcrypt**.
 - Ghi lại mọi thao tác nhạy cảm vào **audit_logs**.
 - Khóa màn hình khi idle X phút.
