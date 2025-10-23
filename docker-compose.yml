@@ -1,29 +1,62 @@
 version: "3.9"
+
 services:
   mysql:
     image: mysql:8.0
     container_name: gympro_mysql
-    restart: always
+    restart: unless-stopped
     environment:
       MYSQL_ROOT_PASSWORD: root123
       MYSQL_DATABASE: gympro
-      MYSQL_USER: gympro_app
-      MYSQL_PASSWORD: gympro123
+      MYSQL_USER: gympro_user
+      MYSQL_PASSWORD: gympro_password
     ports:
       - "3306:3306"
     volumes:
-      - ./db/data:/var/lib/mysql
+      - mysql_data:/var/lib/mysql
       - ./db/migration:/docker-entrypoint-initdb.d
+      - ./db/init:/docker-entrypoint-initdb.d/init
+    command: --default-authentication-plugin=mysql_native_password
     networks:
-      - gympro-net 
+      - gympro-net
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+
   adminer:
-    image: adminer
+    image: adminer:4.8.1
     container_name: gympro_adminer
-    restart: always
+    restart: unless-stopped
     ports:
       - "8080:8080"
     networks:
       - gympro-net
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  # Optional: phpMyAdmin alternative
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:5.2
+    container_name: gympro_phpmyadmin
+    restart: unless-stopped
+    ports:
+      - "8081:80"
+    environment:
+      PMA_HOST: mysql
+      PMA_USER: gympro_user
+      PMA_PASSWORD: gympro_password
+    networks:
+      - gympro-net
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+volumes:
+  mysql_data:
+    driver: local
+
 networks:
   gympro-net:
     driver: bridge
