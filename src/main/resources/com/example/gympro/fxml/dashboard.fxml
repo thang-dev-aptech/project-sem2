@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.Insets?>
+
+<ScrollPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.gympro.controller.DashboardController" stylesheets="@../css/styles.css" fitToWidth="true" styleClass="dashboard-scroll">
+    <VBox spacing="20" styleClass="dashboard-container">
+        <padding>
+            <Insets top="30" left="30" right="30" bottom="30"/>
+        </padding>
+
+        <!-- Header -->
+        <VBox spacing="5">
+            <Label text="GymPro Admin Dashboard" styleClass="page-title"/>
+            <Label text="Welcome back! Here's your gym overview." styleClass="page-subtitle"/>
+        </VBox>
+
+        <!-- Stats Cards Grid -->
+        <GridPane fx:id="statsGrid" hgap="20" vgap="20">
+            <columnConstraints>
+                <ColumnConstraints percentWidth="25" minWidth="200"/>
+                <ColumnConstraints percentWidth="25" minWidth="200"/>
+                <ColumnConstraints percentWidth="25" minWidth="200"/>
+                <ColumnConstraints percentWidth="25" minWidth="200"/>
+            </columnConstraints>
+        </GridPane>
+
+        <!-- Charts Section -->
+        <GridPane hgap="20" vgap="20">
+            <columnConstraints>
+                <ColumnConstraints percentWidth="66" minWidth="300"/>
+                <ColumnConstraints percentWidth="34" minWidth="250"/>
+            </columnConstraints>
+            
+            <!-- Revenue Chart -->
+            <VBox styleClass="card" spacing="10" GridPane.columnIndex="0">
+                <Label text="Monthly Revenue" styleClass="card-title"/>
+                <Pane fx:id="revenueChartPane" VBox.vgrow="ALWAYS" prefHeight="300"/>
+            </VBox>
+
+            <!-- Member Status Chart -->
+            <VBox styleClass="card" spacing="10" GridPane.columnIndex="1">
+                <Label text="Member Status" styleClass="card-title"/>
+                <Pane fx:id="memberStatusChartPane" VBox.vgrow="ALWAYS" prefHeight="300"/>
+            </VBox>
+        </GridPane>
+
+        <!-- Urgent Reminders -->
+        <VBox fx:id="urgentRemindersBox" spacing="15" styleClass="urgent-reminders-box"/>
+
+        <!-- Members Table -->
+        <VBox styleClass="card" spacing="10">
+            <Label text="All Members Expiring Soon" styleClass="card-title"/>
+            <TableView fx:id="membersTable" styleClass="members-table" prefHeight="300">
+                <columns>
+                    <TableColumn text="Member ID" prefWidth="120"/>
+                    <TableColumn text="Name" prefWidth="120"/>
+                    <TableColumn text="Package" prefWidth="100"/>
+                    <TableColumn text="Expiry Date" prefWidth="120"/>
+                    <TableColumn text="Days Left" prefWidth="100"/>
+                    <TableColumn text="Action" prefWidth="80"/>
+                </columns>
+            </TableView>
+        </VBox>
+    </VBox>
+</ScrollPane>

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.Insets?>
+
+<ScrollPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.gympro.controller.MembersController" stylesheets="@../css/styles.css" fitToWidth="true" styleClass="dashboard-scroll">
+    <VBox spacing="20" styleClass="dashboard-container">
+        <padding>
+            <Insets top="30" left="30" right="30" bottom="30"/>
+        </padding>
+
+        <!-- Header -->
+        <VBox spacing="5">
+            <Label text="Members Management" styleClass="page-title"/>
+            <Label text="Manage all gym members and their information." styleClass="page-subtitle"/>
+        </VBox>
+
+        <!-- Search and Filter -->
+<!--        <HBox spacing="10" alignment="CENTER_LEFT">-->
+<!--            <TextField promptText="Search members..." prefWidth="300" styleClass="form-input"/>-->
+<!--            <ComboBox promptText="Filter by status" prefWidth="150" styleClass="form-input"/>-->
+<!--            <Button text="+ Add Member" styleClass="primary-button"/>-->
+<!--        </HBox>-->
+        <HBox spacing="10" alignment="CENTER_LEFT">
+            <TextField promptText="Search members..." prefWidth="300" styleClass="form-input"/>
+            <ComboBox promptText="Filter by status" prefWidth="150" styleClass="form-input"/>
+            <Button text="+ Add Member" styleClass="primary-button" onAction="#handleAddMember"/>
+        </HBox>
+
+        <!-- Members Table -->
+        <VBox styleClass="card" spacing="10" VBox.vgrow="ALWAYS">
+            <Label text="All Members" styleClass="card-title"/>
+            <TableView fx:id="membersTable" styleClass="members-table" VBox.vgrow="ALWAYS">
+                <columns>
+                    <TableColumn text="Member ID" prefWidth="120"/>
+                    <TableColumn text="Name" prefWidth="150"/>
+                    <TableColumn text="Email" prefWidth="180"/>
+                    <TableColumn text="Phone" prefWidth="120"/>
+                    <TableColumn text="Package" prefWidth="100"/>
+                    <TableColumn text="Status" prefWidth="100"/>
+                    <TableColumn text="Actions" prefWidth="100"/>
+                </columns>
+            </TableView>
+        </VBox>
+    </VBox>
+</ScrollPane>

@@ -1,0 +1,18 @@
+{
+  "reminders": [
+    {
+      "id": "GYM-2025-0001",
+      "name": "John Doe",
+      "package": "3-Month",
+      "expiryDate": "2025-01-15",
+      "daysLeft": "5 days"
+    },
+    {
+      "id": "GYM-2025-0002",
+      "name": "Jane Smith",
+      "package": "6-Month",
+      "expiryDate": "2025-01-18",
+      "daysLeft": "8 days"
+    }
+  ]
+}
