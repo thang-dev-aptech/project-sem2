@@ -130,14 +130,359 @@ app/
 
 ## 🚀 9. Kế hoạch triển khai (PM Plan)
 
-| Sprint | Thời gian | Module chính | Ghi chú |
-|---------|------------|---------------|---------|
-| Sprint 0 | 1 tuần | Setup Maven, Flyway, Auth cơ bản | |
-| Sprint 1 | 2 tuần | Members + Plans | |
-| Sprint 2 | 2 tuần | Subscription + Payment + PDF | |
-| Sprint 3 | 1 tuần | Reminder + Report | |
-| Sprint 4 | 1 tuần | Settings + Backup + Audit | |
-| UAT | 1 tuần | Fix lỗi, demo, đóng gói jpackage | |
+### 📊 Hiện trạng dự án
+**✅ Đã hoàn thành:**
+- Database schema đầy đủ (V1__GymPro_Complete_Schema.sql)
+- Database initialization (01-init-database.sql)
+- Docker Compose setup
+- FXML UI layouts cho tất cả screens
+- Cấu hình application.properties
+- ViewModels cơ bản cho data binding
+- DatabaseConnection utility
+
+**❌ Cần hoàn thiện:**
+- Domain/Entity classes
+- Repository/DAO layer
+- Service layer (business logic)
+- Controller implementations đầy đủ
+- Authentication & Authorization
+- Business rules validation
+- PDF/Excel export
+- Unit/Integration tests
+
+### 🎯 Kế hoạch triển khai chi tiết
+
+| Sprint | Thời gian | Nhiệm vụ chính | Công việc cụ thể | Trạng thái |
+|--------|-----------|----------------|------------------|------------|
+| **Sprint 0** | 1.5 tuần | Setup & Foundation | | ✅ Hoàn thành |
+| | | ✓ Database Schema | Schema migration | ✅ |
+| | | ✓ Docker Setup | Docker Compose | ✅ |
+| | | ✓ FXML Layouts | UI screens | ✅ |
+| | | ✓ Project Structure | Maven, dependencies | ✅ |
+| **Sprint 1** | 2 tuần | Authentication & Core Domain | | 🔄 Cần làm |
+| | | ✓ Domain Entities | Branch, User, Member, Plan | ⏳ |
+| | | ✓ Login Service | Authentication với bcrypt | ⏳ |
+| | | ✓ Session Management | User context | ⏳ |
+| | | ✓ Repository Base | Base DAO pattern | ⏳ |
+| **Sprint 2** | 2 tuần | Members & Plans Management | | ⏳ Chưa bắt đầu |
+| | | ✓ Member Repository/Service | CRUD operations | ⏳ |
+| | | ✓ Plan Repository/Service | CRUD operations | ⏳ |
+| | | ✓ Member Controller | Business logic | ⏳ |
+| | | ✓ Plan Controller | Business logic | ⏳ |
+| | | ✓ Data Validation | Phone/Email checks | ⏳ |
+| **Sprint 3** | 2 tuần | Subscription & Payment | | ⏳ Chưa bắt đầu |
+| | | ✓ Subscription Service | Renewal logic (R01, R02) | ⏳ |
+| | | ✓ Invoice Service | Invoice generation | ⏳ |
+| | | ✓ Payment Service | Payment processing | ⏳ |
+| | | ✓ Discount Logic (R04) | Apply discount rules | ⏳ |
+| | | ✓ PDF Invoice Export | Invoice printing | ⏳ |
+| **Sprint 4** | 1.5 tuần | Reminders & Reports | | ⏳ Chưa bắt đầu |
+| | | ✓ Reminder Service | GRACE_DAYS logic (R05) | ⏳ |
+| | | ✓ Dashboard Service | Metrics & stats | ⏳ |
+| | | ✓ Report Service | Revenue reports | ⏳ |
+| | | ✓ Excel Export | Export to Excel | ⏳ |
+| **Sprint 5** | 1.5 tuần | Settings, Backup, Audit | | ⏳ Chưa bắt đầu |
+| | | ✓ Settings Service | System configuration | ⏳ |
+| | | ✓ Backup Service | DB backup/restore | ⏳ |
+| | | ✓ Audit Log | Audit trail (R07) | ⏳ |
+| | | ✓ User Management | User CRUD | ⏳ |
+| **Sprint 6** | 1.5 tuần | Testing & Polish | | ⏳ Chưa bắt đầu |
+| | | ✓ Unit Tests | Domain/Service layer | ⏳ |
+| | | ✓ Integration Tests | Repository layer | ⏳ |
+| | | ✓ UI Tests | Controller validation | ⏳ |
+| | | ✓ Bug Fixes | Performance & bugs | ⏳ |
+| | | ✓ Documentation | User manual | ⏳ |
+| **UAT** | 1 tuần | User Acceptance Testing | | ⏳ Chưa bắt đầu |
+| | | ✓ Demo session | Stakeholder demo | ⏳ |
+| | | ✓ UAT Feedback | User feedback | ⏳ |
+| | | ✓ Final fixes | Critical bugs | ⏳ |
+| | | ✓ Packaging | jpackage/installer | ⏳ |
+| **Total** | **11.5 tuần** | | | **~3 tháng** |
+
+### 📋 Hướng dẫn triển khai Sprint theo Sprint
+
+#### 🔐 Sprint 1: Authentication & Core Domain (2 tuần)
+
+**Tuần 1: Domain Entities**
+```
+1. Tạo Domain Entities:
+   - domain/Branch.java
+   - domain/User.java
+   - domain/Role.java
+   - domain/Member.java
+   - domain/Plan.java
+   - domain/Subscription.java
+   - domain/Invoice.java
+   - domain/Payment.java
+   - domain/PaymentMethod.java
+   - domain/SystemConfig.java
+   - domain/AuditLog.java
+
+2. Thêm getters/setters
+3. Thêm constructors
+4. Thêm equals/hashCode/toString
+```
+
+**Tuần 2: Authentication**
+```
+1. Repository Layer:
+   - repository/BaseRepository.java (template pattern)
+   - repository/UserRepository.java
+   - repository/MemberRepository.java
+
+2. Service Layer:
+   - service/AuthService.java
+   - service/SessionManager.java
+
+3. Controller:
+   - Update LoginController.java với logic authentication
+   - Add bcrypt password verification
+   - Add session management
+
+4. Testing:
+   - Test login flow
+   - Test session timeout
+```
+
+#### 👥 Sprint 2: Members & Plans Management (2 tuần)
+
+**Tuần 1: Members**
+```
+1. Repository:
+   - repository/MemberRepository.java (CRUD)
+   - Add findByPhone(), findByCode()
+
+2. Service:
+   - service/MemberService.java
+   - Member code generation (R06)
+   - Phone duplicate check
+   - Status management
+
+3. Controller:
+   - Update MembersController.java
+   - Add CRUD operations
+   - Add search/filter
+   - Add member dialog
+
+4. Testing:
+   - Test CRUD operations
+   - Test duplicate phone check
+```
+
+**Tuần 2: Plans**
+```
+1. Repository:
+   - repository/PlanRepository.java (CRUD)
+
+2. Service:
+   - service/PlanService.java
+
+3. Controller:
+   - Update PackagesController.java
+   - Add plan management
+
+4. Testing:
+   - Test plan CRUD
+   - Test active/inactive toggle
+```
+
+#### 💳 Sprint 3: Subscription & Payment (2 tuần)
+
+**Tuần 1: Subscription**
+```
+1. Repository:
+   - repository/SubscriptionRepository.java
+
+2. Service:
+   - service/SubscriptionService.java
+   - Implement CalculateRenewalDates (R01, R02)
+   - Status transitions (R03)
+
+3. Controller:
+   - Update RegistrationController.java
+
+4. Testing:
+   - Test R01 (còn hạn)
+   - Test R02 (hết hạn)
+```
+
+**Tuần 2: Payment & Invoice**
+```
+1. Repository:
+   - repository/InvoiceRepository.java
+   - repository/PaymentRepository.java
+
+2. Service:
+   - service/InvoiceService.java
+   - service/PaymentService.java
+   - service/PDFExportService.java
+   - Implement R04 (discount logic)
+
+3. Controller:
+   - Update PaymentController.java
+
+4. Testing:
+   - Test invoice generation
+   - Test payment processing
+   - Test PDF export
+```
+
+#### 📊 Sprint 4: Reminders & Reports (1.5 tuần)
+
+**Tuần 1: Reminders & Dashboard**
+```
+1. Repository:
+   - repository/ReminderRepository.java
+
+2. Service:
+   - service/ReminderService.java
+   - Implement R05 (GRACE_DAYS)
+   - service/DashboardService.java
+
+3. Controller:
+   - Update ExpiryController.java
+   - Update DashboardController.java
+
+4. Testing:
+   - Test reminder generation
+   - Test dashboard metrics
+```
+
+**Tuần 2: Reports & Export**
+```
+1. Service:
+   - service/ReportService.java
+   - service/ExcelExportService.java
+
+2. Controller:
+   - Update ReportsController.java
+
+3. Testing:
+   - Test revenue reports
+   - Test Excel export
+```
+
+#### ⚙️ Sprint 5: Settings, Backup, Audit (1.5 tuần)
+
+**Tuần 1: Settings & User Management**
+```
+1. Repository:
+   - repository/SystemConfigRepository.java
+
+2. Service:
+   - service/SettingsService.java
+   - service/UserManagementService.java
+
+3. Controller:
+   - Update SettingsController.java
+   - Update UserManagementController.java
+
+4. Testing:
+   - Test settings CRUD
+   - Test user management
+```
+
+**Tuần 2: Backup & Audit**
+```
+1. Service:
+   - service/BackupService.java
+   - Audit logs (trigger-based - R07)
+
+2. Testing:
+   - Test backup/restore
+   - Test audit logs
+```
+
+#### 🧪 Sprint 6: Testing & Polish (1.5 tuần)
+
+**Tuần 1: Testing**
+```
+1. Unit Tests:
+   - domain/*Test.java
+   - service/*Test.java
+
+2. Integration Tests:
+   - repository/*Test.java
+   - Test với test DB
+
+3. UI Tests:
+   - Controller tests
+   - Form validation tests
+```
+
+**Tuần 2: Polish & Docs**
+```
+1. Bug fixes
+2. Performance optimization
+3. Code review
+4. Documentation:
+   - USER_MANUAL.md
+   - DEVELOPER_GUIDE.md
+   - API_DOCS.md
+```
+
+#### 🎯 UAT (1 tuần)
+
+**Demo & Launch**
+```
+1. Demo với stakeholders
+2. Collect feedback
+3. Fix critical bugs
+4. Package application (jpackage)
+5. Create installer
+6. Deploy documentation
+```
+
+### 📌 Công cụ & Best Practices
+
+**Development**
+- **IDE**: IntelliJ IDEA / VS Code
+- **SCM**: Git với branching strategy (main, develop, feature/*, bugfix/*)
+- **CI/CD**: GitHub Actions (optional)
+
+**Testing**
+- **JUnit 5**: Unit & Integration tests
+- **TestContainers**: Database testing
+- **Mockito**: Mock dependencies
+
+**Code Quality**
+- **Checkstyle**: Code style
+- **SonarQube**: Code analysis (optional)
+- **Code Review**: Peer review
+
+**Documentation**
+- **Markdown**: README, guides
+- **JavaDoc**: API documentation
+- **Mockups**: UI designs
+
+### ⚠️ Quản lý rủi ro & Mitigation
+
+| Rủi ro | Tác động | Xác suất | Mitigation |
+|--------|----------|----------|-----------|
+| Thành viên bỏ học giữa chừng | Cao | Trung bình | Phân công đa mảng, documentation đầy đủ, code review |
+| Database connection issues | Cao | Thấp | Sử dụng connection pool, retry mechanism, logging đầy đủ |
+| Performance với >10k records | Trung bình | Trung bình | Pagination, lazy loading, indexing, caching |
+| PDF/Excel export bugs | Trung bình | Trung bình | Unit test, integration test, test với nhiều scenarios |
+| Scope creep | Cao | Cao | Strict sprint planning, backlog management, prioritize MVP |
+| Mobile/Responsive issues | Thấp | Thấp | Test trên nhiều screen sizes |
+
+### 🎓 Learning Resources
+
+**Java/JavaFX**
+- [JavaFX Tutorial](https://openjfx.io/)
+- [JavaFX Documentation](https://docs.oracle.com/javase/8/javafx/api/)
+
+**MySQL**
+- [MySQL 8.0 Reference](https://dev.mysql.com/doc/)
+- [Flyway Documentation](https://flywaydb.org/documentation/)
+
+**Testing**
+- [JUnit 5 Guide](https://junit.org/junit5/docs/current/user-guide/)
+- [Mockito Documentation](https://site.mockito.org/)
+
+**PDF/Excel**
+- [Apache POI](https://poi.apache.org/)
+- [PDFBox](https://pdfbox.apache.org/)
 
 ---
 
