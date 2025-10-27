@@ -28,12 +28,12 @@ public class MainController {
 
     private void createNavButtons() {
         String[] menuItems = {
-            "📊 Dashboard", "🧍 Members", "💪 Packages", "📅 Registration",
-            "💳 Payment", "📈 Reports", "⚙️ Settings", "👤 Users"
+                "📊 Dashboard", "🧍 Members", "💪 Packages", "📅 Registration",
+                "💳 Payment", "⏰ Expiring Members", "📈 Reports", "⚙️ Settings", "👤 Users"
         };
         String[] screenIds = {
-            "dashboard", "members", "packages", "registration",
-            "payment", "reports", "settings", "users"
+                "dashboard", "members", "packages", "registration",
+                "payment", "expiry", "reports", "settings", "users"
         };
 
         for (int i = 0; i < menuItems.length; i++) {
@@ -69,6 +69,8 @@ public class MainController {
                 case "reports" -> "/com/example/gympro/fxml/reports.fxml";
                 case "settings" -> "/com/example/gympro/fxml/settings.fxml";
                 case "users" -> "/com/example/gympro/fxml/user-management.fxml";
+                case "expiry" -> "/com/example/gympro/fxml/expiry_view.fxml";
+
                 default -> "/com/example/gympro/fxml/dashboard.fxml";
             };
 

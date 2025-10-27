@@ -17,10 +17,27 @@ public class ExpiringMember {
         this.phone = phone;
     }
 
-    public String getId() { return id; }
-    public String getName() { return name; }
-    public String getPackageName() { return packageName; }
-    public String getExpiry() { return expiry; }
-    public int getDaysLeft() { return daysLeft; }
-    public String getPhone() { return phone; }
+    public String getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getPackageName() {
+        return packageName;
+    }
+
+    public String getExpiry() {
+        return expiry;
+    }
+
+    public int getDaysLeft() {
+        return daysLeft;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
 }
