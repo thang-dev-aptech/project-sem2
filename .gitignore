@@ -41,7 +41,6 @@ build/
 # MySQL data directory (will be created by Docker)
 db/data/
 # Database backup files
-*.sql
 *.dump
 *.backup
 # Database logs
