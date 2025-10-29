@@ -1,5 +1,5 @@
 /* Root Colors */
-:root {
+.root {
   -fx-primary: #0d1b2a;
   -fx-primary-light: #1a2f42;
   -fx-accent: #ffd700;

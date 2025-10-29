@@ -12,9 +12,9 @@ import java.sql.SQLException;
  */
 public class DatabaseConnection {
     private static DatabaseConnection instance;
-    private final String url;
-    private final String username;
-    private final String password;
+    private static  String url;
+    private static  String username;
+    private static  String password;
     private final String driver;
     private final String schema;
 
@@ -71,7 +71,7 @@ public class DatabaseConnection {
      * @return Connection object
      * @throws SQLException if connection fails
      */
-    public Connection getConnection() throws SQLException {
+    public static Connection getConnection() throws SQLException {
         return DriverManager.getConnection(url, username, password);
     }
 
