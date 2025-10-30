@@ -258,6 +258,23 @@
   -fx-cursor: hand;
 }
 
+.extra-button {
+    -fx-padding: 10 16 10 16;
+    -fx-font-size: 13;
+    -fx-font-weight: bold;
+    -fx-text-fill: #0D1B2A;         
+    -fx-background-color: #FFD700;  
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 2, 0, 0, 1);
+}
+
+.extra-button:hover {
+    -fx-background-color: #FFC107; 
+}
+
+
 .primary-button:hover {
   -fx-background-color: #1a2f42;
 }
