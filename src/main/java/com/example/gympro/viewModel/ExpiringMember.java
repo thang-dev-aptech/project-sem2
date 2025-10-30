@@ -7,6 +7,7 @@ public class ExpiringMember {
     private String expiry;
     private int daysLeft;
     private String phone;
+    private String status;
 
     public ExpiringMember(String id, String name, String packageName, String expiry, int daysLeft, String phone) {
         this.id = id;
@@ -15,6 +16,7 @@ public class ExpiringMember {
         this.expiry = expiry;
         this.daysLeft = daysLeft;
         this.phone = phone;
+
     }
 
     public String getId() {
@@ -40,4 +42,13 @@ public class ExpiringMember {
     public String getPhone() {
         return phone;
     }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
 }

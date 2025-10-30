@@ -33,11 +33,13 @@
             <columns>
                 <TableColumn fx:id="colCode" text="Mã" prefWidth="100"/>
                 <TableColumn fx:id="colName" text="Họ tên" prefWidth="180"/>
-                <TableColumn fx:id="colPhone" text="SĐT" prefWidth="120"/>
+                <TableColumn fx:id="colPhone" text="SĐT" prefWidth="100"/>
                 <TableColumn fx:id="colPackage" text="Gói" prefWidth="120"/>
                 <TableColumn fx:id="colEndDate" text="Hết hạn" prefWidth="120"/>
+                <TableColumn fx:id="colExpiry" text="Số ngày còn lại" prefWidth="100"/>
                 <TableColumn fx:id="colStatus" text="Trạng thái" prefWidth="120"/>
-                 <TableColumn fx:id="colActions" text="Hành động" prefWidth="400"/>
+
+                <TableColumn fx:id="colActions" text="Hành động" prefWidth="400"/>
             </columns>
         </TableView>
 
