@@ -355,3 +355,26 @@
   -fx-font-size: 11;
   -fx-font-weight: bold;
 }
+
+
+/* ----Dashboard-- */
+.dashboard-card {
+    -fx-padding: 20;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+    -fx-text-fill: white;
+    -fx-alignment: center;
+}
+
+.dashboard-icon {
+    -fx-font-size: 30px;
+}
+
+.dashboard-label {
+    -fx-font-size: 14px;
+}
+
+.dashboard-value {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+}

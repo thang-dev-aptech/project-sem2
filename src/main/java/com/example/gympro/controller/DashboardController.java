@@ -1,5 +1,6 @@
 package com.example.gympro.controller;
 
+import com.example.gympro.viewModel.DashboardStat;
 import com.example.gympro.viewModel.ExpiringMember;
 import com.example.gympro.viewModel.PieStats;
 import com.example.gympro.viewModel.RevenueData;
@@ -8,7 +9,9 @@ import com.example.gympro.service.ExpiringMemberService;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.NumberAxis;
@@ -17,8 +20,12 @@ import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.text.Text;
+import java.util.*;
 
 public class DashboardController {
+
+    @FXML
+    private GridPane statsGrid;
 
     @FXML
     private TableView<ExpiringMember> tblExpiry;
@@ -59,11 +66,41 @@ public class DashboardController {
 
     @FXML
     private void initialize() {
+        loadDashboardStats();
         setupColumns();
         loadMembers();
         addActionButtonsToTable();
         loadRevenueChart();
         loadMemberPieChart();
+    }
+
+    private void loadDashboardStats() {
+        List<DashboardStat> stats = dashboardService.getDashboardStats();
+        statsGrid.getChildren().clear();
+
+        int col = 0;
+        for (DashboardStat stat : stats) {
+            VBox card = createStatCard(stat);
+            statsGrid.add(card, col++, 0);
+        }
+    }
+
+    private VBox createStatCard(DashboardStat stat) {
+        VBox card = new VBox(10);
+        card.getStyleClass().add("dashboard-card");
+        card.setStyle("-fx-background-color: " + stat.getBgColor());
+
+        Label icon = new Label(stat.getIcon());
+        icon.getStyleClass().add("dashboard-icon");
+
+        Label label = new Label(stat.getLabel());
+        label.getStyleClass().add("dashboard-label");
+
+        Label value = new Label(stat.getValue());
+        value.getStyleClass().add("dashboard-value");
+
+        card.getChildren().addAll(icon, label, value);
+        return card;
     }
 
     private void setupColumns() {

@@ -69,4 +69,75 @@ public class DashboardRepository {
 
         return new PieStats(0, 0, 0);
     }
+
+    public int getTotalMembers() {
+        String sql = "SELECT COUNT(*) AS total FROM members";
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt("total");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    public int getTotalPackages() {
+        String sql = "SELECT COUNT(*) AS total FROM plans";
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt("total");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    public double getTotalRevenueThisMonth() {
+        String sql = """
+                                   SELECT SUM(p.paid_amount) AS total_revenue
+                FROM payments p
+                WHERE p.is_refund = 0
+                  AND YEAR(p.paid_at) = YEAR(CURDATE())
+                  AND MONTH(p.paid_at) = MONTH(CURDATE());
+
+
+                                                """;
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                return rs.getDouble("total_revenue");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    public int getExpiringMembers(int days) {
+        String sql = """
+                    SELECT COUNT(*) AS total
+                    FROM subscriptions
+                   WHERE DATEDIFF(end_date, CURDATE()) BETWEEN 0 AND ?;
+                """;
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, days);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("total");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
 }
