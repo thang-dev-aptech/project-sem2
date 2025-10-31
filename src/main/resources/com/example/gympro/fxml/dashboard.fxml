@@ -3,7 +3,8 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.geometry.Insets?>
-
+<?import javafx.scene.chart.*?>
+<?import javafx.scene.layout.Pane?>
 <ScrollPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.gympro.controller.DashboardController" stylesheets="@../css/styles.css" fitToWidth="true" styleClass="dashboard-scroll">
     <VBox spacing="20" styleClass="dashboard-container">
         <padding>
@@ -25,14 +26,6 @@
                 <ColumnConstraints percentWidth="25" minWidth="200"/>
             </columnConstraints>
         </GridPane>
-          <VBox styleClass="card" spacing="10">
-            <Label text="Quick Actions" styleClass="card-title"/>
-            <HBox spacing="10">
-                <Button fx:id="btnAddMembers" text="+ Add Member" styleClass="primary-button"/>
-                <Button fx:id="btnRegistraction" text="📅 Registration" styleClass="extra-button"/>
-                <Button fx:id="btnPayment" text="💳 Payment" styleClass="extra-button"/>
-            </HBox>
-        </VBox> 
       
 
         <!-- Charts Section -->
@@ -42,21 +35,29 @@
                 <ColumnConstraints percentWidth="34" minWidth="250"/>
             </columnConstraints>
             
-            <!-- Revenue Chart -->
+          
             <VBox styleClass="card" spacing="10" GridPane.columnIndex="0">
-                <Label text="Monthly Revenue" styleClass="card-title"/>
-                <Pane fx:id="revenueChartPane" VBox.vgrow="ALWAYS" prefHeight="300"/>
-            </VBox>
+                 <BarChart fx:id="revenueBarChart" prefWidth="600" prefHeight="400">
+            <xAxis>
+                <CategoryAxis fx:id="xAxis" label="Ngày"/>
+            </xAxis>
+            <yAxis>
+                <NumberAxis fx:id="yAxis" label="Doanh thu (VNĐ)"/>
+            </yAxis>
+        </BarChart>
+            </VBox> 
 
             <!-- Member Status Chart -->
             <VBox styleClass="card" spacing="10" GridPane.columnIndex="1">
-                <Label text="Member Status" styleClass="card-title"/>
-                <Pane fx:id="memberStatusChartPane" VBox.vgrow="ALWAYS" prefHeight="300"/>
+                        <PieChart fx:id="memberPieChart" prefWidth="400" prefHeight="400" title="Trạng thái hội viên"/>
+
             </VBox>
         </GridPane>
 
         <!-- Urgent Reminders -->
-        <VBox fx:id="urgentRemindersBox" spacing="15" styleClass="urgent-reminders-box"/>
+            <VBox fx:id="urgentRemindersBox" spacing="15" styleClass="urgent-reminders-box">
+            <Label text="Urgent Reminders - Expiring Within 3 Days" styleClass="card-title"/>
+        </VBox>
 
         <!-- Members Table -->
         <VBox styleClass="card" spacing="10">

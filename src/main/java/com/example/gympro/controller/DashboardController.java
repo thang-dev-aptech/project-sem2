@@ -1,43 +1,24 @@
 package com.example.gympro.controller;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.example.gympro.viewModel.DashboardStat;
 import com.example.gympro.viewModel.ExpiringMember;
-import com.example.gympro.viewModel.Reminder;
+import com.example.gympro.viewModel.PieStats;
 import com.example.gympro.viewModel.RevenueData;
+import com.example.gympro.service.DashboardService;
 import com.example.gympro.service.ExpiringMemberService;
-import com.example.gympro.utils.DataLoader;
-
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.geometry.Insets;
+import javafx.scene.layout.HBox;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.PieChart;
 import javafx.scene.chart.XYChart;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
-import java.util.ArrayList;
-import java.util.List;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.text.Text;
 
 public class DashboardController {
-    @FXML
-    private GridPane statsGrid;
-    @FXML
-    private Pane revenueChartPane;
-    @FXML
-    private Pane memberStatusChartPane;
-    @FXML
-    private VBox urgentRemindersBox;
 
     @FXML
     private TableView<ExpiringMember> tblExpiry;
@@ -60,35 +41,29 @@ public class DashboardController {
     private Button btnAddMembers;
     @FXML
     private Button btnRegistraction;
-
     @FXML
     private Button btnPayment;
-    @FXML
-    private StackPane mainContentPane;
 
+    @FXML
+    private BarChart<String, Number> revenueBarChart;
+    @FXML
+    private CategoryAxis xAxis;
+    @FXML
+    private NumberAxis yAxis;
+    @FXML
+    private PieChart memberPieChart;
+
+    private final DashboardService dashboardService = new DashboardService();
+    private final ExpiringMemberService memberService = new ExpiringMemberService();
     private ObservableList<ExpiringMember> memberList = FXCollections.observableArrayList();
-    private ExpiringMemberService service = new ExpiringMemberService();
 
     @FXML
     private void initialize() {
-
-        createStatCards();
-        createRevenueChart();
-        createMemberStatusChart();
-        createUrgentReminders();
         setupColumns();
         loadMembers();
         addActionButtonsToTable();
-
-    }
-
-    private void createStatCards() {
-        List<DashboardStat> stats = loadDashboardStats();
-        int col = 0;
-        for (DashboardStat stat : stats) {
-            VBox card = createStatCard(stat.getLabel(), stat.getValue(), stat.getIcon(), stat.getBgColor());
-            statsGrid.add(card, col++, 0);
-        }
+        loadRevenueChart();
+        loadMemberPieChart();
     }
 
     private void setupColumns() {
@@ -98,11 +73,10 @@ public class DashboardController {
         colPackage.setCellValueFactory(new PropertyValueFactory<>("packageName"));
         colEndDate.setCellValueFactory(new PropertyValueFactory<>("expiry"));
         colExpiry.setCellValueFactory(new PropertyValueFactory<>("daysLeft"));
-
     }
 
     private void loadMembers() {
-        memberList = service.getExpiringMembers(3);
+        memberList = memberService.getExpiringMembers(3);
         tblExpiry.setItems(memberList);
     }
 
@@ -113,7 +87,6 @@ public class DashboardController {
             private final Button btnEmail = new Button("📧 Email");
             private final Button btnSMS = new Button("📱 SMS");
             private final Button btnExport = new Button("📤 Xuất");
-
             private final HBox container = new HBox(5, btnExtend, btnCall, btnEmail, btnSMS, btnExport);
 
             {
@@ -133,151 +106,61 @@ public class DashboardController {
         });
     }
 
-    private List<DashboardStat> loadDashboardStats() {
-        List<DashboardStat> stats = new ArrayList<>();
-        JsonArray statsArray = DataLoader.getJsonArray("json/dashboard-stats.json", "stats");
-
-        for (JsonElement element : statsArray) {
-            JsonObject obj = element.getAsJsonObject();
-            stats.add(new DashboardStat(
-                    obj.get("label").getAsString(),
-                    obj.get("value").getAsString(),
-                    obj.get("icon").getAsString(),
-                    obj.get("bgColor").getAsString()));
-        }
-        return stats;
-    }
-
-    private VBox createStatCard(String label, String value, String icon, String bgColor) {
-        VBox card = new VBox(10);
-        card.getStyleClass().add("stat-card");
-        card.setPadding(new Insets(20));
-
-        HBox content = new HBox(15);
-        content.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
-
-        VBox textBox = new VBox(5);
-        Label labelLbl = new Label(label);
-        labelLbl.getStyleClass().add("stat-label");
-        Label valueLbl = new Label(value);
-        valueLbl.getStyleClass().add("stat-value");
-        textBox.getChildren().addAll(labelLbl, valueLbl);
-
-        StackPane iconBox = new StackPane();
-        iconBox.getStyleClass().add("stat-icon");
-        iconBox.setStyle("-fx-background-color: " + bgColor + ";");
-        Label iconLbl = new Label(icon);
-        iconLbl.setStyle("-fx-font-size: 24;");
-        iconBox.getChildren().add(iconLbl);
-        iconBox.setPrefSize(60, 60);
-
-        content.getChildren().addAll(textBox, iconBox);
-        HBox.setHgrow(textBox, javafx.scene.layout.Priority.ALWAYS);
-        card.getChildren().add(content);
-
-        return card;
-    }
-
-    private void createRevenueChart() {
-        List<RevenueData> revenueList = loadRevenueData();
-
-        CategoryAxis xAxis = new CategoryAxis();
-        NumberAxis yAxis = new NumberAxis();
-        BarChart<String, Number> barChart = new BarChart<>(xAxis, yAxis);
-        barChart.setTitle("Monthly Revenue");
-        barChart.setStyle("-fx-font-size: 12;");
+    private void loadRevenueChart() {
+        var revenueList = dashboardService.getMonthlyRevenue();
 
         XYChart.Series<String, Number> series = new XYChart.Series<>();
-        series.setName("Revenue");
+        series.setName("Doanh thu theo tháng");
+
+        String[] months = { "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
 
         for (RevenueData data : revenueList) {
-            series.getData().add(new XYChart.Data<>(data.getMonth(), data.getRevenue()));
+            int month = data.getMonth();
+            double total = data.getTotalRevenue();
+            series.getData().add(new XYChart.Data<>(months[month - 1], total));
         }
 
-        barChart.getData().add(series);
-        revenueChartPane.getChildren().add(barChart);
+        revenueBarChart.getData().clear();
+        revenueBarChart.getData().add(series);
+
+        revenueBarChart.setTitle("Monthly Revenue");
+        xAxis.setLabel("Tháng");
+        yAxis.setLabel("Doanh thu (VND)");
+
     }
 
-    private List<RevenueData> loadRevenueData() {
-        List<RevenueData> revenueList = new ArrayList<>();
-        JsonArray revenueArray = DataLoader.getJsonArray("json/revenue-data.json", "monthlyRevenue");
+    private void loadMemberPieChart() {
+        PieStats stats = dashboardService.getPieStats();
 
-        for (JsonElement element : revenueArray) {
-            JsonObject obj = element.getAsJsonObject();
-            revenueList.add(new RevenueData(
-                    obj.get("month").getAsString(),
-                    obj.get("revenue").getAsInt()));
-        }
-        return revenueList;
+        ObservableList<PieChart.Data> pieData = FXCollections.observableArrayList(
+                new PieChart.Data("Active: " + stats.getActiveMembers(), stats.getActiveMembers()),
+                new PieChart.Data("Expiring: " + stats.getExpiringMembers(), stats.getExpiringMembers()),
+                new PieChart.Data("Expired: " + stats.getExpiredMembers(), stats.getExpiredMembers()));
+
+        memberPieChart.setData(pieData);
+        memberPieChart.setTitle("Member Status");
+        memberPieChart.setLegendVisible(false);
+
+        showDataLabels(memberPieChart);
     }
 
-    private void createMemberStatusChart() {
-        Label chartLabel = new Label("Member Status Chart\n(Pie chart implementation)");
-        chartLabel.setStyle("-fx-font-size: 14; -fx-text-alignment: center;");
-        memberStatusChartPane.getChildren().add(chartLabel);
-    }
+    private void showDataLabels(PieChart chart) {
+        chart.getData().forEach(data -> {
+            Text label = new Text(data.getName());
 
-    private void createUrgentReminders() {
-        Label title = new Label("Urgent Reminders - Expiring Within 3 Days");
-        title.getStyleClass().add("title");
-        title.setStyle("-fx-font-size: 16; -fx-font-weight: bold; -fx-text-fill: #b91c1c;");
-        urgentRemindersBox.getChildren().add(title);
+            data.getNode().parentProperty().addListener((obs, oldParent, parent) -> {
+                if (parent != null) {
+                    ((javafx.scene.Group) parent).getChildren().add(label);
+                }
+            });
 
-        List<Reminder> reminders = loadReminders();
-        for (Reminder reminder : reminders) {
-            VBox reminderCard = createReminderCard(reminder);
-            urgentRemindersBox.getChildren().add(reminderCard);
-        }
-    }
-
-    private List<Reminder> loadReminders() {
-        List<Reminder> reminders = new ArrayList<>();
-        JsonArray remindersArray = DataLoader.getJsonArray("json/urgent-reminders.json", "reminders");
-
-        for (JsonElement element : remindersArray) {
-            JsonObject obj = element.getAsJsonObject();
-            reminders.add(new Reminder(
-                    obj.get("id").getAsString(),
-                    obj.get("name").getAsString(),
-                    obj.get("package").getAsString(),
-                    obj.get("expiryDate").getAsString(),
-                    obj.get("daysLeft").getAsString()));
-        }
-        return reminders;
-    }
-
-    private VBox createReminderCard(Reminder reminder) {
-        VBox card = new VBox(8);
-        card.getStyleClass().add("reminder-card");
-        card.setPadding(new Insets(15));
-
-        // HBox header = new HBox(10);
-        // header.setAlignment(javafx.geometry.Pos.SPACE_BETWEEN);
-        // Label nameLbl = new Label(reminder.getName());
-        // nameLbl.setStyle("-fx-font-weight: bold;");
-        // Label daysLbl = new Label(reminder.getDaysLeft());
-        // daysLbl.getStyleClass().add("badge-caution");
-        // header.getChildren().addAll(nameLbl, daysLbl);
-        HBox header = new HBox(10);
-        Label nameLbl = new Label(reminder.getName());
-        nameLbl.setStyle("-fx-font-weight: bold;");
-        Label daysLbl = new Label(reminder.getDaysLeft());
-        daysLbl.getStyleClass().add("badge-caution");
-
-        // ✅ Thêm một khoảng trống để đẩy 2 label ra hai bên (giống space-between)
-        javafx.scene.layout.Region spacer = new javafx.scene.layout.Region();
-        HBox.setHgrow(spacer, javafx.scene.layout.Priority.ALWAYS);
-
-        // thêm tất cả vào header
-        header.getChildren().addAll(nameLbl, spacer, daysLbl);
-
-        Label idLbl = new Label(reminder.getId());
-        idLbl.setStyle("-fx-font-size: 11; -fx-text-fill: #666666;");
-
-        Label pkgLbl = new Label("Package: " + reminder.getPackageType());
-        Label expiryLbl = new Label("Expires: " + reminder.getExpiryDate());
-
-        card.getChildren().addAll(header, idLbl, pkgLbl, expiryLbl);
-        return card;
+            data.nodeProperty().addListener((obs, oldNode, newNode) -> {
+                if (newNode != null) {
+                    newNode.layoutXProperty().addListener((o, oldX, newX) -> label.setLayoutX(newX.doubleValue()));
+                    newNode.layoutYProperty().addListener((o, oldY, newY) -> label.setLayoutY(newY.doubleValue()));
+                }
+            });
+        });
     }
 }

@@ -1,14 +1,22 @@
 package com.example.gympro.viewModel;
 
 public class RevenueData {
-    private String month;
-    private int revenue;
+    private int month;
+    private double totalRevenue;
 
-    public RevenueData(String month, int revenue) {
+    public RevenueData(int month, double totalRevenue) {
         this.month = month;
-        this.revenue = revenue;
+
+        this.totalRevenue = totalRevenue;
+
     }
 
-    public String getMonth() { return month; }
-    public int getRevenue() { return revenue; }
+    public int getMonth() {
+        return month;
+    }
+
+    public double getTotalRevenue() {
+        return totalRevenue;
+    }
+
 }
