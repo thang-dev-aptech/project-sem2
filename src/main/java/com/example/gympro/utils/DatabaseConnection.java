@@ -23,7 +23,7 @@ public class DatabaseConnection {
         
         try (InputStream input = getClass().getClassLoader().getResourceAsStream("application.properties")) {
             if (input == null) {
-                throw new RuntimeException("application.properties not found!");
+                throw new RuntimeException("application.properties not found in classpath! Make sure it's in src/main/resources/");
             }
             
             prop.load(input);
@@ -72,6 +72,13 @@ public class DatabaseConnection {
      * @throws SQLException if connection fails
      */
     public static Connection getConnection() throws SQLException {
+        // Ensure instance is initialized before using static variables
+        if (instance == null) {
+            getInstance();
+        }
+        if (url == null || username == null || password == null) {
+            throw new SQLException("Database connection not initialized. Call getInstance() first.");
+        }
         return DriverManager.getConnection(url, username, password);
     }
 

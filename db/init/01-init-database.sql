@@ -44,12 +44,18 @@ INSERT IGNORE INTO system_configs(config_key, config_value, config_type, descrip
 ('AUTO_REMINDER_DAYS', '7', 'NUMBER', 'Số ngày nhắc hạn tự động');
 
 -- Create default admin user (password: admin123)
-INSERT IGNORE INTO users (branch_id, username, full_name, email, phone, password_hash, is_active) VALUES
-(1, 'admin', 'Administrator', 'admin@gympro.com', '0123456789', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBOsl7iKTVEFDi', 1);
+-- Use branch by code to avoid hardcoded IDs
+INSERT IGNORE INTO users (branch_id, username, full_name, email, phone, password_hash, is_active)
+SELECT b.id, 'admin', 'Administrator', 'admin@gympro.com', '0123456789',
+       '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBOsl7iKTVEFDi', 1
+FROM branches b
+WHERE b.code = 'BR-001';
 
--- Assign admin role
-INSERT IGNORE INTO user_roles (user_id, role_id) VALUES
-(1, 1); -- admin is OWNER
+-- Assign admin role (OWNER) using subselects to avoid hardcoded IDs
+INSERT IGNORE INTO user_roles (user_id, role_id)
+SELECT u.id, r.id
+FROM users u, roles r
+WHERE u.username = 'admin' AND r.name = 'OWNER';
 
 -- Create sample plans
 INSERT IGNORE INTO plans (branch_id, code, name, description, price, duration_days, is_active) VALUES

@@ -8,6 +8,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import com.example.gympro.GymProApp;
+import com.example.gympro.service.SessionManager;
 import java.io.IOException;
 
 public class MainController {
@@ -84,6 +85,9 @@ public class MainController {
 
     @FXML
     private void handleLogout() {
+        // Clear session
+        SessionManager.getInstance().endSession();
+        
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(GymProApp.class.getResource("/com/example/gympro/fxml/login.fxml"));
             Scene scene = new Scene(fxmlLoader.load(), 1200, 700);

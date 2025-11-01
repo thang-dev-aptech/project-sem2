@@ -12,6 +12,7 @@ module com.example.gympro {
     requires javafx.fxml;
     requires com.google.gson;
     requires java.sql;
+    requires jbcrypt;
 
     opens com.example.gympro.viewModel to com.google.gson;
     opens com.example.gympro.controller to javafx.fxml;
