@@ -674,41 +674,6 @@ END //
 DELIMITER ;
 
 -- =====================================================================
--- SEED DATA MẶC ĐỊNH
--- =====================================================================
-
--- Dữ liệu cơ bản
-INSERT INTO branches(code, name, address, phone) VALUES 
-('BR-001','Chi nhánh 1','123 Đường ABC, Quận 1, TP.HCM','0123-456-789');
-
-INSERT INTO roles(name, description) VALUES 
-('OWNER','Chủ phòng gym'),
-('STAFF','Nhân viên quầy');
-
-INSERT INTO payment_methods(code, display_name) VALUES 
-('CASH','Tiền mặt'),
-('BANK','Chuyển khoản'),
-('QR','Quét QR');
-
--- Chính sách chiết khấu
-INSERT INTO discount_policies(role_name, max_percent, max_amount)
-VALUES ('STAFF', 10.00, 100000.00), ('OWNER', NULL, NULL);
-
--- Cấu hình hệ thống mặc định
-INSERT INTO system_configs(config_key, config_value, config_type, description) VALUES
-('GYM_NAME', 'GymPro Fitness Center', 'STRING', 'Tên phòng gym'),
-('GYM_ADDRESS', '123 Đường ABC, Quận 1, TP.HCM', 'STRING', 'Địa chỉ phòng gym'),
-('GYM_PHONE', '0123-456-789', 'STRING', 'Số điện thoại liên hệ'),
-('GYM_EMAIL', 'info@gympro.com', 'STRING', 'Email liên hệ'),
-('GRACE_DAYS', '5', 'NUMBER', 'Số ngày gia hạn trước khi hết hạn'),
-('MEMBER_CODE_PREFIX', 'GYM', 'STRING', 'Tiền tố mã hội viên'),
-('INVOICE_PREFIX', 'INV', 'STRING', 'Tiền tố số hóa đơn'),
-('CURRENCY_SYMBOL', '₫', 'STRING', 'Ký hiệu tiền tệ'),
-('CURRENCY_FORMAT', 'vi-VN', 'STRING', 'Định dạng tiền tệ'),
-('INVOICE_TEMPLATE', 'default', 'STRING', 'Mẫu hóa đơn mặc định'),
-('BACKUP_RETENTION_DAYS', '30', 'NUMBER', 'Số ngày lưu trữ backup'),
-('AUTO_REMINDER_DAYS', '7', 'NUMBER', 'Số ngày nhắc hạn tự động');
-
--- =====================================================================
--- KẾT THÚC MIGRATION
+-- KẾT THÚC SCHEMA MIGRATION
+-- Lưu ý: Seed data được đặt trong V2__Seed_Data.sql
 -- =====================================================================
