@@ -59,7 +59,7 @@
                         <TableColumn text="Mô tả" prefWidth="200" fx:id="colDescription"/>
                         <TableColumn text="Created At" prefWidth="150" fx:id="colCreatedAt"/>
                         <TableColumn text="Updated At" prefWidth="150" fx:id="colUpdatedAt"/>
-                        <TableColumn text="Hành động" prefWidth="100" fx:id="colActions"/>
+                        <TableColumn text=" " prefWidth="78" fx:id="colActions"/>
                     </columns>
                 </TableView>
             </VBox>
