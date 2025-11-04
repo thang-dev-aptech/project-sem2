@@ -15,18 +15,12 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-
 public class MembersController {
-
-    // KHÔNG CẦN JSON_FILE_PATH NỮA
-    // private static final String JSON_FILE_PATH = "src/main/resources/json/members.json";
 
     @FXML
     private TableView<Member> membersTable;
 
     private ObservableList<Member> memberData = FXCollections.observableArrayList();
-    // KHÔNG CẦN GSON FIELD NỮA
-    // private final Gson gson = new Gson();
 
     @FXML
     private void initialize() {

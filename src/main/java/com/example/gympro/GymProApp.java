@@ -20,7 +20,7 @@ public class GymProApp extends Application {
             // Continue anyway - show error in UI
         }
         
-        FXMLLoader fxmlLoader = new FXMLLoader(GymProApp.class.getResource("/com/example/gympro/fxml/login.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(GymProApp.class.getResource("/com/example/gympro/fxml/main.fxml"));
         Scene scene = new Scene(fxmlLoader.load(), 1200, 700);
         stage.setTitle("GymPro - Gym Management System");
         stage.setScene(scene);
