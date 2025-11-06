@@ -1,62 +1,66 @@
-// File: src/main/java/com/gympro.model/Member.java
 package com.example.gympro.viewModel;
 
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import javafx.beans.property.*;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class Member {
 
-    // Khai báo các trường sử dụng final StringProperty
-    private final StringProperty id;
-    private final StringProperty name;
-    private final StringProperty email;
-    private final StringProperty phone;
-    private final StringProperty joinDate;
-    private final StringProperty status;
-    private final StringProperty packageType;
+    private final LongProperty id = new SimpleLongProperty(0);
+    private final LongProperty branchId = new SimpleLongProperty(1);
+    private final StringProperty memberCode = new SimpleStringProperty("");
+    private final StringProperty fullName = new SimpleStringProperty("");
+    private final StringProperty phone = new SimpleStringProperty("");
+    private final StringProperty email = new SimpleStringProperty("");
+    private final StringProperty gender = new SimpleStringProperty("OTHER");
+    private final ObjectProperty<LocalDate> dob = new SimpleObjectProperty<>();
+    private final StringProperty address = new SimpleStringProperty("");
+    private final StringProperty status = new SimpleStringProperty("PENDING");
+    private final StringProperty note = new SimpleStringProperty("");
+    private final ObjectProperty<LocalDateTime> createdAt = new SimpleObjectProperty<>();
+    private final ObjectProperty<LocalDateTime> updatedAt = new SimpleObjectProperty<>();
 
-    // Constructor: Khởi tạo SimpleStringProperty
-    public Member(String id, String name, String email, String phone, String joinDate, String status, String packageType) {
-        this.id = new SimpleStringProperty(id);
-        this.name = new SimpleStringProperty(name);
-        this.email = new SimpleStringProperty(email);
-        this.phone = new SimpleStringProperty(phone);
-        this.joinDate = new SimpleStringProperty(joinDate);
-        this.status = new SimpleStringProperty(status);
-        this.packageType = new SimpleStringProperty(packageType);
-    }
+    public Member() {}
 
-    // ===============================================
-    // GETTERS CHO PROPERTY (Dùng cho TableView)
-    // ===============================================
-    public StringProperty idProperty() { return id; }
-    public StringProperty nameProperty() { return name; }
-    public StringProperty emailProperty() { return email; }
-    public StringProperty phoneProperty() { return phone; }
-    public StringProperty joinDateProperty() { return joinDate; }
-    public StringProperty statusProperty() { return status; }
-    public StringProperty packageTypeProperty() { return packageType; }
-
-    // ===============================================
-    // GETTERS CHO GIÁ TRỊ (Dùng cho logic)
-    // ===============================================
-    public String getId() { return id.get(); }
-    public String getName() { return name.get(); }
-    public String getEmail() { return email.get(); }
+    // --- Getters cho Repository ---
+    public long getId() { return id.get(); }
+    public long getBranchId() { return branchId.get(); }
+    public String getMemberCode() { return memberCode.get(); }
+    public String getFullName() { return fullName.get(); }
     public String getPhone() { return phone.get(); }
-    public String getJoinDate() { return joinDate.get(); }
+    public String getEmail() { return email.get(); }
+    public String getGender() { return gender.get(); }
+    public LocalDate getDob() { return dob.get(); }
+    public String getAddress() { return address.get(); }
     public String getStatus() { return status.get(); }
-    public String getPackageType() { return packageType.get(); }
+    public String getNote() { return note.get(); }
+    public LocalDateTime getCreatedAt() { return createdAt.get(); }
+    public LocalDateTime getUpdatedAt() { return updatedAt.get(); }
 
-    // ===============================================
-    // SETTERS (Dùng để cập nhật dữ liệu)
-    // ===============================================
-    // Setter phải set lên Property để TableView tự động cập nhật
-    public void setId(String id) { this.id.set(id); }
-    public void setJoinDate(String joinDate) { this.joinDate.set(joinDate); }
-    public void setName(String name) { this.name.set(name); }
-    public void setEmail(String email) { this.email.set(email); }
+    // --- Setters cho Repository & Controller ---
+    public void setId(long id) { this.id.set(id); }
+    public void setBranchId(long branchId) { this.branchId.set(branchId); }
+    public void setMemberCode(String code) { this.memberCode.set(code); }
+    public void setFullName(String name) { this.fullName.set(name); }
     public void setPhone(String phone) { this.phone.set(phone); }
+    public void setEmail(String email) { this.email.set(email); }
+    public void setGender(String gender) { this.gender.set(gender); }
+    public void setDob(LocalDate dob) { this.dob.set(dob); }
+    public void setAddress(String address) { this.address.set(address); }
     public void setStatus(String status) { this.status.set(status); }
-    public void setPackageType(String packageType) { this.packageType.set(packageType); }
+    public void setNote(String note) { this.note.set(note); }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt.set(createdAt); }
+    public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt.set(updatedAt); }
+
+    // --- Property Getters (cho JavaFX Binding) ---
+    public LongProperty idProperty() { return id; }
+    public StringProperty memberCodeProperty() { return memberCode; }
+    public StringProperty fullNameProperty() { return fullName; }
+    public StringProperty phoneProperty() { return phone; }
+    public StringProperty emailProperty() { return email; }
+    public StringProperty genderProperty() { return gender; }
+    public ObjectProperty<LocalDate> dobProperty() { return dob; }
+    public StringProperty statusProperty() { return status; }
+    public ObjectProperty<LocalDateTime> createdAtProperty() { return createdAt; }
+    public ObjectProperty<LocalDateTime> updatedAtProperty() { return updatedAt; }
 }

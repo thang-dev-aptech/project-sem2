@@ -42,7 +42,7 @@ public class RegistrationController {
             public String toString(Member member) {
                 // Nếu member là null, hiển thị rỗng, ngược lại hiển thị tên
                 // Bạn có thể đổi member.getName() thành bất cứ thứ gì bạn muốn
-                return (member == null) ? "" : member.getName();
+                return (member == null) ? "" : member.getFullName();
             }
 
             @Override
@@ -83,7 +83,7 @@ public class RegistrationController {
      */
     private void loadMemberData() {
         try {
-            ObservableList<Member> members = memberService.getAllMembers();
+            ObservableList<Member> members = (ObservableList<Member>) memberService.getAllMembers();
             memberComboBox.setItems(members);
         } catch (Exception e) {
             System.err.println("Không thể tải danh sách thành viên: " + e.getMessage());
@@ -115,8 +115,8 @@ public class RegistrationController {
         }
 
         // Bây giờ bạn có thể truy cập bất kỳ thông tin nào từ thành viên đã chọn
-        String memberId = selectedMember.getId();
-        String memberName = selectedMember.getName();
+        Long memberId = selectedMember.getId();
+        String memberName = selectedMember.getFullName();
 
         System.out.println("Đã chọn Thành viên ID: " + memberId);
         System.out.println("Tên thành viên: " + memberName);
