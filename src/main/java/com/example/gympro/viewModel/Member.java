@@ -22,6 +22,9 @@ public class Member {
 
     public Member() {}
 
+    public Member(String memId, String fullName, String email, String phone, String joinDate, String memStatus, String packageType) {
+    }
+
     // --- Getters cho Repository ---
     public long getId() { return id.get(); }
     public long getBranchId() { return branchId.get(); }

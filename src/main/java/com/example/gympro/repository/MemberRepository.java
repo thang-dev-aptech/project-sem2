@@ -53,7 +53,7 @@ public class MemberRepository implements MemberRepositoryInterface {
 
         sqlBuilder.append(" ORDER BY id DESC");
 
-        try (Connection conn = dbConnection.getConnection();
+        try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sqlBuilder.toString())) {
 
             for (int i = 0; i < params.size(); i++) {
@@ -74,7 +74,7 @@ public class MemberRepository implements MemberRepositoryInterface {
 
     @Override
     public Optional<Member> insert(Member member) {
-        try (Connection conn = dbConnection.getConnection();
+        try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)) {
 
             // Hàm setMemberParams đúng cho INSERT (10 tham số)
@@ -99,7 +99,7 @@ public class MemberRepository implements MemberRepositoryInterface {
     // === SỬA LỖI TRONG HÀM UPDATE ===
     @Override
     public boolean update(Member member) {
-        try (Connection conn = dbConnection.getConnection();
+        try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(UPDATE_SQL)) {
 
             // KHÔNG GỌI setMemberParams(pstmt, member) vì nó bao gồm cả branch_id
@@ -131,7 +131,7 @@ public class MemberRepository implements MemberRepositoryInterface {
     @Override
     public boolean delete(long id) {
         // ... (Hàm này giữ nguyên, không thay đổi) ...
-        try (Connection conn = dbConnection.getConnection();
+        try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(DELETE_SQL)) {
             pstmt.setLong(1, id);
             return pstmt.executeUpdate() > 0;

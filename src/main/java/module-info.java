@@ -8,6 +8,7 @@ module com.example.gympro {
     requires org.controlsfx.controls;
     requires org.kordamp.bootstrapfx.core;
     requires com.google.gson;
+    requires java.net.http;
     // Note: MySQL connector loaded via Class.forName(), no module declaration needed
     
     // Logging (optional - only if directly used in code)
