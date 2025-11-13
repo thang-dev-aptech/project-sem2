@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import java.lang.String?>
+
+<!--
+  GIAO DIỆN QUẢN LÝ HỘI VIÊN
+  Thiết kế theo mô hình 2 hàng (SplitPane Dọc)
+-->
+
+<ScrollPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.example.gympro.controller.MembersController"
+            stylesheets="@../css/styles.css" fitToWidth="true" styleClass="dashboard-scroll">
+
+    <VBox spacing="20" styleClass="dashboard-container">
+        <padding>
+            <Insets top="30" left="30" right="30" bottom="30"/>
+        </padding>
+
+        <!-- HEADER -->
+        <VBox spacing="5">
+            <Label text="Quản lý Hội viên" styleClass="page-title"/>
+            <Label text="Tạo và quản lý thông tin hội viên." styleClass="page-subtitle"/>
+        </VBox>
+
+        <!-- THANH CÔNG CỤ (ToolBar) -->
+        <ToolBar styleClass="tool-bar">
+            <items>
+                <TextField promptText="🔍 Tìm kiếm (Mã, Tên, SĐT, Email)..." fx:id="searchField" prefWidth="250"/>
+                <ComboBox fx:id="statusFilter" promptText="📊 Trạng thái" prefWidth="120"/>
+                <Separator orientation="VERTICAL"/>
+                <Button text="➕ Thêm Hội viên" styleClass="icon-button, success" onAction="#handleNewMember"/>
+                <Button text="🔄 Làm mới" styleClass="icon-button" onAction="#loadMembers"/>
+                <Button text="📤 Xuất Excel" styleClass="icon-button" disable="true"/>
+            </items>
+        </ToolBar>
+
+        <!-- SPLIT PANE (CHIA DỌC) -->
+        <SplitPane VBox.vgrow="ALWAYS" dividerPositions="0.55" orientation="VERTICAL" styleClass="main-split-pane">
+
+            <!-- HÀNG 1: TABLE VIEW (Danh sách Hội viên) -->
+            <VBox styleClass="card" spacing="10" minHeight="300">
+                <padding>
+                    <Insets top="20" right="20" bottom="10" left="20"/>
+                </padding>
+                <Label text="Bảng danh sách hội viên" styleClass="card-title"/>
+                <TableView fx:id="membersTable" VBox.vgrow="ALWAYS">
+                    <columns>
+                        <TableColumn text="Mã HV" prefWidth="100" fx:id="colMemberCode"/>
+                        <TableColumn text="Họ Tên" prefWidth="150" fx:id="colFullName"/>
+                        <TableColumn text="Điện thoại" prefWidth="120" fx:id="colPhone"/>
+                        <TableColumn text="Email" prefWidth="180" fx:id="colEmail"/>
+                        <TableColumn text="Trạng thái" prefWidth="100" fx:id="colStatus"/>
+                        <TableColumn text="Giới tính" prefWidth="80" fx:id="colGender"/>
+                        <TableColumn text="Ngày sinh" prefWidth="100" fx:id="colDOB"/>
+                        <TableColumn text="Ngày tạo" prefWidth="150" fx:id="colCreatedAt"/>
+                        <TableColumn text="Cập nhật" prefWidth="150" fx:id="colUpdatedAt"/>
+                        <TableColumn text=" " prefWidth="78" fx:id="colActions"/>
+                    </columns>
+                </TableView>
+            </VBox>
+
+            <!-- HÀNG 2: FORM CHI TIẾT (Bố cục VBox) -->
+            <VBox fx:id="detailPane" spacing="15" styleClass="card, detail-form-container" minHeight="350">
+                <padding>
+                    <Insets top="20" right="20" bottom="10" left="20"/>
+                </padding>
+
+                <Label fx:id="formTitle" text="Chi tiết Hội viên" styleClass="card-title"/>
+                <Separator styleClass="form-separator"/>
+
+                <!-- FORM INPUTS (GridPane) -->
+                <GridPane hgap="20" vgap="15">
+                    <columnConstraints>
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="100" prefWidth="120"/>
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="100" prefWidth="250"/>
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="100" prefWidth="120"/>
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="100" prefWidth="250"/>
+                    </columnConstraints>
+
+                    <Label text="Mã Hội viên:" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                    <TextField fx:id="codeField" promptText="MEM-001" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+
+                    <Label text="Trạng thái:" GridPane.columnIndex="2" GridPane.rowIndex="0"/>
+                    <ComboBox fx:id="statusComboBox" prefWidth="Infinity" GridPane.columnIndex="3" GridPane.rowIndex="0"/>
+
+                    <Label text="Họ và Tên:" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                    <TextField fx:id="fullNameField" promptText="Nguyễn Văn A" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+
+                    <Label text="Giới tính:" GridPane.columnIndex="2" GridPane.rowIndex="1"/>
+                    <ComboBox fx:id="genderComboBox" prefWidth="Infinity" GridPane.columnIndex="3" GridPane.rowIndex="1"/>
+
+                    <Label text="Điện thoại:" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+                    <TextField fx:id="phoneField" promptText="090xxxxxxx" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+
+                    <Label text="Ngày sinh:" GridPane.columnIndex="2" GridPane.rowIndex="2"/>
+                    <DatePicker fx:id="dobPicker" prefWidth="Infinity" GridPane.columnIndex="3" GridPane.rowIndex="2"/>
+
+                    <Label text="Email:" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
+                    <TextField fx:id="emailField" promptText="example@mail.com" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+
+                    <Label text="Địa chỉ:" GridPane.columnIndex="0" GridPane.rowIndex="4"/>
+                    <TextArea fx:id="addressArea" wrapText="true" prefHeight="60"
+                              GridPane.columnIndex="1" GridPane.rowIndex="4"
+                              GridPane.columnSpan="3"/>
+
+                    <Label text="Ghi chú:" GridPane.columnIndex="0" GridPane.rowIndex="5"/>
+                    <TextArea fx:id="noteArea" wrapText="true" prefHeight="60"
+                              GridPane.columnIndex="1" GridPane.rowIndex="5"
+                              GridPane.columnSpan="3"/>
+                </GridPane>
+
+                <!-- BUTTONS GROUP -->
+                <HBox spacing="10" alignment="CENTER_RIGHT" styleClass="button-group">
+                    <VBox.margin>
+                        <Insets top="-5"/>
+                    </VBox.margin>
+
+                    <Button fx:id="deleteButton" text="Xóa" styleClass="delete-button" onAction="#handleDelete"/>
+                    <Button text="Hủy" styleClass="secondary-button" onAction="#handleCancel"/>
+                    <Button fx:id="saveButton" text="💾 Lưu" styleClass="primary-button" onAction="#handleSave"/>
+                </HBox>
+            </VBox>
+        </SplitPane>
+    </VBox>
+</ScrollPane>
