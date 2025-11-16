@@ -27,13 +27,15 @@ public class RegistrationService implements RegistrationServiceInterface {
     }
 
     @Override
-    public boolean createRegistrationAndInvoice(Member member, Plan plan, LocalDate startDate, LocalDate endDate, long createdByUserId) {
+    public boolean createRegistrationAndInvoice(Member member, Plan plan, LocalDate startDate, LocalDate endDate,
+            long createdByUserId) {
         Connection conn = null;
         try {
             conn = DatabaseConnection.getConnection();
             conn.setAutoCommit(false);
 
-            long subscriptionId = registrationRepository.createSubscription(conn, member, plan, startDate, endDate, createdByUserId);
+            long subscriptionId = registrationRepository.createSubscription(conn, member, plan, startDate, endDate,
+                    createdByUserId);
             long invoiceId = registrationRepository.createInvoice(conn, member, plan, subscriptionId, createdByUserId);
             boolean itemCreated = registrationRepository.createInvoiceItem(conn, plan, invoiceId);
 
@@ -46,7 +48,12 @@ public class RegistrationService implements RegistrationServiceInterface {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            try { if (conn != null) conn.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
+            try {
+                if (conn != null)
+                    conn.rollback();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
             return false;
         } finally {
             try {
@@ -54,7 +61,20 @@ public class RegistrationService implements RegistrationServiceInterface {
                     conn.setAutoCommit(true);
                     conn.close();
                 }
-            } catch (SQLException e) { e.printStackTrace(); }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
     }
+
+    public Member getMemberById(long id) {
+        List<Member> members = memberRepository.findAll(null, null);
+        return members.stream().filter(m -> m.getId() == id).findFirst().orElse(null);
+    }
+
+    public Plan getPlanByName(String name) {
+        List<Plan> plans = planRepository.findAllActive();
+        return plans.stream().filter(p -> p.getName().equals(name)).findFirst().orElse(null);
+    }
+
 }

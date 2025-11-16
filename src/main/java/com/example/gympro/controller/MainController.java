@@ -10,6 +10,7 @@ import javafx.stage.Stage;
 import com.example.gympro.GymProApp;
 import com.example.gympro.service.SessionManager;
 import java.io.IOException;
+import com.example.gympro.viewModel.*;;
 
 public class MainController {
     @FXML
@@ -21,10 +22,21 @@ public class MainController {
 
     private String currentScreen = "dashboard";
 
+    private static MainController instance;
+
     @FXML
     private void initialize() {
+        instance = this;
         createNavButtons();
         loadScreen("dashboard");
+
+        if (contentArea.getScene() != null) {
+            contentArea.getScene().getRoot().setUserData(this);
+        }
+    }
+
+    public static MainController getInstance() {
+        return instance;
     }
 
     private void createNavButtons() {
@@ -63,6 +75,7 @@ public class MainController {
         try {
             String fxmlFile = switch (screenId) {
                 case "dashboard" -> "/com/example/gympro/fxml/dashboard.fxml";
+
                 case "members" -> "/com/example/gympro/fxml/members.fxml";
                 case "packages" -> "/com/example/gympro/fxml/packages.fxml";
                 case "registration" -> "/com/example/gympro/fxml/registration.fxml";
@@ -87,7 +100,7 @@ public class MainController {
     private void handleLogout() {
         // Clear session
         SessionManager.getInstance().endSession();
-        
+
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(GymProApp.class.getResource("/com/example/gympro/fxml/login.fxml"));
             Scene scene = new Scene(fxmlLoader.load(), 1200, 700);
@@ -97,4 +110,21 @@ public class MainController {
             e.printStackTrace();
         }
     }
+
+    public void navigateToRegistration(ExpiringMember expiringMember) {
+        try {
+            String fxmlFile = "/com/example/gympro/fxml/registration.fxml";
+            FXMLLoader fxmlLoader = new FXMLLoader(GymProApp.class.getResource(fxmlFile));
+            contentArea.getChildren().clear();
+            contentArea.getChildren().add(fxmlLoader.load());
+
+            RegistrationController controller = fxmlLoader.getController();
+            if (controller != null && expiringMember != null) {
+                controller.fillFormForRenewal(expiringMember);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 }

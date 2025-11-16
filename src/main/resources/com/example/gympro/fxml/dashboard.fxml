@@ -33,13 +33,14 @@
             <columnConstraints>
                 <ColumnConstraints percentWidth="66" minWidth="300"/>
                 <ColumnConstraints percentWidth="34" minWidth="250"/>
+                
             </columnConstraints>
             
           
             <VBox styleClass="card" spacing="10" GridPane.columnIndex="0">
                  <BarChart fx:id="revenueBarChart" prefWidth="600" prefHeight="400">
             <xAxis>
-                <CategoryAxis fx:id="xAxis" label="Ngày"/>
+                <CategoryAxis fx:id="xAxis" label="Tháng"/>
             </xAxis>
             <yAxis>
                 <NumberAxis fx:id="yAxis" label="Doanh thu (VNĐ)"/>
@@ -52,6 +53,22 @@
                         <PieChart fx:id="memberPieChart" prefWidth="400" prefHeight="400" title="Trạng thái hội viên"/>
 
             </VBox>
+
+        <!-- Top Selling Packages Table -->
+        <!-- <VBox styleClass="card" spacing="10" GridPane.columnIndex="1">
+            <Label text="Top gói bán chạy" styleClass="card-title"/>
+            <TableView fx:id="tblTopPackages" prefHeight="150">
+                <columns>
+                    <TableColumn fx:id="colRank" text="#" prefWidth="40"/>
+                    <TableColumn fx:id="colPackageName" text="Tên gói" prefWidth="50"/>
+                    <TableColumn fx:id="colSoldCount" text="Số HĐ" prefWidth="80"/>
+                </columns>
+            </TableView>
+        </VBox> -->
+
+
+
+
         </GridPane>
 
         <!-- Urgent Reminders -->

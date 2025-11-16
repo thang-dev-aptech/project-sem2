@@ -38,7 +38,7 @@ public class DashboardController {
     @FXML
     private TableColumn<ExpiringMember, String> colPackage;
     @FXML
-    private TableColumn<ExpiringMember, String> colExpiry;
+    private TableColumn<ExpiringMember, Integer> colExpiry;
     @FXML
     private TableColumn<ExpiringMember, String> colEndDate;
     @FXML
@@ -149,21 +149,16 @@ public class DashboardController {
         XYChart.Series<String, Number> series = new XYChart.Series<>();
         series.setName("Doanh thu theo tháng");
 
-        String[] months = { "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-                "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
-
         for (RevenueData data : revenueList) {
-            int month = data.getMonth();
+            String monthLabel = data.getLabel();
             double total = data.getTotalRevenue();
-            series.getData().add(new XYChart.Data<>(months[month - 1], total));
+            series.getData().add(new XYChart.Data<>(monthLabel, total));
         }
 
         revenueBarChart.getData().clear();
         revenueBarChart.getData().add(series);
 
-        revenueBarChart.setTitle("Monthly Revenue");
-        xAxis.setLabel("Tháng");
-        yAxis.setLabel("Doanh thu (VND)");
+        revenueBarChart.setTitle("Doanh thu theo tháng");
 
     }
 

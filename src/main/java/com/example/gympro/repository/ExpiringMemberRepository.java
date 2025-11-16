@@ -9,6 +9,7 @@ import java.time.temporal.ChronoUnit;
 
 import com.example.gympro.utils.DatabaseConnection;
 import com.example.gympro.viewModel.ExpiringMember;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -17,7 +18,7 @@ public class ExpiringMemberRepository {
         ObservableList<ExpiringMember> list = FXCollections.observableArrayList();
         String sql = """
                 SELECT
-                m.id,
+                m.member_code,
                 m.full_name,
                 m.phone,
                 p.name AS packageName,
@@ -38,7 +39,7 @@ public class ExpiringMemberRepository {
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
-                String id = rs.getString("id");
+                String id = rs.getString("member_code");
                 String name = rs.getString("full_name");
                 String phone = rs.getString("phone");
                 String packageName = rs.getString("packageName");
@@ -53,4 +54,5 @@ public class ExpiringMemberRepository {
         }
         return list;
     }
+
 }

@@ -51,4 +51,15 @@ public class ExpiringMember {
         this.status = status;
     }
 
+    public Member toMember() {
+        return new Member(
+                this.getId(),
+                this.getName(),
+                "",
+                this.getPhone(),
+                this.getExpiry(),
+                "ACTIVE",
+                this.getPackageName());
+    }
+
 }

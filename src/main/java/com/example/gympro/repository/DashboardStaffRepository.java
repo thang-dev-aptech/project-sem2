@@ -4,35 +4,29 @@ import java.sql.*;
 import java.util.*;
 
 import com.example.gympro.utils.DatabaseConnection;
-import com.example.gympro.viewModel.PieStats;
 import com.example.gympro.viewModel.RevenueData;
 
-public class DashboardRepository {
+public class DashboardStaffRepository {
 
-    public List<RevenueData> getMonthlyRevenue() {
+    public List<RevenueData> getDailyRevenue() {
         List<RevenueData> list = new ArrayList<>();
         String sql = """
-                    SELECT MONTH(p.paid_at) AS metric_month, SUM(p.paid_amount) AS total_revenue
+                    SELECT DATE(p.paid_at) as chart_date, SUM(p.paid_amount) as daily_revenue
                     FROM payments p
-                    WHERE p.is_refund = 0 AND YEAR(p.paid_at) = YEAR(CURDATE())
-                    GROUP BY MONTH(p.paid_at)
-                    ORDER BY metric_month
+                    WHERE p.is_refund = 0
+                      AND p.paid_at >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
+                    GROUP BY DATE(p.paid_at)
+                    ORDER BY chart_date ASC;
                 """;
 
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);
                 ResultSet rs = ps.executeQuery()) {
 
-            Map<Integer, Double> monthMap = new HashMap<>();
             while (rs.next()) {
-                int month = rs.getInt("metric_month");
-                double total = rs.getDouble("total_revenue");
-                monthMap.put(month, total);
-            }
-
-            for (int i = 1; i <= 12; i++) {
-                double total = monthMap.getOrDefault(i, 0.0);
-                list.add(new RevenueData("Tháng " + i, total));
+                String date = rs.getDate("chart_date").toString();
+                double total = rs.getDouble("daily_revenue");
+                list.add(new RevenueData(date, total));
             }
 
         } catch (SQLException e) {
@@ -42,36 +36,8 @@ public class DashboardRepository {
         return list;
     }
 
-    public PieStats getPieStats() {
-        String sql = """
-                    SELECT
-                        SUM(CASE WHEN s.end_date > CURDATE() THEN 1 ELSE 0 END) AS active_members,
-                        SUM(CASE WHEN s.end_date BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 7 DAY) THEN 1 ELSE 0 END) AS expiring_members,
-                        SUM(CASE WHEN s.end_date < CURDATE() THEN 1 ELSE 0 END) AS expired_members
-                    FROM subscriptions s;
-                """;
-
-        try (Connection conn = DatabaseConnection.getInstance().getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql);
-                ResultSet rs = ps.executeQuery()) {
-
-            if (rs.next()) {
-                int active = rs.getInt("active_members");
-                int expiring = rs.getInt("expiring_members");
-                int expired = rs.getInt("expired_members");
-
-                return new PieStats(active, expiring, expired);
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return new PieStats(0, 0, 0);
-    }
-
-    public int getTotalMembers() {
-        String sql = "SELECT COUNT(*) AS total FROM members";
+    public int getTotalInvoices() {
+        String sql = "SELECT COUNT(*) AS total FROM invoices";
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);
                 ResultSet rs = ps.executeQuery()) {
@@ -98,16 +64,13 @@ public class DashboardRepository {
         return 0;
     }
 
-    public double getTotalRevenueThisMonth() {
+    public double getTotalRevenueThisDay() {
         String sql = """
-                SELECT SUM(p.paid_amount) AS total_revenue
-                FROM payments p
-                WHERE p.is_refund = 0
-                  AND YEAR(p.paid_at) = YEAR(CURDATE())
-                  AND MONTH(p.paid_at) = MONTH(CURDATE());
-
-
-                                                """;
+                      SELECT SUM(p.paid_amount) AS total_revenue
+                      FROM payments p
+                      WHERE p.is_refund = 0
+                        AND DATE(p.paid_at) = DATE(CURDATE())
+                """;
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);
                 ResultSet rs = ps.executeQuery()) {

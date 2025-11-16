@@ -32,7 +32,7 @@ public class DashboardService {
 
         stats.add(new DashboardStat("Tổng học viên", String.valueOf(totalMembers), "👥", "#4CAF50"));
         stats.add(new DashboardStat("Tổng số gói", String.valueOf(totalPackages), "📦", "#2196F3"));
-        stats.add(new DashboardStat("Doanh thu tháng", String.format("%,.0f VND", revenueThisMonth * 1000), "💰",
+        stats.add(new DashboardStat("Doanh thu tháng", String.format("%,.0f VND", revenueThisMonth), "💰",
                 "#FFC107"));
         stats.add(new DashboardStat("Sắp hết hạn", String.valueOf(expiringMembers), "⏰", "#F44336"));
 

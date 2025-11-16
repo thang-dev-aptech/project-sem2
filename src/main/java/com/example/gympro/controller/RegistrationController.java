@@ -2,6 +2,7 @@ package com.example.gympro.controller;
 
 import com.example.gympro.service.RegistrationService;
 import com.example.gympro.service.RegistrationServiceInterface;
+import com.example.gympro.viewModel.ExpiringMember;
 import com.example.gympro.viewModel.Member;
 import com.example.gympro.viewModel.Plan;
 import javafx.collections.FXCollections; // <-- Quan trọng
@@ -13,22 +14,34 @@ import javafx.util.StringConverter;
 import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.List; // <-- Quan trọng
 
 public class RegistrationController {
 
     // --- FXML Injections ---
-    @FXML private ComboBox<Member> memberComboBox;
-    @FXML private ComboBox<Plan> packageComboBox;
-    @FXML private DatePicker startDatePicker;
-    @FXML private TextField endDateField;
-    @FXML private Button createButton;
-    @FXML private Label summaryMemberLabel;
-    @FXML private Label summaryPackageLabel;
-    @FXML private Label summaryDurationLabel;
-    @FXML private Label summaryStartDateLabel;
-    @FXML private Label summaryEndDateLabel;
-    @FXML private Label summaryAmountLabel;
+    @FXML
+    private ComboBox<Member> memberComboBox;
+    @FXML
+    private ComboBox<Plan> packageComboBox;
+    @FXML
+    private DatePicker startDatePicker;
+    @FXML
+    private TextField endDateField;
+    @FXML
+    private Button createButton;
+    @FXML
+    private Label summaryMemberLabel;
+    @FXML
+    private Label summaryPackageLabel;
+    @FXML
+    private Label summaryDurationLabel;
+    @FXML
+    private Label summaryStartDateLabel;
+    @FXML
+    private Label summaryEndDateLabel;
+    @FXML
+    private Label summaryAmountLabel;
 
     // --- Service ---
     private final RegistrationServiceInterface registrationService = new RegistrationService();
@@ -96,8 +109,7 @@ public class RegistrationController {
 
         // Gọi Service (Bộ não)
         boolean success = registrationService.createRegistrationAndInvoice(
-                selectedMember, selectedPlan, startDate, endDate, CURRENT_USER_ID
-        );
+                selectedMember, selectedPlan, startDate, endDate, CURRENT_USER_ID);
 
         if (success) {
             showAlert(Alert.AlertType.INFORMATION, "Thành công",
@@ -112,21 +124,33 @@ public class RegistrationController {
 
     private void setupMemberComboBox() {
         memberComboBox.setConverter(new StringConverter<>() {
-            @Override public String toString(Member member) {
+            @Override
+            public String toString(Member member) {
                 return (member == null) ? "Chọn hội viên..." : member.getFullName() + " (ID: " + member.getId() + ")";
             }
-            @Override public Member fromString(String string) { return null; }
+
+            @Override
+            public Member fromString(String string) {
+                return null;
+            }
         });
         memberComboBox.setPromptText("Chọn hội viên...");
     }
 
     private void setupPackageComboBox() {
         packageComboBox.setConverter(new StringConverter<>() {
-            @Override public String toString(Plan plan) {
-                if (plan == null) return "Chọn gói tập...";
-                return plan.getName() + " - " + plan.getDurationDays() + " ngày (" + moneyFormatter.format(plan.getPrice()) + ")";
+            @Override
+            public String toString(Plan plan) {
+                if (plan == null)
+                    return "Chọn gói tập...";
+                return plan.getName() + " - " + plan.getDurationDays() + " ngày ("
+                        + moneyFormatter.format(plan.getPrice()) + ")";
             }
-            @Override public Plan fromString(String string) { return null; }
+
+            @Override
+            public Plan fromString(String string) {
+                return null;
+            }
         });
         packageComboBox.setPromptText("Chọn gói tập...");
     }
@@ -178,4 +202,69 @@ public class RegistrationController {
         alert.setContentText(content);
         alert.showAndWait();
     }
+
+    public void fillFormForRenewal(ExpiringMember expMember) {
+        if (expMember == null)
+            return;
+
+        String memberCode = expMember.getId();
+        Member foundMember = null;
+
+        for (Member member : memberComboBox.getItems()) {
+            if (member.getMemberCode().equals(memberCode)) {
+                foundMember = member;
+                break;
+            }
+        }
+
+        if (foundMember != null) {
+            memberComboBox.setValue(foundMember);
+        } else {
+            for (Member member : memberComboBox.getItems()) {
+                if (member.getPhone().equals(expMember.getPhone())) {
+                    foundMember = member;
+                    break;
+                }
+            }
+            if (foundMember != null) {
+                memberComboBox.setValue(foundMember);
+            } else {
+                showAlert(Alert.AlertType.WARNING, "Không tìm thấy hội viên",
+                        "Không tìm thấy hội viên với mã: " + memberCode);
+            }
+        }
+
+        String packageName = expMember.getPackageName();
+        if (packageName != null) {
+            for (Plan plan : packageComboBox.getItems()) {
+                if (plan.getName().equals(packageName)) {
+                    packageComboBox.setValue(plan);
+                    break;
+                }
+            }
+        }
+
+        LocalDate currentEndDate = null;
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        try {
+            currentEndDate = LocalDate.parse(expMember.getExpiry(), formatter);
+        } catch (DateTimeParseException ex) {
+            ex.printStackTrace();
+        }
+
+        LocalDate today = LocalDate.now();
+        LocalDate startDate = (currentEndDate != null && currentEndDate.isAfter(today))
+                ? currentEndDate.plusDays(1)
+                : today;
+        startDatePicker.setValue(startDate);
+
+        Plan selectedPlan = packageComboBox.getValue();
+        if (selectedPlan != null) {
+            LocalDate endDate = startDate.plusDays(selectedPlan.getDurationDays() - 1);
+            endDateField.setText(endDate.format(formatter));
+        }
+
+        updateSummary();
+    }
+
 }

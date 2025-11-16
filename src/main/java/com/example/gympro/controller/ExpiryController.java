@@ -1,6 +1,8 @@
 package com.example.gympro.controller;
 
 import com.example.gympro.service.ExpiringMemberService;
+import com.example.gympro.service.NotificationService;
+
 import com.example.gympro.viewModel.ExpiringMember;
 
 import javafx.collections.FXCollections;
@@ -9,6 +11,11 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
+import javafx.stage.FileChooser;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 
 public class ExpiryController {
 
@@ -25,7 +32,7 @@ public class ExpiryController {
     @FXML
     private TableColumn<ExpiringMember, String> colEndDate;
     @FXML
-    private TableColumn<ExpiringMember, String> colExpiry;
+    private TableColumn<ExpiringMember, Integer> colExpiry;
     @FXML
     private TableColumn<ExpiringMember, String> colStatus;
     @FXML
@@ -34,11 +41,15 @@ public class ExpiryController {
     @FXML
     private ComboBox<String> cbFilter;
     @FXML
-
     private TextField txtSearch;
+    @FXML
+    private Button btnNotify;
+    @FXML
+    private Button btnExport;
 
     private ObservableList<ExpiringMember> memberList = FXCollections.observableArrayList();
     private ExpiringMemberService service = new ExpiringMemberService();
+    private NotificationService notifyService = new NotificationService();
 
     @FXML
     public void initialize() {
@@ -47,7 +58,51 @@ public class ExpiryController {
         setupFilter();
         setupSearch();
         addActionButtonsToTable();
+        btnNotify.setOnAction(e -> sendBulkReminder());
+        btnExport.setOnAction(e -> exportMembersToCSV());
 
+    }
+
+    @FXML
+    private void exportMembersToCSV() {
+        try {
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Lưu danh sách thành viên");
+            fileChooser.setInitialFileName("ExpiringMembers.csv");
+            fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV Files", "*.csv"));
+
+            File file = fileChooser.showSaveDialog(btnExport.getScene().getWindow());
+            if (file != null) {
+                try (PrintWriter writer = new PrintWriter(
+                        new OutputStreamWriter(new FileOutputStream(file), "UTF-8"))) {
+
+                    writer.write('\uFEFF');
+
+                    writer.println("Mã,Họ tên,SĐT,Gói,Hết hạn,Số ngày còn lại,Trạng thái");
+
+                    for (ExpiringMember m : memberList) {
+                        writer.printf("%s,%s,%s,%s,%s,%d,%s%n",
+                                m.getId(),
+                                m.getName(),
+                                m.getPhone(),
+                                m.getPackageName(),
+                                m.getExpiry(),
+                                m.getDaysLeft(),
+                                m.getStatus());
+                    }
+                }
+
+                showAlert("✅ Xuất thành công: " + file.getAbsolutePath());
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            showAlert("❌ Lỗi khi xuất file!");
+        }
+    }
+
+    private void sendBulkReminder() {
+        int sent = notifyService.sendBulkReminder(memberList);
+        showAlert("📩 Đã gửi nhắc cho " + sent + "/" + memberList.size() + " thành viên.");
     }
 
     private void setupColumns() {
@@ -89,6 +144,13 @@ public class ExpiryController {
         });
     }
 
+    private void showAlert(String msg) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setHeaderText(null);
+        alert.setContentText(msg);
+        alert.show();
+    }
+
     private void addActionButtonsToTable() {
         colActions.setCellFactory(param -> new TableCell<>() {
             private final Button btnExtend = new Button("📝 Gia hạn");
@@ -100,6 +162,71 @@ public class ExpiryController {
             private final HBox container = new HBox(5, btnExtend, btnCall, btnEmail, btnSMS, btnExport);
 
             {
+                btnExtend.setOnAction(e -> {
+                    ExpiringMember member = getTableRow().getItem();
+                    if (member != null) {
+                        MainController mainController = MainController.getInstance();
+                        if (mainController != null) {
+                            mainController.navigateToRegistration(member);
+                        } else {
+                            showAlert("❌ Không thể chuyển trang. Vui lòng thử lại.");
+                        }
+                    }
+                });
+
+                btnCall.setOnAction(e -> {
+                    ExpiringMember member = getTableRow().getItem();
+                    if (notifyService.sendEmailReminder(member))
+                        showAlert("📞 Gọi điện cho: " + member.getName());
+                });
+                btnEmail.setOnAction(e -> {
+                    ExpiringMember member = getTableRow().getItem();
+                    if (notifyService.sendEmailReminder(member))
+                        showAlert("📧 Email đã gửi cho: " + member.getName());
+                });
+
+                btnSMS.setOnAction(e -> {
+                    ExpiringMember member = getTableRow().getItem();
+                    if (notifyService.sendSMSReminder(member))
+                        showAlert("📱 SMS đã gửi cho: " + member.getName());
+                });
+                btnExport.setOnAction(e -> {
+                    ExpiringMember member = getTableRow().getItem();
+                    if (member == null)
+                        return;
+
+                    try {
+                        FileChooser fileChooser = new FileChooser();
+                        fileChooser.setTitle("Lưu danh sách thành viên");
+                        fileChooser.setInitialFileName("Member_" + member.getId() + ".csv");
+                        File file = fileChooser.showSaveDialog(btnExport.getScene().getWindow());
+
+                        if (file != null) {
+                            try (PrintWriter writer = new PrintWriter(new OutputStreamWriter(
+                                    new FileOutputStream(file), "UTF-8"))) {
+
+                                writer.write('\uFEFF');
+
+                                writer.println("Mã,Họ tên,SĐT,Gói,Hết hạn,Số ngày còn lại,Trạng thái");
+
+                                writer.printf("%s,%s,%s,%s,%s,%d,%s%n",
+                                        member.getId(),
+                                        member.getName(),
+                                        member.getPhone(),
+                                        member.getPackageName(),
+                                        member.getExpiry(),
+                                        member.getDaysLeft(),
+                                        member.getStatus());
+                            }
+                            showAlert("✅ Xuất thành công: " + file.getAbsolutePath());
+                        }
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                        showAlert("❌ Lỗi khi xuất file!");
+                    }
+
+                });
+
                 container.setStyle("-fx-alignment: CENTER; -fx-padding: 5;");
                 btnExtend.setStyle("-fx-background-color: #FFD700;");
                 btnCall.setStyle("-fx-background-color: #90EE90;");

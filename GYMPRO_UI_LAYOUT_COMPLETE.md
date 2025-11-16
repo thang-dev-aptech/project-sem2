@@ -1,6 +1,7 @@
 # 🎨 GymPro - Complete UI Layout Design
 
 ## 📱 LOGIN SCREEN
+
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │                         LOGO GYMPRO                        │
@@ -23,6 +24,7 @@
 ```
 
 ## 🏠 DASHBOARD NHÂN VIÊN (STAFF)
+
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │ TopBar: GymPro | Tìm nhanh (SĐT/Mã) | Ca: [Mở/Đóng] | 👤  │
@@ -40,6 +42,7 @@
 ```
 
 ### 📊 TRANG CHỦ NHÂN VIÊN
+
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │ Hàng 1 (4 ô metrics)                                       │
@@ -65,6 +68,7 @@
 ```
 
 ### 👥 QUẢN LÝ HỘI VIÊN
+
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │ Thanh công cụ                                             │
@@ -85,6 +89,7 @@
 ```
 
 ### 👤 CHI TIẾT HỘI VIÊN (Modal/Slide)
+
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │ Header (Thông tin cơ bản)                                  │
@@ -107,6 +112,7 @@
 ```
 
 ### 📝 ĐĂNG KÝ / GIA HẠN
+
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │ Cột trái (Thông tin hội viên)   │ Cột phải (Thông số gói)  │
@@ -124,6 +130,7 @@
 ```
 
 ### 💳 THANH TOÁN
+
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │ Cột trái (Thông tin)              │ Cột phải (Hóa đơn)      │
@@ -143,6 +150,7 @@
 ```
 
 ### ⏰ SẮP HẾT HẠN
+
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │ Thanh công cụ                                             │
@@ -162,6 +170,7 @@
 ```
 
 ### 🚪 ĐÓNG CA
+
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │ Thẻ tổng kết ca                                           │
@@ -185,6 +194,7 @@
 ```
 
 ## 👑 DASHBOARD CHỦ (OWNER)
+
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │ TopBar: GymPro | Bộ lọc thời gian (Hôm nay/Tháng/Năm) | 👤 │
@@ -202,6 +212,7 @@
 ```
 
 ### 📊 TRANG CHỦ CHỦ
+
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │ Hàng 1 (4 ô metrics)                                       │
@@ -232,6 +243,7 @@
 ```
 
 ### 📊 BÁO CÁO
+
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │ Thanh công cụ                                             │
@@ -254,6 +266,7 @@
 ```
 
 ### 📦 QUẢN LÝ GÓI TẬP
+
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │ Thanh công cụ                                             │
@@ -277,6 +290,7 @@
 ```
 
 ### 👥 QUẢN LÝ NHÂN VIÊN
+
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │ Thanh công cụ                                             │
@@ -301,6 +315,7 @@
 ```
 
 ### ⚙️ CẤU HÌNH HỆ THỐNG
+
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │ Lưới 2 cột                                                 │
@@ -323,6 +338,7 @@
 ```
 
 ### 📋 AUDIT LOGS
+
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │ Thanh công cụ                                             │
@@ -343,6 +359,7 @@
 ```
 
 ### 💾 SAO LƯU / KHÔI PHỤC
+
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │ Cột trái: Danh sách bản sao lưu                            │
@@ -365,6 +382,7 @@
 ## 📱 RESPONSIVE DESIGN
 
 ### Mobile (≤ 768px)
+
 ```
 ┌─────────────────┐
 │ ☰ GymPro    👤 │
@@ -380,6 +398,7 @@
 ```
 
 ### Tablet (769px - 1024px)
+
 ```
 ┌─────────────────────────────────┐
 │ GymPro | Tìm kiếm | Ca | 👤     │
@@ -396,6 +415,7 @@
 ## 🔔 NOTIFICATION SYSTEM
 
 ### Toast Notifications
+
 ```
 ┌─────────────────────────────────┐
 │ ✅ Thành công: Đã lưu hội viên  │
@@ -406,6 +426,7 @@
 ```
 
 ### Loading States
+
 ```
 ┌─────────────────────────────────┐
 │ 🔄 Đang tải dữ liệu...         │
@@ -416,6 +437,7 @@
 ## 🎨 DESIGN SYSTEM
 
 ### Colors
+
 - **Primary**: #2563eb (Blue)
 - **Success**: #10b981 (Green)
 - **Warning**: #f59e0b (Orange)
@@ -423,12 +445,14 @@
 - **Info**: #3b82f6 (Light Blue)
 
 ### Typography
+
 - **Heading**: Inter Bold 24px
 - **Subheading**: Inter SemiBold 18px
 - **Body**: Inter Regular 14px
 - **Caption**: Inter Regular 12px
 
 ### Spacing
+
 - **XS**: 4px
 - **SM**: 8px
 - **MD**: 16px
@@ -436,6 +460,7 @@
 - **XL**: 32px
 
 ### Icons
+
 - **Material Design Icons** hoặc **Heroicons**
 - **Size**: 16px, 20px, 24px
 - **Color**: Inherit from text
@@ -443,17 +468,20 @@
 ## 🚀 IMPLEMENTATION NOTES
 
 ### JavaFX Components
+
 - **SceneBuilder** cho FXML design
 - **CSS** cho styling
 - **Controller** cho business logic
 - **Model** cho data binding
 
 ### Database Integration
+
 - **Hibernate** hoặc **MyBatis** cho ORM
 - **Connection Pool** cho performance
 - **Transaction Management** cho data integrity
 
 ### Performance
+
 - **Lazy Loading** cho large datasets
 - **Pagination** cho tables
 - **Caching** cho frequently accessed data
