@@ -34,36 +34,6 @@ public class MainController {
         if (contentArea.getScene() != null) {
             contentArea.getScene().getRoot().setUserData(this);
         }
-        
-        // In thông tin phân quyền ra console để debug
-        printPermissionInfo();
-    }
-    
-    private void printPermissionInfo() {
-        System.out.println("\n╔════════════════════════════════════════════╗");
-        System.out.println("║         PHÂN QUYỀN - MAIN SCREEN         ║");
-        System.out.println("╚════════════════════════════════════════════╝");
-        
-        SessionManager session = SessionManager.getInstance();
-        if (session.getCurrentUser() != null) {
-            String username = session.getCurrentUser().getUsername();
-            String fullName = session.getCurrentUser().getFullName();
-            
-            if (PermissionManager.isAdmin()) {
-                System.out.println("👑 User: " + fullName + " (" + username + ")");
-                System.out.println("✅ Vai trò: ADMIN/OWNER - 100% quyền");
-                System.out.println("✅ Thấy TẤT CẢ menu: Dashboard, Members, Packages, Registration, Payment, Expiring, Reports, Settings, Users");
-            } else if (PermissionManager.isStaff()) {
-                System.out.println("👤 User: " + fullName + " (" + username + ")");
-                System.out.println("⚠️ Vai trò: STAFF - 40% quyền");
-                System.out.println("✅ Thấy menu: Dashboard, Members, Packages, Registration, Payment, Expiring");
-                System.out.println("❌ KHÔNG thấy: Reports, Settings, Users");
-            }
-            
-            System.out.println("\nTổng số quyền: " + PermissionManager.getCurrentUserPermissions().size() + " quyền");
-        }
-        
-        System.out.println("════════════════════════════════════════════\n");
     }
 
     public static MainController getInstance() {
