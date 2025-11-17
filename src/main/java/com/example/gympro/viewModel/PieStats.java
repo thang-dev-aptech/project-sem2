@@ -8,6 +8,7 @@ public class PieStats {
     public PieStats(int activeMembers, int expiringMembers, int expiredMembers) {
         this.activeMembers = activeMembers;
         this.expiredMembers = expiredMembers;
+        this.expiringMembers = expiringMembers;
     }
 
     public int getActiveMembers() {
