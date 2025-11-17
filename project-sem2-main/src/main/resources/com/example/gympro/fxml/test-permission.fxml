@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" 
+      fx:controller="com.example.gympro.controller.TestPermissionController"
+      spacing="20" style="-fx-padding: 30; -fx-background-color: #f5f5f5;">
+
+    <!-- Header -->
+    <VBox spacing="10" style="-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 10;">
+        <Label text="🔐 TEST HỆ THỐNG PHÂN QUYỀN" style="-fx-font-size: 24; -fx-font-weight: bold;"/>
+        <Separator/>
+        
+        <HBox spacing="10" alignment="CENTER_LEFT">
+            <Label text="Vai trò hiện tại:" style="-fx-font-weight: bold;"/>
+            <Label fx:id="roleLabel" text="Đang tải..." style="-fx-text-fill: #2196F3;"/>
+        </HBox>
+        
+        <HBox spacing="10" alignment="CENTER_LEFT">
+            <Label text="Quyền hạn:" style="-fx-font-weight: bold;"/>
+            <Label fx:id="permissionCountLabel" text="0 quyền" style="-fx-text-fill: #4CAF50;"/>
+        </HBox>
+    </VBox>
+
+    <!-- Test Buttons Section -->
+    <VBox spacing="15" style="-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 10;">
+        <Label text="📋 Test các button theo quyền:" style="-fx-font-size: 18; -fx-font-weight: bold;"/>
+        <Label text="Staff sẽ KHÔNG THẤY các button màu đỏ bên dưới" style="-fx-text-fill: #666;"/>
+        <Separator/>
+        
+        <!-- Button cả Admin và Staff đều thấy -->
+        <Button fx:id="staffCanSeeButton" text="✅ Staff Can See (Cả Admin và Staff đều thấy)" 
+                onAction="#handleStaffCanSee"
+                style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 14; -fx-padding: 10 20;"
+                maxWidth="Infinity"/>
+        
+        <!-- Button CHỈ ADMIN thấy -->
+        <Button fx:id="adminOnlyButton" text="👑 Admin Only (Chỉ Admin thấy)" 
+                onAction="#handleAdminOnly"
+                style="-fx-background-color: #FF5722; -fx-text-fill: white; -fx-font-size: 14; -fx-padding: 10 20;"
+                maxWidth="Infinity"/>
+        
+        <Button fx:id="editButton" text="✏️ Sửa thành viên (Chỉ Admin)" 
+                onAction="#handleEdit"
+                style="-fx-background-color: #FF9800; -fx-text-fill: white; -fx-font-size: 14; -fx-padding: 10 20;"
+                maxWidth="Infinity"/>
+        
+        <Button fx:id="deleteButton" text="🗑️ Xóa thành viên (Chỉ Admin)" 
+                onAction="#handleDelete"
+                style="-fx-background-color: #F44336; -fx-text-fill: white; -fx-font-size: 14; -fx-padding: 10 20;"
+                maxWidth="Infinity"/>
+        
+        <Button fx:id="viewReportsButton" text="📊 Xem báo cáo (Chỉ Admin)" 
+                onAction="#handleViewReports"
+                style="-fx-background-color: #9C27B0; -fx-text-fill: white; -fx-font-size: 14; -fx-padding: 10 20;"
+                maxWidth="Infinity"/>
+    </VBox>
+
+    <!-- Info Section -->
+    <VBox spacing="15" style="-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 10;">
+        <Label text="ℹ️ Thông tin:" style="-fx-font-size: 18; -fx-font-weight: bold;"/>
+        <Separator/>
+        
+        <HBox spacing="10">
+            <Button text="🔍 Test Permission" onAction="#handleTestPermission"
+                    style="-fx-background-color: #2196F3; -fx-text-fill: white; -fx-padding: 10 20;"/>
+            
+            <Button text="📋 Show Role Info" onAction="#handleShowRoleInfo"
+                    style="-fx-background-color: #00BCD4; -fx-text-fill: white; -fx-padding: 10 20;"/>
+        </HBox>
+        
+        <Label text="✅ Admin (100%): Thấy TẤT CẢ các button" 
+               style="-fx-text-fill: #4CAF50; -fx-font-weight: bold;"/>
+        <Label text="⚠️ Staff (40%): CHỈ thấy button màu xanh lá" 
+               style="-fx-text-fill: #FF9800; -fx-font-weight: bold;"/>
+    </VBox>
+
+    <!-- Console Note -->
+    <VBox spacing="5" style="-fx-background-color: #263238; -fx-padding: 15; -fx-background-radius: 5;">
+        <Label text="💡 Lưu ý:" style="-fx-text-fill: #FFC107; -fx-font-weight: bold;"/>
+        <Label text="• Mở Console để xem log chi tiết về phân quyền" 
+               style="-fx-text-fill: white; -fx-font-size: 12;"/>
+        <Label text="• Login bằng Admin và Staff để so sánh sự khác biệt" 
+               style="-fx-text-fill: white; -fx-font-size: 12;"/>
+        <Label text="• Button màu đỏ/cam/tím sẽ BIẾN MẤT khi login Staff" 
+               style="-fx-text-fill: white; -fx-font-size: 12;"/>
+    </VBox>
+
+</VBox>

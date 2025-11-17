@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<ScrollPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.gympro.controller.ExpiryController" stylesheets="@../css/styles.css" fitToWidth="true" styleClass="dashboard-scroll">
+    <VBox spacing="20" styleClass="dashboard-container">
+        <padding>
+            <Insets top="30" left="30" right="30" bottom="30"/>
+        </padding>
+
+     <VBox spacing="5">
+        <Label text="Expiring Members" styleClass="page-title"/>
+        <Label text="View and manage members whose memberships are expiring soon." styleClass="page-subtitle"/>
+    </VBox>
+
+        <HBox spacing="10" alignment="CENTER_LEFT" style="-fx-background-color: #0D1B2A; -fx-padding: 10;">
+            <Label text="⏰ SẮP HẾT HẠN"
+                style="-fx-text-fill: white; -fx-font-size: 18; -fx-font-weight: bold;"/>
+
+
+            <ComboBox fx:id="cbFilter" promptText="Lọc hạn còn lại" prefWidth="150">
+            
+            </ComboBox>
+
+            <TextField fx:id="txtSearch" promptText="🔍 Tìm kiếm hội viên..." prefWidth="200"/>
+            <Button fx:id="btnExport" text="📤 Xuất Excel" style="-fx-background-color: #FFD700;"/>
+            <Button fx:id="btnNotify" text="📧 Gửi nhắc hàng loạt" style="-fx-background-color: #FFD700;"/>
+        </HBox>
+
+        <TableView fx:id="tblExpiry" prefHeight="400">
+            <columns>
+                <TableColumn fx:id="colCode" text="Mã" prefWidth="100"/>
+                <TableColumn fx:id="colName" text="Họ tên" prefWidth="180"/>
+                <TableColumn fx:id="colPhone" text="SĐT" prefWidth="100"/>
+                <TableColumn fx:id="colPackage" text="Gói" prefWidth="120"/>
+                <TableColumn fx:id="colEndDate" text="Hết hạn" prefWidth="120"/>
+                <TableColumn fx:id="colExpiry" text="Số ngày còn lại" prefWidth="100"/>
+                <TableColumn fx:id="colStatus" text="Trạng thái" prefWidth="120"/>
+
+                <TableColumn fx:id="colActions" text="Hành động" prefWidth="400"/>
+            </columns>
+        </TableView>
+
+      
+
+    </VBox>
+</ScrollPane>
+
+
+
+   
