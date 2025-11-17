@@ -6,6 +6,8 @@ import com.example.gympro.viewModel.PieStats;
 import com.example.gympro.viewModel.RevenueData;
 import com.example.gympro.service.DashboardService;
 import com.example.gympro.service.ExpiringMemberService;
+import com.example.gympro.service.NotificationService;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -20,6 +22,12 @@ import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.text.Text;
+import javafx.stage.FileChooser;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.util.*;
 
 public class DashboardController {
@@ -63,6 +71,7 @@ public class DashboardController {
     private final DashboardService dashboardService = new DashboardService();
     private final ExpiringMemberService memberService = new ExpiringMemberService();
     private ObservableList<ExpiringMember> memberList = FXCollections.observableArrayList();
+    private NotificationService notifyService = new NotificationService();
 
     @FXML
     private void initialize() {
@@ -117,6 +126,13 @@ public class DashboardController {
         tblExpiry.setItems(memberList);
     }
 
+    private void showAlert(String msg) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setHeaderText(null);
+        alert.setContentText(msg);
+        alert.show();
+    }
+
     private void addActionButtonsToTable() {
         colActions.setCellFactory(param -> new TableCell<>() {
             private final Button btnExtend = new Button("📝 Gia hạn");
@@ -124,9 +140,75 @@ public class DashboardController {
             private final Button btnEmail = new Button("📧 Email");
             private final Button btnSMS = new Button("📱 SMS");
             private final Button btnExport = new Button("📤 Xuất");
+
             private final HBox container = new HBox(5, btnExtend, btnCall, btnEmail, btnSMS, btnExport);
 
             {
+                btnExtend.setOnAction(e -> {
+                    ExpiringMember member = getTableRow().getItem();
+                    if (member != null) {
+                        MainController mainController = MainController.getInstance();
+                        if (mainController != null) {
+                            mainController.navigateToRegistration(member);
+                        } else {
+                            showAlert("❌ Không thể chuyển trang. Vui lòng thử lại.");
+                        }
+                    }
+                });
+
+                btnCall.setOnAction(e -> {
+                    ExpiringMember member = getTableRow().getItem();
+                    if (notifyService.sendEmailReminder(member))
+                        showAlert("📞 Gọi điện cho: " + member.getName());
+                });
+                btnEmail.setOnAction(e -> {
+                    ExpiringMember member = getTableRow().getItem();
+                    if (notifyService.sendEmailReminder(member))
+                        showAlert("📧 Email đã gửi cho: " + member.getName());
+                });
+
+                btnSMS.setOnAction(e -> {
+                    ExpiringMember member = getTableRow().getItem();
+                    if (notifyService.sendSMSReminder(member))
+                        showAlert("📱 SMS đã gửi cho: " + member.getName());
+                });
+                btnExport.setOnAction(e -> {
+                    ExpiringMember member = getTableRow().getItem();
+                    if (member == null)
+                        return;
+
+                    try {
+                        FileChooser fileChooser = new FileChooser();
+                        fileChooser.setTitle("Lưu danh sách thành viên");
+                        fileChooser.setInitialFileName("Member_" + member.getId() + ".csv");
+                        File file = fileChooser.showSaveDialog(btnExport.getScene().getWindow());
+
+                        if (file != null) {
+                            try (PrintWriter writer = new PrintWriter(new OutputStreamWriter(
+                                    new FileOutputStream(file), "UTF-8"))) {
+
+                                writer.write('\uFEFF');
+
+                                writer.println("Mã,Họ tên,SĐT,Gói,Hết hạn,Số ngày còn lại,Trạng thái");
+
+                                writer.printf("%s,%s,%s,%s,%s,%d,%s%n",
+                                        member.getId(),
+                                        member.getName(),
+                                        member.getPhone(),
+                                        member.getPackageName(),
+                                        member.getExpiry(),
+                                        member.getDaysLeft(),
+                                        member.getStatus());
+                            }
+                            showAlert("✅ Xuất thành công: " + file.getAbsolutePath());
+                        }
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                        showAlert("❌ Lỗi khi xuất file!");
+                    }
+
+                });
+
                 container.setStyle("-fx-alignment: CENTER; -fx-padding: 5;");
                 btnExtend.setStyle("-fx-background-color: #FFD700;");
                 btnCall.setStyle("-fx-background-color: #90EE90;");

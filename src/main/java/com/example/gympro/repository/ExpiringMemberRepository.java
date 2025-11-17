@@ -17,22 +17,29 @@ public class ExpiringMemberRepository {
     public ObservableList<ExpiringMember> getExpiringMembers(int maxDayLeft) {
         ObservableList<ExpiringMember> list = FXCollections.observableArrayList();
         String sql = """
-                SELECT
-                m.member_code,
-                m.full_name,
-                m.phone,
-                p.name AS packageName,
-                s.end_date,
-                DATEDIFF(s.end_date, CURDATE()) AS days_left
-                FROM members m
-                JOIN subscriptions s ON m.id = s.member_id
-                JOIN plans p ON s.plan_id = p.id
-                WHERE DATEDIFF(s.end_date, CURDATE()) BETWEEN 0 AND ?
-                  AND s.status = 'ACTIVE'
-                  AND m.is_deleted = 0
-                ORDER BY s.end_date ASC;
+                      SELECT
+                      m.member_code,
+                      m.full_name,
+                      m.phone,
+                      p.name AS packageName,
+                      s.end_date,
+                      DATEDIFF(s.end_date, CURDATE()) AS days_left
+                  FROM members m
+                  JOIN (
+                      SELECT member_id, MAX(end_date) AS max_end_date
+                      FROM subscriptions
+                      GROUP BY member_id
+                  ) latest ON m.id = latest.member_id
+                  JOIN subscriptions s
+                      ON s.member_id = latest.member_id
+                      AND s.end_date = latest.max_end_date
+                  JOIN plans p ON s.plan_id = p.id
+                  WHERE DATEDIFF(s.end_date, CURDATE()) BETWEEN 0 AND ?
+                    AND m.is_deleted = 0
+                  ORDER BY s.end_date ASC;
 
-                                """;
+                """;
+
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);) {
             ps.setInt(1, maxDayLeft);
