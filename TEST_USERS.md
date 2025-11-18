@@ -8,7 +8,6 @@ File này chứa thông tin các user test để đăng nhập vào hệ thống
 |----------|----------|------|---------|
 | `admin` | `admin123` | OWNER | Administrator - Full access |
 | `staff` | `staff123` | STAFF | Nhân viên quầy - Limited access |
-| `manager` | `manager123` | OWNER | Quản lý - Full access |
 
 ## 🔑 Cách tạo hash password mới
 

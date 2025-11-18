@@ -1,4 +1,12 @@
 -- =====================================================================
+-- V2__Seed_Data.sql
+-- Seed data for GymPro (for testing/demo)
+-- Inserts sample branches, roles, users, plans, members, subscriptions,
+-- invoices, payments and reminders.
+-- =====================================================================
+
+-- End of seed
+-- =====================================================================
 -- V2 - Seed Data: Đầy đủ dữ liệu mặc định cho GymPro
 -- Tất cả INSERT đều dùng WHERE NOT EXISTS để idempotent (an toàn khi chạy lại)
 -- =====================================================================
@@ -309,9 +317,9 @@ WHERE
 -- =====================================================================
 -- 6. USERS (Người dùng - Test Accounts)
 -- Passwords đã được hash bằng BCrypt:
---   admin: admin123
---   staff: staff123
---   manager: manager123
+--   admin: admin123  (OWNER)
+--   staff: staff123  (STAFF)
+--   => dùng để đăng nhập DEV/TEST (tham khảo TEST_USERS.md)
 -- =====================================================================
 
 -- Admin user (password: admin123)
@@ -358,28 +366,6 @@ WHERE
             username = 'staff'
     );
 
--- Manager user (password: manager123)
-INSERT INTO
-    users (
-        branch_id,
-        username,
-        full_name,
-        email,
-        phone,
-        password_hash,
-        is_active
-    )
-SELECT b.id, 'manager', 'Quản lý Test', 'manager@gympro.com', '0912345678', '$2a$10$rORI/A9ufqDyL3QLN.XcLOT9n/SQzQPbT3r91RdyaeSWmwtULjquy', 1
-FROM branches b
-WHERE
-    b.code = 'BR-001'
-    AND NOT EXISTS (
-        SELECT 1
-        FROM users
-        WHERE
-            username = 'manager'
-    );
-
 -- =====================================================================
 -- 7. USER ROLES (Phân quyền cho users)
 -- =====================================================================
@@ -416,21 +402,6 @@ WHERE
             AND ur.role_id = r.id
     );
 
--- Grant OWNER role to manager
-INSERT INTO
-    user_roles (user_id, role_id)
-SELECT u.id, r.id
-FROM users u
-    JOIN roles r ON r.name = 'OWNER'
-WHERE
-    u.username = 'manager'
-    AND NOT EXISTS (
-        SELECT 1
-        FROM user_roles ur
-        WHERE
-            ur.user_id = u.id
-            AND ur.role_id = r.id
-    );
 -- =====================================================================
 -- 8. PLANS (Gói tập)
 -- =====================================================================

@@ -1,7 +1,8 @@
 package com.example.gympro.service;
 
-import com.example.gympro.repository.PackageRepository;
-import com.example.gympro.repository.PackageRepositoryInterface;
+import com.example.gympro.mapper.plan.PlanMapper;
+import com.example.gympro.repository.plan.PackageRepository;
+import com.example.gympro.repository.plan.PackageRepositoryInterface;
 import com.example.gympro.viewModel.Package;
 
 import java.util.List;
@@ -21,37 +22,35 @@ public class PackageService implements PackageServiceInterface {
 
         Boolean isActive = null;
 
-        // Chuyển đổi chuỗi trạng thái từ ComboBox thành Boolean cho Repository
         if ("Hiển thị (Active)".equals(statusFilter)) {
             isActive = true;
         } else if ("Ẩn (Inactive)".equals(statusFilter)) {
             isActive = false;
         }
 
-        return packageRepositoryInterface.findAll(searchTerm, isActive);
+        var plans = packageRepositoryInterface.findAll(searchTerm, isActive);
+        return PlanMapper.toPackageViewList(plans);
     }
 
     @Override
     public Optional<Package> savePackage(Package pkg) {
 
-        // --- LOGIC NGHIỆP VỤ / VALIDATION ---
         if (pkg.getName() == null || pkg.getName().trim().isEmpty() || pkg.getPrice().doubleValue() < 0) {
             System.err.println("Validation Error: Dữ liệu gói tập không hợp lệ.");
             return Optional.empty();
         }
 
+        var domain = PlanMapper.toDomain(pkg);
         if (pkg.getId() == 0) {
-            // INSERT
-            return packageRepositoryInterface.insert(pkg);
+            return packageRepositoryInterface.insert(domain).map(PlanMapper::toPackageView);
         } else {
-            // UPDATE
-            return packageRepositoryInterface.update(pkg) ? Optional.of(pkg) : Optional.empty();
+            boolean updated = packageRepositoryInterface.update(domain);
+            return updated ? Optional.of(PlanMapper.toPackageView(domain)) : Optional.empty();
         }
     }
 
     @Override
     public boolean deletePackage(long id) {
-        // Logic nghiệp vụ xóa
         return packageRepositoryInterface.delete(id);
     }
 }

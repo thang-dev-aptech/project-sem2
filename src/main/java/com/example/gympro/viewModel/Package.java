@@ -37,6 +37,7 @@ public class Package {
 
     // --- Setters cho Repository và Controller ---
     public void setId(long id) { this.id.set(id); }
+    public void setBranchId(long branchId) { this.branchId.set(branchId); }
     public void setCode(String code) { this.code.set(code); }
     public void setName(String name) { this.name.set(name); }
     public void setDescription(String description) { this.description.set(description); }
@@ -48,6 +49,7 @@ public class Package {
 
     // --- Property Getters (cho JavaFX Binding) ---
     public LongProperty idProperty() { return id; }
+    public LongProperty branchIdProperty() { return branchId; }
     public StringProperty codeProperty() { return code; }
     public StringProperty nameProperty() { return name; }
     public StringProperty descriptionProperty() { return description; }

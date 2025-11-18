@@ -1,9 +1,17 @@
 package com.example.gympro.service;
 
-import com.example.gympro.repository.*;
+import com.example.gympro.mapper.member.MemberMapper;
+import com.example.gympro.mapper.plan.PlanMapper;
+import com.example.gympro.repository.member.MemberRepository;
+import com.example.gympro.repository.member.MemberRepositoryInterface;
+import com.example.gympro.repository.plan.PlanRepository;
+import com.example.gympro.repository.plan.PlanRepositoryInterface;
+import com.example.gympro.repository.subscription.RegistrationRepository;
+import com.example.gympro.repository.subscription.RegistrationRepositoryInterface;
 import com.example.gympro.utils.DatabaseConnection;
 import com.example.gympro.viewModel.Member;
 import com.example.gympro.viewModel.Plan;
+
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.LocalDate;
@@ -18,26 +26,29 @@ public class RegistrationService implements RegistrationServiceInterface {
 
     @Override
     public List<Member> getMembersForRegistration() {
-        return memberRepository.findAll(null, null);
+        return MemberMapper.toViewModelList(memberRepository.findAll(null, null));
     }
 
     @Override
     public List<Plan> getPlansForRegistration() {
-        return planRepository.findAllActive();
+        return PlanMapper.toPlanViewList(planRepository.findAllActive());
     }
 
     @Override
     public boolean createRegistrationAndInvoice(Member member, Plan plan, LocalDate startDate, LocalDate endDate,
             long createdByUserId) {
         Connection conn = null;
+        var memberDomain = MemberMapper.toDomain(member);
+        var planDomain = PlanMapper.toDomain(plan);
+
         try {
             conn = DatabaseConnection.getConnection();
             conn.setAutoCommit(false);
 
-            long subscriptionId = registrationRepository.createSubscription(conn, member, plan, startDate, endDate,
+            long subscriptionId = registrationRepository.createSubscription(conn, memberDomain, planDomain, startDate, endDate,
                     createdByUserId);
-            long invoiceId = registrationRepository.createInvoice(conn, member, plan, subscriptionId, createdByUserId);
-            boolean itemCreated = registrationRepository.createInvoiceItem(conn, plan, invoiceId);
+            long invoiceId = registrationRepository.createInvoice(conn, memberDomain, planDomain, subscriptionId, createdByUserId);
+            boolean itemCreated = registrationRepository.createInvoiceItem(conn, planDomain, invoiceId);
 
             if (subscriptionId > 0 && invoiceId > 0 && itemCreated) {
                 conn.commit();
@@ -68,13 +79,17 @@ public class RegistrationService implements RegistrationServiceInterface {
     }
 
     public Member getMemberById(long id) {
-        List<Member> members = memberRepository.findAll(null, null);
-        return members.stream().filter(m -> m.getId() == id).findFirst().orElse(null);
+        return memberRepository.findById(id)
+                .map(MemberMapper::toViewModel)
+                .orElse(null);
     }
 
     public Plan getPlanByName(String name) {
-        List<Plan> plans = planRepository.findAllActive();
-        return plans.stream().filter(p -> p.getName().equals(name)).findFirst().orElse(null);
+        return PlanMapper.toPlanViewList(planRepository.findAllActive())
+                .stream()
+                .filter(p -> p.getName().equals(name))
+                .findFirst()
+                .orElse(null);
     }
 
 }

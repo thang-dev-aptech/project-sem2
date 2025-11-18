@@ -1,34 +1,49 @@
 package com.example.gympro.service;
 
-import com.example.gympro.repository.PaymentRepository;
-import com.example.gympro.repository.PaymentRepositoryInterface;
+import com.example.gympro.domain.billing.Payment;
+import com.example.gympro.mapper.billing.InvoiceMapper;
+import com.example.gympro.repository.billing.PaymentRepository;
+import com.example.gympro.repository.billing.PaymentRepositoryInterface;
 import com.example.gympro.utils.DatabaseConnection;
 import com.example.gympro.viewModel.Invoice;
+
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 
-// SỬA Ở ĐÂY: Thêm "implements"
 public class PaymentService implements PaymentServiceInterface {
 
-    // (Các biến Repository và dbConnection giữ nguyên)
     private final PaymentRepositoryInterface paymentRepository = new PaymentRepository();
     private final DatabaseConnection dbConnection = DatabaseConnection.getInstance();
 
-    @Override // SỬA: Thêm @Override
+    @Override
     public List<Invoice> getUnpaidInvoices() {
-        return paymentRepository.findUnpaidInvoices();
+        var invoices = paymentRepository.findUnpaidInvoices();
+        return InvoiceMapper.toViewModels(invoices);
     }
 
-    @Override // SỬA: Thêm @Override
+    @Override
     public boolean processPayment(Invoice invoice, long paymentMethodId, long shiftId, long createdByUserId) {
+        var domainInvoice = InvoiceMapper.toDomain(invoice);
         Connection conn = null;
         try {
             conn = dbConnection.getConnection();
             conn.setAutoCommit(false);
 
-            boolean paymentCreated = paymentRepository.createPayment(conn, invoice, paymentMethodId, shiftId, createdByUserId);
-            boolean subUpdated = paymentRepository.updateSubscriptionStatus(conn, invoice.getSubscriptionId());
+            Payment payment = new Payment.Builder()
+                    .invoiceId(domainInvoice.getId())
+                    .methodId(paymentMethodId)
+                    .shiftId(shiftId > 0 ? shiftId : null)
+                    .paidAmount(domainInvoice.getTotalAmount() != null
+                            ? domainInvoice.getTotalAmount()
+                            : BigDecimal.valueOf(invoice.getTotalAmount()))
+                    .createdBy(createdByUserId)
+                    .build();
+
+            boolean paymentCreated = paymentRepository.createPayment(conn, payment);
+            boolean subUpdated = domainInvoice.getSubscriptionId() == null
+                    || paymentRepository.updateSubscriptionStatus(conn, domainInvoice.getSubscriptionId());
 
             if (paymentCreated && subUpdated) {
                 conn.commit();
@@ -39,7 +54,11 @@ public class PaymentService implements PaymentServiceInterface {
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            try { if (conn != null) conn.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
+            try {
+                if (conn != null) conn.rollback();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
             return false;
         } finally {
             try {
@@ -47,7 +66,9 @@ public class PaymentService implements PaymentServiceInterface {
                     conn.setAutoCommit(true);
                     conn.close();
                 }
-            } catch (SQLException e) { e.printStackTrace(); }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
     }
 }
