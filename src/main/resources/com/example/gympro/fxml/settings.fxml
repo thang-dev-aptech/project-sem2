@@ -4,12 +4,198 @@
 <?import javafx.scene.control.*?>
 <?import javafx.geometry.Insets?>
 
-<ScrollPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.gympro.controller.SettingsController" stylesheets="@../css/styles.css" fitToWidth="true" styleClass="dashboard-scroll">
+<ScrollPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" 
+            fx:controller="com.example.gympro.controller.SettingsController" 
+            stylesheets="@../css/styles.css" 
+            fitToWidth="true" 
+            styleClass="dashboard-scroll">
     <VBox spacing="20" styleClass="dashboard-container">
         <padding>
             <Insets top="30" left="30" right="30" bottom="30"/>
         </padding>
-        <Label text="Settings" styleClass="page-title"/>
-        <Label text="Configure application settings." styleClass="page-subtitle"/>
+
+        <!-- Header -->
+        <VBox spacing="5">
+            <Label text="⚙️ Cấu Hình Hệ Thống" styleClass="page-title"/>
+            <Label text="Quản lý cấu hình và thiết lập hệ thống" styleClass="page-subtitle"/>
+        </VBox>
+
+        <!-- TabPane for different settings -->
+        <TabPane fx:id="tabPane" tabClosingPolicy="UNAVAILABLE">
+            
+            <!-- Tab 1: Thông tin phòng gym -->
+            <Tab text="🏋️ Thông Tin Phòng Gym" closable="false">
+                <VBox spacing="15" style="-fx-padding: 20;">
+                    <Label text="Thông tin cơ bản của phòng gym" style="-fx-font-size: 14; -fx-font-weight: bold;"/>
+                    
+                    <GridPane hgap="15" vgap="15">
+                        <columnConstraints>
+                            <ColumnConstraints minWidth="150" prefWidth="150"/>
+                            <ColumnConstraints hgrow="ALWAYS" minWidth="300"/>
+                        </columnConstraints>
+                        
+                        <Label text="Tên phòng gym:" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                        <TextField fx:id="txtGymName" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                        
+                        <Label text="Địa chỉ:" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                        <TextField fx:id="txtGymAddress" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                        
+                        <Label text="Số điện thoại:" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+                        <TextField fx:id="txtGymPhone" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+                        
+                        <Label text="Email:" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
+                        <TextField fx:id="txtGymEmail" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+                    </GridPane>
+                    
+                    <HBox spacing="10" alignment="CENTER_RIGHT">
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Button fx:id="btnSaveBranch" text="💾 Lưu" 
+                                style="-fx-background-color: #4CAF50; -fx-text-fill: white;"/>
+                    </HBox>
+                </VBox>
+            </Tab>
+
+            <!-- Tab 2: Cấu hình nghiệp vụ -->
+            <Tab text="📋 Cấu Hình Nghiệp Vụ" closable="false">
+                <VBox spacing="15" style="-fx-padding: 20;">
+                    <Label text="Cấu hình các quy tắc nghiệp vụ" style="-fx-font-size: 14; -fx-font-weight: bold;"/>
+                    
+                    <GridPane hgap="15" vgap="15">
+                        <columnConstraints>
+                            <ColumnConstraints minWidth="200" prefWidth="250"/>
+                            <ColumnConstraints hgrow="ALWAYS" minWidth="200"/>
+                        </columnConstraints>
+                        
+                        <Label text="Số ngày gia hạn tự động (Grace Days):" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                        <TextField fx:id="txtGraceDays" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                        
+                        <Label text="Số ngày nhắc nhở trước khi hết hạn:" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                        <TextField fx:id="txtReminderDays" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                        
+                        <Label text="Tiền tố mã hội viên:" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+                        <TextField fx:id="txtMemberCodePrefix" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+                        
+                        <Label text="Tiền tố số hóa đơn:" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
+                        <TextField fx:id="txtInvoicePrefix" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+                        
+                        <Label text="Ký hiệu tiền tệ:" GridPane.columnIndex="0" GridPane.rowIndex="4"/>
+                        <TextField fx:id="txtCurrencySymbol" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
+                    </GridPane>
+                    
+                    <HBox spacing="10" alignment="CENTER_RIGHT">
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Button fx:id="btnSaveBusiness" text="💾 Lưu" 
+                                style="-fx-background-color: #4CAF50; -fx-text-fill: white;"/>
+                    </HBox>
+                </VBox>
+            </Tab>
+
+            <!-- Tab 3: Chiết khấu sự kiện -->
+            <Tab text="🎉 Chiết Khấu Sự Kiện" closable="false">
+                <VBox spacing="15" style="-fx-padding: 20;">
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <Label text="Quản lý chiết khấu cho các sự kiện đặc biệt" style="-fx-font-size: 14; -fx-font-weight: bold;"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Button fx:id="btnAddEventDiscount" text="➕ Thêm sự kiện" 
+                                style="-fx-background-color: #2196F3; -fx-text-fill: white;"/>
+                    </HBox>
+                    
+                    <TableView fx:id="tblEventDiscounts" prefHeight="400">
+                        <columns>
+                            <TableColumn fx:id="colEventName" text="Tên sự kiện" prefWidth="150"/>
+                            <TableColumn fx:id="colEventDescription" text="Mô tả" prefWidth="200"/>
+                            <TableColumn fx:id="colEventDiscountPercent" text="Giảm %" prefWidth="100"/>
+                            <TableColumn fx:id="colEventDiscountAmount" text="Giảm số tiền" prefWidth="120"/>
+                            <TableColumn fx:id="colEventStartDate" text="Ngày bắt đầu" prefWidth="120"/>
+                            <TableColumn fx:id="colEventEndDate" text="Ngày kết thúc" prefWidth="120"/>
+                            <TableColumn fx:id="colEventActive" text="Kích hoạt" prefWidth="80"/>
+                            <TableColumn fx:id="colEventActions" text="Thao tác" prefWidth="120"/>
+                        </columns>
+                    </TableView>
+                </VBox>
+            </Tab>
+
+            <!-- Tab 4: Thông báo -->
+            <Tab text="🔔 Thông Báo" closable="false">
+                <VBox spacing="15" style="-fx-padding: 20;">
+                    <Label text="Cấu hình thông báo tự động" style="-fx-font-size: 14; -fx-font-weight: bold;"/>
+                    
+                    <VBox spacing="10">
+                        <CheckBox fx:id="chkAutoReminder" text="Bật tự động nhắc nhở hội viên sắp hết hạn"/>
+                    </VBox>
+                    
+                    <HBox spacing="10" alignment="CENTER_RIGHT">
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Button fx:id="btnSaveNotification" text="💾 Lưu" 
+                                style="-fx-background-color: #4CAF50; -fx-text-fill: white;"/>
+                    </HBox>
+                </VBox>
+            </Tab>
+
+            <!-- Tab 5: Bảo mật -->
+            <Tab text="🔒 Bảo Mật" closable="false">
+                <VBox spacing="15" style="-fx-padding: 20;">
+                    <Label text="Cấu hình bảo mật hệ thống" style="-fx-font-size: 14; -fx-font-weight: bold;"/>
+                    
+                    <GridPane hgap="15" vgap="15">
+                        <columnConstraints>
+                            <ColumnConstraints minWidth="200" prefWidth="250"/>
+                            <ColumnConstraints hgrow="ALWAYS" minWidth="200"/>
+                        </columnConstraints>
+                        
+                        <Label text="Độ dài mật khẩu tối thiểu:" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                        <TextField fx:id="txtPasswordMinLength" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                        
+                        <Label text="Thời gian timeout session (phút):" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                        <TextField fx:id="txtSessionTimeout" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                        
+                        <Label text="Số lần đăng nhập sai tối đa:" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+                        <TextField fx:id="txtMaxLoginAttempts" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+                        
+                        <Label text="Thời gian khóa tài khoản (phút):" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
+                        <TextField fx:id="txtLockoutDuration" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+                    </GridPane>
+                    
+                    <HBox spacing="10" alignment="CENTER_RIGHT">
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Button fx:id="btnSaveSecurity" text="💾 Lưu" 
+                                style="-fx-background-color: #4CAF50; -fx-text-fill: white;"/>
+                    </HBox>
+                </VBox>
+            </Tab>
+
+            <!-- Tab 6: Hệ thống -->
+            <Tab text="ℹ️ Hệ Thống" closable="false">
+                <VBox spacing="15" style="-fx-padding: 20;">
+                    <Label text="Thông tin hệ thống" style="-fx-font-size: 14; -fx-font-weight: bold;"/>
+                    
+                    <GridPane hgap="15" vgap="15">
+                        <columnConstraints>
+                            <ColumnConstraints minWidth="200" prefWidth="250"/>
+                            <ColumnConstraints hgrow="ALWAYS" minWidth="200"/>
+                        </columnConstraints>
+                        
+                        <Label text="Phiên bản ứng dụng:" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                        <Label fx:id="lblAppVersion" text="1.0.0" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                        
+                        <Label text="Phiên bản database:" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                        <Label fx:id="lblDbVersion" text="-" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                        
+                        <Label text="Thông tin database:" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+                        <Label fx:id="lblDbInfo" text="-" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+                    </GridPane>
+                    
+                    <Separator/>
+                    
+                    <HBox spacing="10">
+                        <Button fx:id="btnViewLogs" text="📄 Xem Logs" 
+                                style="-fx-background-color: #757575; -fx-text-fill: white;"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                    </HBox>
+                </VBox>
+            </Tab>
+
+        </TabPane>
+
     </VBox>
 </ScrollPane>

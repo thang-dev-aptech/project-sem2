@@ -2,6 +2,7 @@ package com.example.gympro.repository.subscription;
 
 import com.example.gympro.domain.member.Member;
 import com.example.gympro.domain.plan.Plan;
+import com.example.gympro.service.settings.SettingsService;
 
 import java.sql.Connection;
 import java.sql.Date;
@@ -50,7 +51,10 @@ public class RegistrationRepository implements RegistrationRepositoryInterface {
     @Override
     public long createInvoice(Connection conn, Member member, Plan plan, long subscriptionId, long createdByUserId)
             throws SQLException {
-        String invoiceNo = "INV-" + System.currentTimeMillis();
+        // Lấy invoice prefix từ settings
+        SettingsService settingsService = new SettingsService();
+        String invoicePrefix = settingsService.getInvoicePrefix();
+        String invoiceNo = invoicePrefix + "-" + System.currentTimeMillis();
         try (PreparedStatement pstmt = conn.prepareStatement(INSERT_INVOICE_SQL, Statement.RETURN_GENERATED_KEYS)) {
             pstmt.setLong(1, member.getId());
             pstmt.setLong(2, subscriptionId);

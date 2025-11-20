@@ -11,8 +11,8 @@
         </padding>
 
      <VBox spacing="5">
-        <Label text="Expiring Members" styleClass="page-title"/>
-        <Label text="View and manage members whose memberships are expiring soon." styleClass="page-subtitle"/>
+        <Label text="Quản Lý Hội Viên Sắp Hết Hạn" styleClass="page-title"/>
+        <Label text="Xem và quản lý hội viên có gói tập sắp hết hạn (≤ 14 ngày) hoặc đã hết hạn (≤ 30 ngày qua)" styleClass="page-subtitle"/>
     </VBox>
 
         <HBox spacing="10" alignment="CENTER_LEFT" style="-fx-background-color: #0D1B2A; -fx-padding: 10;">

@@ -42,6 +42,12 @@ public class UserService {
 
         // Hash password nếu có
         if (vm.getPassword() != null && !vm.getPassword().trim().isEmpty()) {
+            // Validate password min length từ settings
+            com.example.gympro.service.settings.SettingsService settingsService = new com.example.gympro.service.settings.SettingsService();
+            int minLength = settingsService.getPasswordMinLength();
+            if (vm.getPassword().length() < minLength) {
+                return Optional.empty(); // Password quá ngắn
+            }
             String hashedPassword = BCrypt.hashpw(vm.getPassword(), BCrypt.gensalt());
             user.setPasswordHash(hashedPassword);
         } else if (user.getId() == null || user.getId() == 0) {
@@ -60,6 +66,12 @@ public class UserService {
 
             // Cập nhật password nếu có
             if (updated && vm.getPassword() != null && !vm.getPassword().trim().isEmpty()) {
+                // Validate password min length từ settings
+                com.example.gympro.service.settings.SettingsService settingsService = new com.example.gympro.service.settings.SettingsService();
+                int minLength = settingsService.getPasswordMinLength();
+                if (vm.getPassword().length() < minLength) {
+                    return Optional.empty(); // Password quá ngắn
+                }
                 String hashedPassword = BCrypt.hashpw(vm.getPassword(), BCrypt.gensalt());
                 userRepository.updatePassword(user.getId(), hashedPassword);
             }

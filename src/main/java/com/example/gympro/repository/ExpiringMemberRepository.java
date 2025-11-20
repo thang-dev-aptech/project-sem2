@@ -16,6 +16,10 @@ import javafx.collections.ObservableList;
 public class ExpiringMemberRepository {
     public ObservableList<ExpiringMember> getExpiringMembers(int maxDayLeft) {
         ObservableList<ExpiringMember> list = FXCollections.observableArrayList();
+        
+        // Lấy reminder days từ settings (nếu maxDayLeft = 0 hoặc null thì dùng default)
+        int reminderDays = maxDayLeft > 0 ? maxDayLeft : 7; // Default 7 nếu không chỉ định
+        
         // Lấy members sắp hết hạn (trong vòng maxDayLeft ngày) hoặc đã hết hạn (trong vòng 30 ngày qua)
         String sql = """
                       SELECT
@@ -26,28 +30,28 @@ public class ExpiringMemberRepository {
                       s.end_date,
                       DATEDIFF(s.end_date, CURDATE()) AS days_left
                   FROM members m
-                  JOIN (
+                  INNER JOIN subscriptions s ON m.id = s.member_id
+                  INNER JOIN plans p ON s.plan_id = p.id
+                  INNER JOIN (
                       SELECT member_id, MAX(end_date) AS max_end_date
                       FROM subscriptions
                       GROUP BY member_id
-                  ) latest ON m.id = latest.member_id
-                  JOIN subscriptions s
-                      ON s.member_id = latest.member_id
+                  ) latest ON s.member_id = latest.member_id 
                       AND s.end_date = latest.max_end_date
-                  JOIN plans p ON s.plan_id = p.id
-                  WHERE (DATEDIFF(s.end_date, CURDATE()) BETWEEN -30 AND ?)
+                  WHERE DATEDIFF(s.end_date, CURDATE()) BETWEEN -30 AND ?
                     AND m.is_deleted = 0
-                    AND m.status IN ('ACTIVE', 'PENDING', 'RENEWED')
-                  ORDER BY s.end_date ASC;
-
+                  ORDER BY s.end_date ASC
                 """;
 
         try (Connection conn = DatabaseConnection.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql);) {
-            ps.setInt(1, maxDayLeft);
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, reminderDays);
+            System.out.println("🔍 Query expiring members với maxDayLeft = " + maxDayLeft);
             ResultSet rs = ps.executeQuery();
 
+            int count = 0;
             while (rs.next()) {
+                count++;
                 String id = rs.getString("member_code");
                 String name = rs.getString("full_name");
                 String phone = rs.getString("phone");
@@ -55,10 +59,12 @@ public class ExpiringMemberRepository {
                 LocalDate endDate = rs.getDate("end_date").toLocalDate();
                 int daysLeft = (int) ChronoUnit.DAYS.between(LocalDate.now(), endDate);
 
+                System.out.println("✅ Found: " + id + " - " + name + " - Days left: " + daysLeft);
                 list.add(new ExpiringMember(id, name, packageName, endDate.toString(), daysLeft, phone));
-
             }
+            System.out.println("📊 Total expiring members found: " + count);
         } catch (SQLException e) {
+            System.err.println("❌ SQL Error in getExpiringMembers: " + e.getMessage());
             e.printStackTrace();
         }
         return list;

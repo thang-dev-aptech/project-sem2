@@ -23,7 +23,7 @@
           <execution>
             <id>default-cli</id>
             <configuration>
-              <mainClass>com.gympro/com.gympro.MainApp</mainClass>
+              <mainClass>com.example.gympro/com.example.gympro.GymProApp</mainClass>
               <launcher>gympro</launcher>
               <stripDebug>true</stripDebug>
               <noManPages>true</noManPages>
@@ -44,7 +44,7 @@
             <configuration>
               <transformers>
                 <transformer>
-                  <mainClass>com.gympro.MainApp</mainClass>
+                  <mainClass>com.example.gympro.GymProApp</mainClass>
                 </transformer>
               </transformers>
             </configuration>
@@ -65,6 +65,11 @@
             <artifactId>mysql-connector-j</artifactId>
             <version>8.4.0</version>
           </dependency>
+          <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-mysql</artifactId>
+            <version>10.14.0</version>
+          </dependency>
         </dependencies>
         <configuration>
           <url>jdbc:mysql://localhost:3306/gympro?useSSL=false&amp;serverTimezone=UTC&amp;allowPublicKeyRetrieval=true</url>
@@ -75,7 +80,12 @@
             <location>filesystem:db/migration</location>
           </locations>
           <baselineOnMigrate>true</baselineOnMigrate>
+          <validateOnMigrate>true</validateOnMigrate>
           <cleanDisabled>false</cleanDisabled>
+          <encoding>UTF-8</encoding>
+          <sqlMigrationPrefix>V</sqlMigrationPrefix>
+          <sqlMigrationSeparator>__</sqlMigrationSeparator>
+          <sqlMigrationSuffixes>.sql</sqlMigrationSuffixes>
         </configuration>
       </plugin>
     </plugins>
@@ -119,9 +129,9 @@
     </dependency>
   </dependencies>
   <properties>
+    <java.version>21</java.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <javafx.version>21.0.6</javafx.version>
     <junit.version>5.10.2</junit.version>
-    <java.version>21</java.version>
   </properties>
 </project>

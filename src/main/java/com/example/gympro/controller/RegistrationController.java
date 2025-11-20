@@ -252,10 +252,26 @@ public class RegistrationController {
             ex.printStackTrace();
         }
 
+        // Lấy Grace Days từ settings
+        com.example.gympro.service.settings.SettingsService settingsService = new com.example.gympro.service.settings.SettingsService();
+        int graceDays = settingsService.getGraceDays();
+        
         LocalDate today = LocalDate.now();
-        LocalDate startDate = (currentEndDate != null && currentEndDate.isAfter(today))
-                ? currentEndDate.plusDays(1)
-                : today;
+        LocalDate startDate;
+        
+        if (currentEndDate != null) {
+            // Nếu còn hạn hoặc hết hạn trong vòng grace days → gia hạn từ ngày hết hạn + 1
+            if (currentEndDate.isAfter(today) || 
+                (currentEndDate.isBefore(today) && java.time.temporal.ChronoUnit.DAYS.between(currentEndDate, today) <= graceDays)) {
+                startDate = currentEndDate.plusDays(1);
+            } else {
+                // Hết hạn quá lâu → gia hạn từ hôm nay
+                startDate = today;
+            }
+        } else {
+            startDate = today;
+        }
+        
         startDatePicker.setValue(startDate);
 
         Plan selectedPlan = packageComboBox.getValue();

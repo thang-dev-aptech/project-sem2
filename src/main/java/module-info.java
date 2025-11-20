@@ -22,4 +22,5 @@ module com.example.gympro {
     exports com.example.gympro;
     exports com.example.gympro.controller;
     exports com.example.gympro.viewModel;
+    exports com.example.gympro.utils;
 }
