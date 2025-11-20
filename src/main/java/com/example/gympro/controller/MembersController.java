@@ -2,6 +2,7 @@ package com.example.gympro.controller;
 
 import com.example.gympro.service.MemberService;
 import com.example.gympro.service.MemberServiceInterface;
+import com.example.gympro.service.AuthorizationService;
 import com.example.gympro.viewModel.Member;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -54,6 +55,7 @@ public class MembersController {
 
     // === SERVICE & DATA ===
     private final MemberService memberService = new MemberService();
+    private final AuthorizationService authService = new AuthorizationService();
     private final ObservableList<Member> memberData = FXCollections.observableArrayList();
     private Member selectedMember = null;
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
@@ -102,6 +104,11 @@ public class MembersController {
         setFormEditable(false);
         detailPane.setDisable(true);
         deleteButton.setVisible(false);
+        
+        // Ẩn nút xóa nếu user không có quyền
+        if (!authService.canDelete()) {
+            deleteButton.setVisible(false);
+        }
     }
 
     private void initializeColumns() {
@@ -268,6 +275,11 @@ public class MembersController {
 
     @FXML
     private void handleDelete() {
+        if (!authService.canDelete()) {
+            authService.showAccessDeniedAlert();
+            return;
+        }
+        
         if (selectedMember == null || selectedMember.getId() == 0) return;
 
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION, "Bạn có chắc chắn muốn xóa hội viên " + selectedMember.getFullName() + "? (Hành động này sẽ chuyển trạng thái sang EXPIRED và ẩn đi)", ButtonType.YES, ButtonType.NO);

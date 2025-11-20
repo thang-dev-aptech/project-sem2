@@ -1,15 +1,108 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.control.*?>
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 
-<ScrollPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.gympro.controller.UserManagementController" stylesheets="@../css/styles.css" fitToWidth="true" styleClass="dashboard-scroll">
+<ScrollPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.example.gympro.controller.UserManagementController"
+            stylesheets="@../css/styles.css" fitToWidth="true" styleClass="dashboard-scroll">
+
     <VBox spacing="20" styleClass="dashboard-container">
         <padding>
             <Insets top="30" left="30" right="30" bottom="30"/>
         </padding>
-        <Label text="User Management" styleClass="page-title"/>
-        <Label text="Manage admin users and permissions." styleClass="page-subtitle"/>
+
+        <!-- HEADER -->
+        <VBox spacing="5">
+            <Label text="Quản lý Người dùng" styleClass="page-title"/>
+            <Label text="Tạo và quản lý tài khoản người dùng và phân quyền." styleClass="page-subtitle"/>
+        </VBox>
+
+        <!-- THANH CÔNG CỤ -->
+        <ToolBar styleClass="tool-bar">
+            <items>
+                <TextField promptText="🔍 Tìm kiếm (Username, Tên, Email)..." fx:id="searchField" prefWidth="250"/>
+                <ComboBox fx:id="statusFilter" promptText="📊 Trạng thái" prefWidth="120"/>
+                <Separator orientation="VERTICAL"/>
+                <Button text="➕ Thêm User" styleClass="icon-button, success" onAction="#handleNewUser"/>
+                <Button text="🔄 Làm mới" styleClass="icon-button" onAction="#loadUsers"/>
+            </items>
+        </ToolBar>
+
+        <!-- SPLIT PANE -->
+        <SplitPane VBox.vgrow="ALWAYS" dividerPositions="0.55" orientation="VERTICAL" styleClass="main-split-pane">
+
+            <!-- HÀNG 1: TABLE VIEW -->
+            <VBox styleClass="card" spacing="10" minHeight="300">
+                <padding>
+                    <Insets top="20" right="20" bottom="10" left="20"/>
+                </padding>
+                <Label text="Danh sách người dùng" styleClass="card-title"/>
+                <TableView fx:id="usersTable" VBox.vgrow="ALWAYS">
+                    <columns>
+                        <TableColumn text="Username" prefWidth="120" fx:id="colUsername"/>
+                        <TableColumn text="Họ Tên" prefWidth="150" fx:id="colFullName"/>
+                        <TableColumn text="Email" prefWidth="180" fx:id="colEmail"/>
+                        <TableColumn text="Điện thoại" prefWidth="120" fx:id="colPhone"/>
+                        <TableColumn text="Quyền" prefWidth="150" fx:id="colRoles"/>
+                        <TableColumn text="Trạng thái" prefWidth="100" fx:id="colStatus"/>
+                        <TableColumn text="Đăng nhập cuối" prefWidth="150" fx:id="colLastLogin"/>
+                        <TableColumn text=" " prefWidth="78" fx:id="colActions"/>
+                    </columns>
+                </TableView>
+            </VBox>
+
+            <!-- HÀNG 2: FORM CHI TIẾT -->
+            <VBox fx:id="detailPane" spacing="15" styleClass="card, detail-form-container" minHeight="350">
+                <padding>
+                    <Insets top="20" right="20" bottom="10" left="20"/>
+                </padding>
+
+                <Label fx:id="formTitle" text="Chi tiết Người dùng" styleClass="card-title"/>
+                <Separator styleClass="form-separator"/>
+
+                <!-- FORM INPUTS -->
+                <GridPane hgap="20" vgap="15">
+                    <columnConstraints>
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="100" prefWidth="120"/>
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="100" prefWidth="250"/>
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="100" prefWidth="120"/>
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="100" prefWidth="250"/>
+                    </columnConstraints>
+
+                    <Label text="Username:" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                    <TextField fx:id="usernameField" promptText="username" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+
+                    <Label text="Trạng thái:" GridPane.columnIndex="2" GridPane.rowIndex="0"/>
+                    <ComboBox fx:id="statusComboBox" prefWidth="Infinity" GridPane.columnIndex="3" GridPane.rowIndex="0"/>
+
+                    <Label text="Họ và Tên:" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                    <TextField fx:id="fullNameField" promptText="Nguyễn Văn A" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+
+                    <Label text="Mật khẩu:" GridPane.columnIndex="2" GridPane.rowIndex="1"/>
+                    <PasswordField fx:id="passwordField" promptText="(Để trống nếu không đổi)" GridPane.columnIndex="3" GridPane.rowIndex="1"/>
+
+                    <Label text="Email:" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+                    <TextField fx:id="emailField" promptText="email@example.com" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+
+                    <Label text="Điện thoại:" GridPane.columnIndex="2" GridPane.rowIndex="2"/>
+                    <TextField fx:id="phoneField" promptText="090xxxxxxx" GridPane.columnIndex="3" GridPane.rowIndex="2"/>
+
+                    <Label text="Quyền:" GridPane.columnIndex="0" GridPane.rowIndex="3" GridPane.columnSpan="4"/>
+                    <VBox spacing="10" GridPane.columnIndex="0" GridPane.rowIndex="4" GridPane.columnSpan="4">
+                        <CheckBox text="OWNER - Chủ phòng gym (Toàn quyền)" fx:id="roleOwnerCheckBox"/>
+                        <CheckBox text="STAFF - Nhân viên quầy (Quyền hạn chế)" fx:id="roleStaffCheckBox"/>
+                    </VBox>
+                </GridPane>
+
+                <!-- BUTTONS -->
+                <HBox spacing="10" alignment="CENTER_RIGHT">
+                    <Button text="💾 Lưu" fx:id="saveButton" styleClass="icon-button, success" onAction="#handleSave"/>
+                    <Button text="🗑️ Xóa" fx:id="deleteButton" styleClass="icon-button, danger" onAction="#handleDelete"/>
+                    <Button text="❌ Hủy" styleClass="icon-button" onAction="#handleCancel"/>
+                </HBox>
+            </VBox>
+        </SplitPane>
     </VBox>
 </ScrollPane>

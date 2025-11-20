@@ -16,6 +16,9 @@ public class RoleRepository {
             "SELECT r.id, r.name, r.description " +
             "FROM user_roles ur JOIN roles r ON ur.role_id = r.id WHERE ur.user_id = ?";
 
+    private static final String SQL_FIND_ALL =
+            "SELECT id, name, description FROM roles ORDER BY name";
+
     public List<Role> findRolesByUserId(Long userId) {
         List<Role> roles = new ArrayList<>();
         try (Connection conn = DatabaseConnection.getConnection();
@@ -23,17 +26,35 @@ public class RoleRepository {
             ps.setLong(1, userId);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    Role role = new Role();
-                    role.setId(rs.getLong("id"));
-                    role.setName(rs.getString("name"));
-                    role.setDescription(rs.getString("description"));
-                    roles.add(role);
+                    roles.add(mapResultSetToRole(rs));
                 }
             }
         } catch (SQLException e) {
             throw new RuntimeException("Failed to query roles by user id", e);
         }
         return roles;
+    }
+
+    public List<Role> findAll() {
+        List<Role> roles = new ArrayList<>();
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(SQL_FIND_ALL);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                roles.add(mapResultSetToRole(rs));
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to query all roles", e);
+        }
+        return roles;
+    }
+
+    private Role mapResultSetToRole(ResultSet rs) throws SQLException {
+        Role role = new Role();
+        role.setId(rs.getLong("id"));
+        role.setName(rs.getString("name"));
+        role.setDescription(rs.getString("description"));
+        return role;
     }
 }
 

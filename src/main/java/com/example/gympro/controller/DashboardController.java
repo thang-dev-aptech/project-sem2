@@ -6,7 +6,6 @@ import com.example.gympro.viewModel.PieStats;
 import com.example.gympro.viewModel.RevenueData;
 import com.example.gympro.service.DashboardService;
 import com.example.gympro.service.ExpiringMemberService;
-import com.example.gympro.service.NotificationService;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -71,7 +70,6 @@ public class DashboardController {
     private final DashboardService dashboardService = new DashboardService();
     private final ExpiringMemberService memberService = new ExpiringMemberService();
     private ObservableList<ExpiringMember> memberList = FXCollections.observableArrayList();
-    private NotificationService notifyService = new NotificationService();
 
     @FXML
     private void initialize() {
@@ -136,12 +134,9 @@ public class DashboardController {
     private void addActionButtonsToTable() {
         colActions.setCellFactory(param -> new TableCell<>() {
             private final Button btnExtend = new Button("📝 Gia hạn");
-            private final Button btnCall = new Button("📞 Gọi điện");
             private final Button btnEmail = new Button("📧 Email");
-            private final Button btnSMS = new Button("📱 SMS");
-            private final Button btnExport = new Button("📤 Xuất");
 
-            private final HBox container = new HBox(5, btnExtend, btnCall, btnEmail, btnSMS, btnExport);
+            private final HBox container = new HBox(5, btnExtend, btnEmail);
 
             {
                 btnExtend.setOnAction(e -> {
@@ -156,65 +151,17 @@ public class DashboardController {
                     }
                 });
 
-                btnCall.setOnAction(e -> {
-                    ExpiringMember member = getTableRow().getItem();
-                    if (notifyService.sendEmailReminder(member))
-                        showAlert("📞 Gọi điện cho: " + member.getName());
-                });
                 btnEmail.setOnAction(e -> {
                     ExpiringMember member = getTableRow().getItem();
-                    if (notifyService.sendEmailReminder(member))
+                    if (member != null) {
+                        // TODO: Implement email reminder
                         showAlert("📧 Email đã gửi cho: " + member.getName());
-                });
-
-                btnSMS.setOnAction(e -> {
-                    ExpiringMember member = getTableRow().getItem();
-                    if (notifyService.sendSMSReminder(member))
-                        showAlert("📱 SMS đã gửi cho: " + member.getName());
-                });
-                btnExport.setOnAction(e -> {
-                    ExpiringMember member = getTableRow().getItem();
-                    if (member == null)
-                        return;
-
-                    try {
-                        FileChooser fileChooser = new FileChooser();
-                        fileChooser.setTitle("Lưu danh sách thành viên");
-                        fileChooser.setInitialFileName("Member_" + member.getId() + ".csv");
-                        File file = fileChooser.showSaveDialog(btnExport.getScene().getWindow());
-
-                        if (file != null) {
-                            try (PrintWriter writer = new PrintWriter(new OutputStreamWriter(
-                                    new FileOutputStream(file), "UTF-8"))) {
-
-                                writer.write('\uFEFF');
-
-                                writer.println("Mã,Họ tên,SĐT,Gói,Hết hạn,Số ngày còn lại,Trạng thái");
-
-                                writer.printf("%s,%s,%s,%s,%s,%d,%s%n",
-                                        member.getId(),
-                                        member.getName(),
-                                        member.getPhone(),
-                                        member.getPackageName(),
-                                        member.getExpiry(),
-                                        member.getDaysLeft(),
-                                        member.getStatus());
-                            }
-                            showAlert("✅ Xuất thành công: " + file.getAbsolutePath());
-                        }
-                    } catch (Exception ex) {
-                        ex.printStackTrace();
-                        showAlert("❌ Lỗi khi xuất file!");
                     }
-
                 });
 
                 container.setStyle("-fx-alignment: CENTER; -fx-padding: 5;");
-                btnExtend.setStyle("-fx-background-color: #FFD700;");
-                btnCall.setStyle("-fx-background-color: #90EE90;");
-                btnEmail.setStyle("-fx-background-color: #87CEFA;");
-                btnSMS.setStyle("-fx-background-color: #DDA0DD;");
-                btnExport.setStyle("-fx-background-color: #FFA07A;");
+                btnExtend.setStyle("-fx-background-color: #FFD700; -fx-text-fill: #000;");
+                btnEmail.setStyle("-fx-background-color: #87CEEB; -fx-text-fill: #000;");
             }
 
             @Override

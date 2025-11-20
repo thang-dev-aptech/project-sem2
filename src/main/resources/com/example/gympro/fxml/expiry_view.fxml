@@ -26,7 +26,6 @@
 
             <TextField fx:id="txtSearch" promptText="🔍 Tìm kiếm hội viên..." prefWidth="200"/>
             <Button fx:id="btnExport" text="📤 Xuất Excel" style="-fx-background-color: #FFD700;"/>
-            <Button fx:id="btnNotify" text="📧 Gửi nhắc hàng loạt" style="-fx-background-color: #FFD700;"/>
         </HBox>
 
         <TableView fx:id="tblExpiry" prefHeight="400">
@@ -39,7 +38,7 @@
                 <TableColumn fx:id="colExpiry" text="Số ngày còn lại" prefWidth="100"/>
                 <TableColumn fx:id="colStatus" text="Trạng thái" prefWidth="120"/>
 
-                <TableColumn fx:id="colActions" text="Hành động" prefWidth="400"/>
+                <TableColumn fx:id="colActions" text="Hành động" prefWidth="180"/>
             </columns>
         </TableView>
 

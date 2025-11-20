@@ -50,16 +50,4 @@ public class ExpiringMember {
     public void setStatus(String status) {
         this.status = status;
     }
-
-    public Member toMember() {
-        return new Member(
-                this.getId(),
-                this.getName(),
-                "",
-                this.getPhone(),
-                this.getExpiry(),
-                "ACTIVE",
-                this.getPackageName());
-    }
-
 }

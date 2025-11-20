@@ -2,6 +2,7 @@ package com.example.gympro.controller;
 
 import com.example.gympro.service.PackageServiceInterface;
 import com.example.gympro.service.PackageService;
+import com.example.gympro.service.AuthorizationService;
 import com.example.gympro.viewModel.Package;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -48,6 +49,7 @@ public class PackagesController {
 
     // === SERVICE & DATA ===
     private final PackageServiceInterface packageService = new PackageService();
+    private final AuthorizationService authService = new AuthorizationService();
     private final ObservableList<Package> packageData = FXCollections.observableArrayList();
     private Package selectedPackage = null;
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
@@ -83,6 +85,12 @@ public class PackagesController {
         setFormEditable(false);
         detailPane.setDisable(true);
         deleteButton.setVisible(false);
+        
+        // Chỉ OWNER mới quản lý được gói tập
+        if (!authService.canManagePackages()) {
+            detailPane.setDisable(true);
+            detailPane.setVisible(false);
+        }
     }
 
     private void initializeColumns() {
@@ -174,6 +182,11 @@ public class PackagesController {
 
     @FXML
     private void handleNewPackage() {
+        if (!authService.canManagePackages()) {
+            authService.showAccessDeniedAlert();
+            return;
+        }
+        
         packagesTable.getSelectionModel().clearSelection();
         selectedPackage = new Package();
         formTitle.setText("➕ Thêm Gói tập Mới");
@@ -194,6 +207,11 @@ public class PackagesController {
 
     @FXML
     private void handleSave() {
+        if (!authService.canManagePackages()) {
+            authService.showAccessDeniedAlert();
+            return;
+        }
+        
         if (!isInputValid()) {
             new Alert(Alert.AlertType.WARNING, "Vui lòng kiểm tra lại dữ liệu nhập. Tên, Code, Giá và Số ngày không được để trống/sai định dạng.").showAndWait();
             return;
@@ -229,7 +247,11 @@ public class PackagesController {
 
     @FXML
     private void handleDelete() {
-        // Logic xóa (giữ nguyên)
+        if (!authService.canManagePackages()) {
+            authService.showAccessDeniedAlert();
+            return;
+        }
+        
         if (selectedPackage == null || selectedPackage.getId() == 0) return;
 
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION, "Bạn có chắc chắn muốn xóa gói tập " + selectedPackage.getName() + "?", ButtonType.YES, ButtonType.NO);

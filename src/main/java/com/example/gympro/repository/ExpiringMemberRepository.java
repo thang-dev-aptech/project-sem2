@@ -16,6 +16,7 @@ import javafx.collections.ObservableList;
 public class ExpiringMemberRepository {
     public ObservableList<ExpiringMember> getExpiringMembers(int maxDayLeft) {
         ObservableList<ExpiringMember> list = FXCollections.observableArrayList();
+        // Lấy members sắp hết hạn (trong vòng maxDayLeft ngày) hoặc đã hết hạn (trong vòng 30 ngày qua)
         String sql = """
                       SELECT
                       m.member_code,
@@ -34,13 +35,14 @@ public class ExpiringMemberRepository {
                       ON s.member_id = latest.member_id
                       AND s.end_date = latest.max_end_date
                   JOIN plans p ON s.plan_id = p.id
-                  WHERE DATEDIFF(s.end_date, CURDATE()) BETWEEN 0 AND ?
+                  WHERE (DATEDIFF(s.end_date, CURDATE()) BETWEEN -30 AND ?)
                     AND m.is_deleted = 0
+                    AND m.status IN ('ACTIVE', 'PENDING', 'RENEWED')
                   ORDER BY s.end_date ASC;
 
                 """;
 
-        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+        try (Connection conn = DatabaseConnection.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);) {
             ps.setInt(1, maxDayLeft);
             ResultSet rs = ps.executeQuery();

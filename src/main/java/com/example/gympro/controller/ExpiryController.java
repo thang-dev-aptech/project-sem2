@@ -1,8 +1,6 @@
 package com.example.gympro.controller;
 
 import com.example.gympro.service.ExpiringMemberService;
-import com.example.gympro.service.NotificationService;
-
 import com.example.gympro.viewModel.ExpiringMember;
 
 import javafx.collections.FXCollections;
@@ -43,13 +41,10 @@ public class ExpiryController {
     @FXML
     private TextField txtSearch;
     @FXML
-    private Button btnNotify;
-    @FXML
     private Button btnExport;
 
     private ObservableList<ExpiringMember> memberList = FXCollections.observableArrayList();
     private ExpiringMemberService service = new ExpiringMemberService();
-    private NotificationService notifyService = new NotificationService();
 
     @FXML
     public void initialize() {
@@ -58,7 +53,6 @@ public class ExpiryController {
         setupFilter();
         setupSearch();
         addActionButtonsToTable();
-        btnNotify.setOnAction(e -> sendBulkReminder());
         btnExport.setOnAction(e -> exportMembersToCSV());
 
     }
@@ -100,11 +94,6 @@ public class ExpiryController {
         }
     }
 
-    private void sendBulkReminder() {
-        int sent = notifyService.sendBulkReminder(memberList);
-        showAlert("📩 Đã gửi nhắc cho " + sent + "/" + memberList.size() + " thành viên.");
-    }
-
     private void setupColumns() {
         colCode.setCellValueFactory(new PropertyValueFactory<>("id"));
         colName.setCellValueFactory(new PropertyValueFactory<>("name"));
@@ -130,17 +119,24 @@ public class ExpiryController {
                 case "≤ 7 ngày" -> 7;
                 case "≤ 14 ngày" -> 14;
                 default -> 14;
-
             };
-            tblExpiry.setItems(service.getExpiringMembers(days));
+            memberList = service.getExpiringMembers(days);
+            tblExpiry.setItems(memberList);
+            // Reset search khi filter
+            txtSearch.clear();
         });
-
     }
 
     private void setupSearch() {
         txtSearch.textProperty().addListener((obs, oldText, newText) -> {
-            ObservableList<ExpiringMember> filtered = service.search(memberList, newText);
-            tblExpiry.setItems(filtered);
+            if (newText == null || newText.trim().isEmpty()) {
+                // Nếu search rỗng, hiển thị lại memberList gốc
+                tblExpiry.setItems(memberList);
+            } else {
+                // Search trên memberList hiện tại
+                ObservableList<ExpiringMember> filtered = service.search(memberList, newText);
+                tblExpiry.setItems(filtered);
+            }
         });
     }
 
@@ -154,12 +150,9 @@ public class ExpiryController {
     private void addActionButtonsToTable() {
         colActions.setCellFactory(param -> new TableCell<>() {
             private final Button btnExtend = new Button("📝 Gia hạn");
-            private final Button btnCall = new Button("📞 Gọi điện");
             private final Button btnEmail = new Button("📧 Email");
-            private final Button btnSMS = new Button("📱 SMS");
-            private final Button btnExport = new Button("📤 Xuất");
 
-            private final HBox container = new HBox(5, btnExtend, btnCall, btnEmail, btnSMS, btnExport);
+            private final HBox container = new HBox(5, btnExtend, btnEmail);
 
             {
                 btnExtend.setOnAction(e -> {
@@ -174,65 +167,17 @@ public class ExpiryController {
                     }
                 });
 
-                btnCall.setOnAction(e -> {
-                    ExpiringMember member = getTableRow().getItem();
-                    if (notifyService.sendEmailReminder(member))
-                        showAlert("📞 Gọi điện cho: " + member.getName());
-                });
                 btnEmail.setOnAction(e -> {
                     ExpiringMember member = getTableRow().getItem();
-                    if (notifyService.sendEmailReminder(member))
+                    if (member != null) {
+                        // TODO: Implement email reminder
                         showAlert("📧 Email đã gửi cho: " + member.getName());
-                });
-
-                btnSMS.setOnAction(e -> {
-                    ExpiringMember member = getTableRow().getItem();
-                    if (notifyService.sendSMSReminder(member))
-                        showAlert("📱 SMS đã gửi cho: " + member.getName());
-                });
-                btnExport.setOnAction(e -> {
-                    ExpiringMember member = getTableRow().getItem();
-                    if (member == null)
-                        return;
-
-                    try {
-                        FileChooser fileChooser = new FileChooser();
-                        fileChooser.setTitle("Lưu danh sách thành viên");
-                        fileChooser.setInitialFileName("Member_" + member.getId() + ".csv");
-                        File file = fileChooser.showSaveDialog(btnExport.getScene().getWindow());
-
-                        if (file != null) {
-                            try (PrintWriter writer = new PrintWriter(new OutputStreamWriter(
-                                    new FileOutputStream(file), "UTF-8"))) {
-
-                                writer.write('\uFEFF');
-
-                                writer.println("Mã,Họ tên,SĐT,Gói,Hết hạn,Số ngày còn lại,Trạng thái");
-
-                                writer.printf("%s,%s,%s,%s,%s,%d,%s%n",
-                                        member.getId(),
-                                        member.getName(),
-                                        member.getPhone(),
-                                        member.getPackageName(),
-                                        member.getExpiry(),
-                                        member.getDaysLeft(),
-                                        member.getStatus());
-                            }
-                            showAlert("✅ Xuất thành công: " + file.getAbsolutePath());
-                        }
-                    } catch (Exception ex) {
-                        ex.printStackTrace();
-                        showAlert("❌ Lỗi khi xuất file!");
                     }
-
                 });
 
                 container.setStyle("-fx-alignment: CENTER; -fx-padding: 5;");
-                btnExtend.setStyle("-fx-background-color: #FFD700;");
-                btnCall.setStyle("-fx-background-color: #90EE90;");
-                btnEmail.setStyle("-fx-background-color: #87CEFA;");
-                btnSMS.setStyle("-fx-background-color: #DDA0DD;");
-                btnExport.setStyle("-fx-background-color: #FFA07A;");
+                btnExtend.setStyle("-fx-background-color: #FFD700; -fx-text-fill: #000;");
+                btnEmail.setStyle("-fx-background-color: #87CEEB; -fx-text-fill: #000;");
             }
 
             @Override

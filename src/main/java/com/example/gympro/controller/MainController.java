@@ -9,6 +9,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import com.example.gympro.GymProApp;
 import com.example.gympro.service.SessionManager;
+import com.example.gympro.service.AuthorizationService;
 import java.io.IOException;
 import com.example.gympro.viewModel.*;;
 
@@ -21,6 +22,7 @@ public class MainController {
     private Button logoutBtn;
 
     private String currentScreen = "dashboard";
+    private final AuthorizationService authService = new AuthorizationService();
 
     private static MainController instance;
 
@@ -53,6 +55,21 @@ public class MainController {
             Button btn = new Button(menuItems[i]);
             btn.getStyleClass().add("nav-button");
             final String screenId = screenIds[i];
+            
+            // Ẩn menu theo quyền
+            if (screenId.equals("packages") && !authService.canManagePackages()) {
+                btn.setVisible(false);
+                continue;
+            }
+            if (screenId.equals("settings") && !authService.canManageSettings()) {
+                btn.setVisible(false);
+                continue;
+            }
+            if (screenId.equals("users") && !authService.isOwner()) {
+                btn.setVisible(false);
+                continue;
+            }
+            
             btn.setOnAction(e -> {
                 currentScreen = screenId;
                 loadScreen(screenId);
