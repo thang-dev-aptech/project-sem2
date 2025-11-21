@@ -88,6 +88,35 @@
           <sqlMigrationSuffixes>.sql</sqlMigrationSuffixes>
         </configuration>
       </plugin>
+      <plugin>
+        <groupId>org.panteleyev</groupId>
+        <artifactId>jpackage-maven-plugin</artifactId>
+        <version>1.6.5</version>
+        <configuration>
+          <name>GymPro</name>
+          <appVersion>${project.version}</appVersion>
+          <vendor>GymPro Team</vendor>
+          <destination>target/dist</destination>
+          <input>${project.build.directory}</input>
+          <mainJar>${project.build.finalName}.jar</mainJar>
+          <mainClass>com.example.gympro.GymProApp</mainClass>
+          <javaOptions>
+            <option>-Dfile.encoding=UTF-8</option>
+            <option>--module-path</option>
+            <option>${project.build.directory}/lib</option>
+            <option>--add-modules</option>
+            <option>javafx.controls,javafx.fxml</option>
+          </javaOptions>
+          <macPackageIdentifier>com.gympro.app</macPackageIdentifier>
+          <macPackageName>GymPro</macPackageName>
+          <macSign>false</macSign>
+          <winDirChooser>true</winDirChooser>
+          <winMenu>true</winMenu>
+          <winShortcut>true</winShortcut>
+          <linuxMenuGroup>Office</linuxMenuGroup>
+          <linuxShortcut>true</linuxShortcut>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
   <dependencies>

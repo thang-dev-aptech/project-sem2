@@ -64,7 +64,23 @@ mvn clean compile
 mvn javafx:run
 ```
 
-**Note:** JavaFX applications cannot run directly from JAR file. Use the launcher script or Maven command above.
+**Option 3: Build Native Application (Optional)**
+
+Build a native application (.app on macOS, .exe on Windows):
+
+**macOS/Linux:**
+```bash
+./build-app.sh
+```
+
+**Windows:**
+```cmd
+build-app.bat
+```
+
+The native application will be created in `target/dist/` directory.
+
+**Note:** JavaFX applications cannot run directly from JAR file. Use the launcher script, Maven command, or build native application.
 
 ### Step 5: Login
 - **Username:** `admin`
@@ -130,6 +146,8 @@ GymPro/
 ├── docker-compose.yml       # Docker MySQL setup
 ├── run.sh                   # Launcher script (macOS/Linux)
 ├── run.bat                  # Launcher script (Windows)
+├── build-app.sh             # Build native app script (macOS/Linux)
+├── build-app.bat            # Build native app script (Windows)
 └── pom.xml                  # Maven dependencies
 ```
 
