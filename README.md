@@ -46,17 +46,25 @@ mvn flyway:migrate
 
 ### Step 4: Run the application
 
-**Option 1: Run with Maven (Recommended)**
+**Option 1: Run with launcher script (Recommended)**
+
+**macOS/Linux:**
+```bash
+./run.sh
+```
+
+**Windows:**
+```cmd
+run.bat
+```
+
+**Option 2: Run with Maven**
 ```bash
 mvn clean compile
 mvn javafx:run
 ```
 
-**Option 2: Build JAR and run**
-```bash
-mvn clean package
-java -jar target/GymPro-1.0.0.jar
-```
+**Note:** JavaFX applications cannot run directly from JAR file. Use the launcher script or Maven command above.
 
 ### Step 5: Login
 - **Username:** `admin`
@@ -92,6 +100,11 @@ db.password=root123
   mvn flyway:migrate
   ```
 
+### JavaFX runtime error
+- **Do not run JAR directly** with `java -jar`
+- Use launcher script: `./run.sh` (macOS/Linux) or `run.bat` (Windows)
+- Or use Maven: `mvn javafx:run`
+
 ---
 
 ## 📂 Project Structure
@@ -115,6 +128,8 @@ GymPro/
 │   ├── V1__GymPro_Complete_Schema.sql
 │   └── V2__Seed_Data.sql
 ├── docker-compose.yml       # Docker MySQL setup
+├── run.sh                   # Launcher script (macOS/Linux)
+├── run.bat                  # Launcher script (Windows)
 └── pom.xml                  # Maven dependencies
 ```
 
