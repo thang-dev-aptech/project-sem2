@@ -1,9 +1,11 @@
 package com.example.gympro;
 
-import javafx.application.Application;
-
+/**
+ * Launcher class for jpackage native application
+ * This class is needed because jpackage requires a non-module launcher
+ */
 public class Launcher {
     public static void main(String[] args) {
-        Application.launch(GymProApp.class, args);
+        GymProApp.main(args);
     }
 }

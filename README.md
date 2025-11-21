@@ -66,7 +66,7 @@ mvn javafx:run
 
 **Option 3: Build Native Application (Optional)**
 
-Build a native application (.app on macOS, .exe on Windows):
+Build a native application (.dmg on macOS, .exe on Windows):
 
 **macOS/Linux:**
 ```bash
@@ -78,7 +78,15 @@ Build a native application (.app on macOS, .exe on Windows):
 build-app.bat
 ```
 
-The native application will be created in `target/dist/` directory.
+The native application will be created in `target/dist/` directory:
+- **macOS:** `GymPro-1.0.0.dmg` (double-click to install, then drag GymPro.app to Applications)
+- **Windows:** `GymPro.exe`
+- **Linux:** `GymPro.deb` or `GymPro.rpm`
+
+**Test the native app:**
+```bash
+./test-app.sh
+```
 
 **Note:** JavaFX applications cannot run directly from JAR file. Use the launcher script, Maven command, or build native application.
 

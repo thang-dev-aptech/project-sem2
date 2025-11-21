@@ -219,13 +219,14 @@
                     <destination>target/dist</destination>
                     <input>${project.build.directory}</input>
                     <mainJar>${project.build.finalName}.jar</mainJar>
-                    <mainClass>com.example.gympro.GymProApp</mainClass>
+                    <mainClass>com.example.gympro.Launcher</mainClass>
                     <javaOptions>
                         <option>-Dfile.encoding=UTF-8</option>
-                        <option>--module-path</option>
-                        <option>${project.build.directory}/lib</option>
-                        <option>--add-modules</option>
-                        <option>javafx.controls,javafx.fxml</option>
+                        <option>--add-opens</option>
+                        <option>java.base/java.lang=ALL-UNNAMED</option>
+                        <option>--add-opens</option>
+                        <option>java.base/java.util=ALL-UNNAMED</option>
+                        <option>--enable-native-access=ALL-UNNAMED</option>
                     </javaOptions>
                     <!-- macOS -->
                     <macPackageIdentifier>com.gympro.app</macPackageIdentifier>
