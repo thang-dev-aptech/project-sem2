@@ -2,11 +2,11 @@ package com.example.gympro.controller;
 
 import com.example.gympro.service.RegistrationService;
 import com.example.gympro.service.RegistrationServiceInterface;
+import com.example.gympro.service.SessionManager;
 import com.example.gympro.viewModel.ExpiringMember;
 import com.example.gympro.viewModel.Member;
 import com.example.gympro.viewModel.Plan;
 import javafx.collections.FXCollections; // <-- Quan trọng
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -49,7 +49,11 @@ public class RegistrationController {
     // --- Helpers ---
     private final DateTimeFormatter summaryDateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     private final DecimalFormat moneyFormatter = new DecimalFormat("₫#,###");
-    private final long CURRENT_USER_ID = 1; // TODO: Lấy ID user thật
+    
+    private long getCurrentUserId() {
+        var currentUser = SessionManager.getInstance().getCurrentUser();
+        return currentUser != null ? currentUser.getId() : 0;
+    }
 
     @FXML
     private void initialize() {
@@ -108,8 +112,14 @@ public class RegistrationController {
         }
 
         // Gọi Service (Bộ não)
+        long userId = getCurrentUserId();
+        if (userId == 0) {
+            showAlert(Alert.AlertType.ERROR, "Lỗi phiên đăng nhập", "Vui lòng đăng nhập lại.");
+            return;
+        }
+        
         boolean success = registrationService.createRegistrationAndInvoice(
-                selectedMember, selectedPlan, startDate, endDate, CURRENT_USER_ID);
+                selectedMember, selectedPlan, startDate, endDate, userId);
 
         if (success) {
             showAlert(Alert.AlertType.INFORMATION, "Thành công",

@@ -1,6 +1,6 @@
 package com.example.gympro.service.reports;
 
-import com.example.gympro.repository.reports.ReportsRepository;
+import com.example.gympro.repository.reports.*;
 import com.example.gympro.viewModel.MemberReport;
 import com.example.gympro.viewModel.PackageReport;
 import com.example.gympro.viewModel.PaymentReport;
@@ -11,61 +11,67 @@ import java.util.List;
 
 /**
  * Service cho báo cáo
+ * Sử dụng các repository riêng cho từng loại báo cáo
  */
 public class ReportsService {
-    private final ReportsRepository repository;
+    private final RevenueReportRepository revenueRepository;
+    private final MemberReportRepository memberRepository;
+    private final PackageReportRepository packageRepository;
+    private final PaymentReportRepository paymentRepository;
 
     public ReportsService() {
-        this.repository = new ReportsRepository();
+        this.revenueRepository = new RevenueReportRepository();
+        this.memberRepository = new MemberReportRepository();
+        this.packageRepository = new PackageReportRepository();
+        this.paymentRepository = new PaymentReportRepository();
     }
 
     /**
      * Lấy báo cáo doanh thu
      */
     public List<RevenueReport> getRevenueReport(LocalDate fromDate, LocalDate toDate) {
-        return repository.getRevenueReport(fromDate, toDate);
+        return revenueRepository.getRevenueReport(fromDate, toDate);
     }
 
     /**
      * Lấy tổng hợp doanh thu
      */
-    public ReportsRepository.RevenueSummary getRevenueSummary(LocalDate fromDate, LocalDate toDate) {
-        return repository.getRevenueSummary(fromDate, toDate);
+    public RevenueReportRepository.RevenueSummary getRevenueSummary(LocalDate fromDate, LocalDate toDate) {
+        return revenueRepository.getRevenueSummary(fromDate, toDate);
     }
 
     /**
      * Lấy báo cáo hội viên
      */
     public List<MemberReport> getMemberReport(LocalDate fromDate, LocalDate toDate) {
-        return repository.getMemberReport(fromDate, toDate);
+        return memberRepository.getMemberReport(fromDate, toDate);
     }
 
     /**
      * Lấy tổng hợp hội viên
      */
-    public ReportsRepository.MemberSummary getMemberSummary(LocalDate fromDate, LocalDate toDate) {
-        return repository.getMemberSummary(fromDate, toDate);
+    public MemberReportRepository.MemberSummary getMemberSummary(LocalDate fromDate, LocalDate toDate) {
+        return memberRepository.getMemberSummary(fromDate, toDate);
     }
 
     /**
      * Lấy báo cáo gói tập
      */
     public List<PackageReport> getPackageReport(LocalDate fromDate, LocalDate toDate) {
-        return repository.getPackageReport(fromDate, toDate);
+        return packageRepository.getPackageReport(fromDate, toDate);
     }
 
     /**
      * Lấy báo cáo thanh toán
      */
     public List<PaymentReport> getPaymentReport(LocalDate fromDate, LocalDate toDate) {
-        return repository.getPaymentReport(fromDate, toDate);
+        return paymentRepository.getPaymentReport(fromDate, toDate);
     }
 
     /**
      * Lấy tổng hợp thanh toán
      */
-    public ReportsRepository.PaymentSummary getPaymentSummary(LocalDate fromDate, LocalDate toDate) {
-        return repository.getPaymentSummary(fromDate, toDate);
+    public PaymentReportRepository.PaymentSummary getPaymentSummary(LocalDate fromDate, LocalDate toDate) {
+        return paymentRepository.getPaymentSummary(fromDate, toDate);
     }
 }
-

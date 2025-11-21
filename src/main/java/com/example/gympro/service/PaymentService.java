@@ -24,7 +24,7 @@ public class PaymentService implements PaymentServiceInterface {
     }
 
     @Override
-    public boolean processPayment(Invoice invoice, long paymentMethodId, long shiftId, long createdByUserId) {
+    public boolean processPayment(Invoice invoice, long paymentMethodId, long createdByUserId) {
         var domainInvoice = InvoiceMapper.toDomain(invoice);
         Connection conn = null;
         try {
@@ -34,7 +34,6 @@ public class PaymentService implements PaymentServiceInterface {
             Payment payment = new Payment.Builder()
                     .invoiceId(domainInvoice.getId())
                     .methodId(paymentMethodId)
-                    .shiftId(shiftId > 0 ? shiftId : null)
                     .paidAmount(domainInvoice.getTotalAmount() != null
                             ? domainInvoice.getTotalAmount()
                             : BigDecimal.valueOf(invoice.getTotalAmount()))

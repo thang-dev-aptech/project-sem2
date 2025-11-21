@@ -4,10 +4,7 @@ import com.example.gympro.utils.DatabaseConnection;
 
 import java.math.BigDecimal;
 import java.sql.*;
-import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -146,43 +143,6 @@ public class SettingsRepository {
         return false;
     }
 
-    /**
-     * Lấy danh sách chiết khấu sự kiện từ JSON trong settings
-     */
-    public List<EventDiscount> getEventDiscounts() {
-        List<EventDiscount> discounts = new ArrayList<>();
-        String sql = "SELECT value_json FROM settings WHERE key_name = 'EVENT_DISCOUNTS'";
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
-            if (rs.next()) {
-                String json = rs.getString("value_json");
-                // TODO: Parse JSON và convert sang List<EventDiscount>
-                // Tạm thời return empty list
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return discounts;
-    }
-
-    /**
-     * Lưu danh sách chiết khấu sự kiện vào JSON
-     */
-    public boolean saveEventDiscounts(List<EventDiscount> discounts) {
-        // TODO: Convert List<EventDiscount> sang JSON và lưu vào settings
-        String sql = "INSERT INTO settings (key_name, value_json) VALUES ('EVENT_DISCOUNTS', ?) " +
-                     "ON DUPLICATE KEY UPDATE value_json = VALUES(value_json)";
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            // Tạm thời: lưu empty JSON
-            ps.setString(1, "[]");
-            return ps.executeUpdate() > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
 
     // Inner classes
     public static class BranchInfo {
@@ -202,35 +162,6 @@ public class SettingsRepository {
         public String getName() { return name; }
         public String getAddress() { return address; }
         public String getPhone() { return phone; }
-    }
-
-    public static class EventDiscount {
-        private long id;
-        private String eventName;
-        private String description;
-        private BigDecimal discountPercent;
-        private BigDecimal discountAmount;
-        private LocalDate startDate;
-        private LocalDate endDate;
-        private boolean isActive;
-
-        // Getters and setters
-        public long getId() { return id; }
-        public void setId(long id) { this.id = id; }
-        public String getEventName() { return eventName; }
-        public void setEventName(String eventName) { this.eventName = eventName; }
-        public String getDescription() { return description; }
-        public void setDescription(String description) { this.description = description; }
-        public BigDecimal getDiscountPercent() { return discountPercent; }
-        public void setDiscountPercent(BigDecimal discountPercent) { this.discountPercent = discountPercent; }
-        public BigDecimal getDiscountAmount() { return discountAmount; }
-        public void setDiscountAmount(BigDecimal discountAmount) { this.discountAmount = discountAmount; }
-        public LocalDate getStartDate() { return startDate; }
-        public void setStartDate(LocalDate startDate) { this.startDate = startDate; }
-        public LocalDate getEndDate() { return endDate; }
-        public void setEndDate(LocalDate endDate) { this.endDate = endDate; }
-        public boolean isActive() { return isActive; }
-        public void setActive(boolean active) { isActive = active; }
     }
 }
 

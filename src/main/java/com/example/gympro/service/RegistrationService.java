@@ -22,7 +22,6 @@ public class RegistrationService implements RegistrationServiceInterface {
     private final MemberRepositoryInterface memberRepository = new MemberRepository();
     private final PlanRepositoryInterface planRepository = new PlanRepository();
     private final RegistrationRepositoryInterface registrationRepository = new RegistrationRepository();
-    private final DatabaseConnection dbConnection = DatabaseConnection.getInstance();
 
     @Override
     public List<Member> getMembersForRegistration() {

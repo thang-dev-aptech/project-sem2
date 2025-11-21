@@ -19,7 +19,6 @@ public interface PaymentServiceInterface {
     boolean processPayment(
             Invoice invoice,
             long paymentMethodId,
-            long shiftId,
             long createdByUserId
     );
 }

@@ -21,7 +21,6 @@ public class MainController {
     @FXML
     private Button logoutBtn;
 
-    private String currentScreen = "dashboard";
     private final AuthorizationService authService = new AuthorizationService();
 
     private static MainController instance;
@@ -71,7 +70,6 @@ public class MainController {
             }
             
             btn.setOnAction(e -> {
-                currentScreen = screenId;
                 loadScreen(screenId);
                 updateNavButtons(btn);
             });

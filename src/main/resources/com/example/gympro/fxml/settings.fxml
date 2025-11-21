@@ -69,17 +69,14 @@
                         <Label text="Số ngày gia hạn tự động (Grace Days):" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
                         <TextField fx:id="txtGraceDays" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
                         
-                        <Label text="Số ngày nhắc nhở trước khi hết hạn:" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
-                        <TextField fx:id="txtReminderDays" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                        <Label text="Tiền tố mã hội viên:" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                        <TextField fx:id="txtMemberCodePrefix" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
                         
-                        <Label text="Tiền tố mã hội viên:" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
-                        <TextField fx:id="txtMemberCodePrefix" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+                        <Label text="Tiền tố số hóa đơn:" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+                        <TextField fx:id="txtInvoicePrefix" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
                         
-                        <Label text="Tiền tố số hóa đơn:" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
-                        <TextField fx:id="txtInvoicePrefix" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
-                        
-                        <Label text="Ký hiệu tiền tệ:" GridPane.columnIndex="0" GridPane.rowIndex="4"/>
-                        <TextField fx:id="txtCurrencySymbol" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
+                        <Label text="Ký hiệu tiền tệ:" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
+                        <TextField fx:id="txtCurrencySymbol" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
                     </GridPane>
                     
                     <HBox spacing="10" alignment="CENTER_RIGHT">
@@ -90,49 +87,7 @@
                 </VBox>
             </Tab>
 
-            <!-- Tab 3: Chiết khấu sự kiện -->
-            <Tab text="🎉 Chiết Khấu Sự Kiện" closable="false">
-                <VBox spacing="15" style="-fx-padding: 20;">
-                    <HBox spacing="10" alignment="CENTER_LEFT">
-                        <Label text="Quản lý chiết khấu cho các sự kiện đặc biệt" style="-fx-font-size: 14; -fx-font-weight: bold;"/>
-                        <Region HBox.hgrow="ALWAYS"/>
-                        <Button fx:id="btnAddEventDiscount" text="➕ Thêm sự kiện" 
-                                style="-fx-background-color: #2196F3; -fx-text-fill: white;"/>
-                    </HBox>
-                    
-                    <TableView fx:id="tblEventDiscounts" prefHeight="400">
-                        <columns>
-                            <TableColumn fx:id="colEventName" text="Tên sự kiện" prefWidth="150"/>
-                            <TableColumn fx:id="colEventDescription" text="Mô tả" prefWidth="200"/>
-                            <TableColumn fx:id="colEventDiscountPercent" text="Giảm %" prefWidth="100"/>
-                            <TableColumn fx:id="colEventDiscountAmount" text="Giảm số tiền" prefWidth="120"/>
-                            <TableColumn fx:id="colEventStartDate" text="Ngày bắt đầu" prefWidth="120"/>
-                            <TableColumn fx:id="colEventEndDate" text="Ngày kết thúc" prefWidth="120"/>
-                            <TableColumn fx:id="colEventActive" text="Kích hoạt" prefWidth="80"/>
-                            <TableColumn fx:id="colEventActions" text="Thao tác" prefWidth="120"/>
-                        </columns>
-                    </TableView>
-                </VBox>
-            </Tab>
-
-            <!-- Tab 4: Thông báo -->
-            <Tab text="🔔 Thông Báo" closable="false">
-                <VBox spacing="15" style="-fx-padding: 20;">
-                    <Label text="Cấu hình thông báo tự động" style="-fx-font-size: 14; -fx-font-weight: bold;"/>
-                    
-                    <VBox spacing="10">
-                        <CheckBox fx:id="chkAutoReminder" text="Bật tự động nhắc nhở hội viên sắp hết hạn"/>
-                    </VBox>
-                    
-                    <HBox spacing="10" alignment="CENTER_RIGHT">
-                        <Region HBox.hgrow="ALWAYS"/>
-                        <Button fx:id="btnSaveNotification" text="💾 Lưu" 
-                                style="-fx-background-color: #4CAF50; -fx-text-fill: white;"/>
-                    </HBox>
-                </VBox>
-            </Tab>
-
-            <!-- Tab 5: Bảo mật -->
+            <!-- Tab 3: Bảo mật -->
             <Tab text="🔒 Bảo Mật" closable="false">
                 <VBox spacing="15" style="-fx-padding: 20;">
                     <Label text="Cấu hình bảo mật hệ thống" style="-fx-font-size: 14; -fx-font-weight: bold;"/>
@@ -164,7 +119,7 @@
                 </VBox>
             </Tab>
 
-            <!-- Tab 6: Hệ thống -->
+            <!-- Tab 4: Hệ thống -->
             <Tab text="ℹ️ Hệ Thống" closable="false">
                 <VBox spacing="15" style="-fx-padding: 20;">
                     <Label text="Thông tin hệ thống" style="-fx-font-size: 14; -fx-font-weight: bold;"/>
@@ -184,14 +139,6 @@
                         <Label text="Thông tin database:" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
                         <Label fx:id="lblDbInfo" text="-" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
                     </GridPane>
-                    
-                    <Separator/>
-                    
-                    <HBox spacing="10">
-                        <Button fx:id="btnViewLogs" text="📄 Xem Logs" 
-                                style="-fx-background-color: #757575; -fx-text-fill: white;"/>
-                        <Region HBox.hgrow="ALWAYS"/>
-                    </HBox>
                 </VBox>
             </Tab>
 

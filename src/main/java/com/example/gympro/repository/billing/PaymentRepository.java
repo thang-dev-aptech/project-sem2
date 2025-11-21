@@ -56,9 +56,9 @@ public class PaymentRepository implements PaymentRepositoryInterface {
             """;
 
     private static final String INSERT_PAYMENT_SQL = """
-            INSERT INTO payments (invoice_id, method_id, shift_id, paid_amount, created_by, reference_code, is_refund,
+            INSERT INTO payments (invoice_id, method_id, paid_amount, created_by, reference_code, is_refund,
                                    refund_of_payment_id)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
             """;
 
     private static final String UPDATE_SUBSCRIPTION_STATUS_SQL = """
@@ -85,23 +85,18 @@ public class PaymentRepository implements PaymentRepositoryInterface {
         try (PreparedStatement pstmt = conn.prepareStatement(INSERT_PAYMENT_SQL)) {
             pstmt.setLong(1, payment.getInvoiceId());
             pstmt.setLong(2, payment.getMethodId());
-            if (payment.getShiftId() != null && payment.getShiftId() > 0) {
-                pstmt.setLong(3, payment.getShiftId());
-            } else {
-                pstmt.setNull(3, Types.BIGINT);
-            }
-            pstmt.setBigDecimal(4, payment.getPaidAmount());
-            pstmt.setLong(5, payment.getCreatedBy());
+            pstmt.setBigDecimal(3, payment.getPaidAmount());
+            pstmt.setLong(4, payment.getCreatedBy());
             if (payment.getReferenceCode() != null) {
-                pstmt.setString(6, payment.getReferenceCode());
+                pstmt.setString(5, payment.getReferenceCode());
             } else {
-                pstmt.setNull(6, Types.VARCHAR);
+                pstmt.setNull(5, Types.VARCHAR);
             }
-            pstmt.setBoolean(7, payment.isRefund());
+            pstmt.setBoolean(6, payment.isRefund());
             if (payment.getRefundOfPaymentId() != null) {
-                pstmt.setLong(8, payment.getRefundOfPaymentId());
+                pstmt.setLong(7, payment.getRefundOfPaymentId());
             } else {
-                pstmt.setNull(8, Types.BIGINT);
+                pstmt.setNull(7, Types.BIGINT);
             }
             return pstmt.executeUpdate() > 0;
         }

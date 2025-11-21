@@ -1,5 +1,6 @@
 package com.example.gympro.controller;
 
+import com.example.gympro.service.ExcelExportService;
 import com.example.gympro.service.ExpiringMemberService;
 import com.example.gympro.viewModel.ExpiringMember;
 
@@ -11,9 +12,6 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
 import javafx.stage.FileChooser;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
 
 public class ExpiryController {
 
@@ -45,6 +43,7 @@ public class ExpiryController {
 
     private ObservableList<ExpiringMember> memberList = FXCollections.observableArrayList();
     private ExpiringMemberService service = new ExpiringMemberService();
+    private ExcelExportService excelExportService = new ExcelExportService();
 
     @FXML
     public void initialize() {
@@ -53,44 +52,29 @@ public class ExpiryController {
         setupFilter();
         setupSearch();
         addActionButtonsToTable();
-        btnExport.setOnAction(e -> exportMembersToCSV());
+        btnExport.setOnAction(e -> exportMembersToExcel());
 
     }
 
     @FXML
-    private void exportMembersToCSV() {
+    private void exportMembersToExcel() {
         try {
             FileChooser fileChooser = new FileChooser();
-            fileChooser.setTitle("Lưu danh sách thành viên");
-            fileChooser.setInitialFileName("ExpiringMembers.csv");
-            fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV Files", "*.csv"));
+            fileChooser.setTitle("Xuất danh sách Hội viên sắp hết hạn");
+            fileChooser.setInitialFileName("HoiVienSapHetHan.xlsx");
+            fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Excel Files", "*.xlsx"));
 
             File file = fileChooser.showSaveDialog(btnExport.getScene().getWindow());
             if (file != null) {
-                try (PrintWriter writer = new PrintWriter(
-                        new OutputStreamWriter(new FileOutputStream(file), "UTF-8"))) {
-
-                    writer.write('\uFEFF');
-
-                    writer.println("Mã,Họ tên,SĐT,Gói,Hết hạn,Số ngày còn lại,Trạng thái");
-
-                    for (ExpiringMember m : memberList) {
-                        writer.printf("%s,%s,%s,%s,%s,%d,%s%n",
-                                m.getId(),
-                                m.getName(),
-                                m.getPhone(),
-                                m.getPackageName(),
-                                m.getExpiry(),
-                                m.getDaysLeft(),
-                                m.getStatus());
-                    }
-                }
-
-                showAlert("✅ Xuất thành công: " + file.getAbsolutePath());
+                excelExportService.exportExpiringMembers(
+                    memberList.stream().toList(),
+                    file.getAbsolutePath()
+                );
+                showAlert("✅ Xuất Excel thành công: " + file.getAbsolutePath());
             }
         } catch (Exception ex) {
             ex.printStackTrace();
-            showAlert("❌ Lỗi khi xuất file!");
+            showAlert("❌ Lỗi khi xuất Excel: " + ex.getMessage());
         }
     }
 
@@ -170,7 +154,6 @@ public class ExpiryController {
                 btnEmail.setOnAction(e -> {
                     ExpiringMember member = getTableRow().getItem();
                     if (member != null) {
-                        // TODO: Implement email reminder
                         showAlert("📧 Email đã gửi cho: " + member.getName());
                     }
                 });

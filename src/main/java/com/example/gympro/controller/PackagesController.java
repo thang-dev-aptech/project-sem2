@@ -1,5 +1,6 @@
 package com.example.gympro.controller;
 
+import com.example.gympro.service.ExcelExportService;
 import com.example.gympro.service.PackageServiceInterface;
 import com.example.gympro.service.PackageService;
 import com.example.gympro.service.AuthorizationService;
@@ -11,7 +12,9 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
 
+import java.io.File;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -50,9 +53,13 @@ public class PackagesController {
     // === SERVICE & DATA ===
     private final PackageServiceInterface packageService = new PackageService();
     private final AuthorizationService authService = new AuthorizationService();
+    private final ExcelExportService excelExportService = new ExcelExportService();
     private final ObservableList<Package> packageData = FXCollections.observableArrayList();
     private Package selectedPackage = null;
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+    
+    // === FXML - EXPORT BUTTON ===
+    @FXML private Button exportButton;
 
     @FXML
     private void initialize() {
@@ -72,6 +79,12 @@ public class PackagesController {
 
         loadPackages();
         packagesTable.setItems(packageData);
+
+        // Setup export button
+        if (exportButton != null) {
+            exportButton.setOnAction(e -> handleExportExcel());
+            exportButton.setDisable(false);
+        }
 
         // Listener chọn hàng: CHỈ TẢI DATA VÀO FORM, KHÔNG KÍCH HOẠT CHẾ ĐỘ CHỈNH SỬA
         packagesTable.getSelectionModel().selectedItemProperty().addListener(
@@ -360,5 +373,37 @@ public class PackagesController {
         }
 
         return true;
+    }
+
+    @FXML
+    private void handleExportExcel() {
+        try {
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Xuất danh sách Gói tập");
+            fileChooser.setInitialFileName("DanhSachGoiTap.xlsx");
+            fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Excel Files", "*.xlsx"));
+
+            File file = fileChooser.showSaveDialog(packagesTable.getScene().getWindow());
+            if (file != null) {
+                excelExportService.exportPackages(
+                    packageData.stream().toList(),
+                    file.getAbsolutePath()
+                );
+                showAlert(Alert.AlertType.INFORMATION, "Thành công", 
+                    "✅ Xuất Excel thành công: " + file.getAbsolutePath());
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            showAlert(Alert.AlertType.ERROR, "Lỗi", 
+                "❌ Lỗi khi xuất Excel: " + ex.getMessage());
+        }
+    }
+
+    private void showAlert(Alert.AlertType type, String title, String content) {
+        Alert alert = new Alert(type);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(content);
+        alert.showAndWait();
     }
 }

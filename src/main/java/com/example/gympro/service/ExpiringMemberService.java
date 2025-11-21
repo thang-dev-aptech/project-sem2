@@ -3,7 +3,6 @@ package com.example.gympro.service;
 import java.util.stream.Collectors;
 
 import com.example.gympro.repository.ExpiringMemberRepository;
-import com.example.gympro.service.settings.SettingsService;
 import com.example.gympro.viewModel.ExpiringMember;
 
 import javafx.collections.FXCollections;
@@ -11,12 +10,11 @@ import javafx.collections.ObservableList;
 
 public class ExpiringMemberService {
     private final ExpiringMemberRepository repository = new ExpiringMemberRepository();
-    private final SettingsService settingsService = new SettingsService();
 
     public ObservableList<ExpiringMember> getExpiringMembers(int daysLeft) {
-        // Nếu daysLeft = 0 hoặc không chỉ định, lấy từ settings
-        int reminderDays = (daysLeft > 0) ? daysLeft : settingsService.getReminderDays();
-        ObservableList<ExpiringMember> list = repository.getExpiringMembers(reminderDays);
+        // Nếu daysLeft = 0 hoặc không chỉ định, dùng giá trị mặc định 7 ngày
+        int maxDayLeft = (daysLeft > 0) ? daysLeft : 7;
+        ObservableList<ExpiringMember> list = repository.getExpiringMembers(maxDayLeft);
 
         list.forEach(m -> {
             if (m.getDaysLeft() < 0) {

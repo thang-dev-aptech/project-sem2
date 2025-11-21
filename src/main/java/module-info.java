@@ -9,6 +9,7 @@ module com.example.gympro {
     requires org.kordamp.bootstrapfx.core;
     requires com.google.gson;
     requires java.net.http;
+    requires org.apache.poi.ooxml;
     // Note: MySQL connector loaded via Class.forName(), no module declaration needed
     
     // Logging (optional - only if directly used in code)

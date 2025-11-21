@@ -1,7 +1,7 @@
 package com.example.gympro.controller;
 
+import com.example.gympro.service.ExcelExportService;
 import com.example.gympro.service.MemberService;
-import com.example.gympro.service.MemberServiceInterface;
 import com.example.gympro.service.AuthorizationService;
 import com.example.gympro.viewModel.Member;
 import javafx.collections.FXCollections;
@@ -11,8 +11,9 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
 
-import java.sql.Date;
+import java.io.File;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -56,10 +57,14 @@ public class MembersController {
     // === SERVICE & DATA ===
     private final MemberService memberService = new MemberService();
     private final AuthorizationService authService = new AuthorizationService();
+    private final ExcelExportService excelExportService = new ExcelExportService();
     private final ObservableList<Member> memberData = FXCollections.observableArrayList();
     private Member selectedMember = null;
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    
+    // === FXML - EXPORT BUTTON ===
+    @FXML private Button exportButton;
 
     // Dữ liệu cho ComboBoxes
     private final ObservableList<String> statusList = FXCollections.observableArrayList(
@@ -91,6 +96,12 @@ public class MembersController {
 
         loadMembers();
         membersTable.setItems(memberData);
+
+        // Setup export button
+        if (exportButton != null) {
+            exportButton.setOnAction(e -> handleExportExcel());
+            exportButton.setDisable(false);
+        }
 
         // Listener chọn hàng: CHỈ TẢI DATA VÀO FORM (chế độ XEM)
         membersTable.getSelectionModel().selectedItemProperty().addListener(
@@ -418,5 +429,37 @@ public class MembersController {
             return comboBoxValue.substring(comboBoxValue.indexOf("(") + 1, comboBoxValue.indexOf(")")).toUpperCase();
         }
         return defaultValue;
+    }
+
+    @FXML
+    private void handleExportExcel() {
+        try {
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Xuất danh sách Hội viên");
+            fileChooser.setInitialFileName("DanhSachHoiVien.xlsx");
+            fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Excel Files", "*.xlsx"));
+
+            File file = fileChooser.showSaveDialog(membersTable.getScene().getWindow());
+            if (file != null) {
+                excelExportService.exportMembers(
+                    memberData.stream().toList(),
+                    file.getAbsolutePath()
+                );
+                showAlert(Alert.AlertType.INFORMATION, "Thành công", 
+                    "✅ Xuất Excel thành công: " + file.getAbsolutePath());
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            showAlert(Alert.AlertType.ERROR, "Lỗi", 
+                "❌ Lỗi khi xuất Excel: " + ex.getMessage());
+        }
+    }
+
+    private void showAlert(Alert.AlertType type, String title, String content) {
+        Alert alert = new Alert(type);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(content);
+        alert.showAndWait();
     }
 }

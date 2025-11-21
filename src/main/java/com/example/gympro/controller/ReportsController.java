@@ -1,5 +1,7 @@
 package com.example.gympro.controller;
 
+import com.example.gympro.controller.base.BaseController;
+import com.example.gympro.service.ExcelExportService;
 import com.example.gympro.service.reports.ReportsService;
 import com.example.gympro.viewModel.MemberReport;
 import com.example.gympro.viewModel.PackageReport;
@@ -13,17 +15,15 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.FileChooser;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 /**
  * Controller cho màn hình Báo cáo
+ * Sử dụng BaseController cho common methods
  */
-public class ReportsController {
+public class ReportsController extends BaseController {
 
     @FXML private DatePicker dateFrom;
     @FXML private DatePicker dateTo;
@@ -91,6 +91,7 @@ public class ReportsController {
     @FXML private Button btnExportPayments;
 
     private final ReportsService service = new ReportsService();
+    private final ExcelExportService excelExportService = new ExcelExportService();
     private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     @FXML
@@ -109,10 +110,10 @@ public class ReportsController {
         // Setup event handlers
         btnFilter.setOnAction(e -> applyFilter());
         btnReset.setOnAction(e -> resetFilter());
-        btnExportRevenue.setOnAction(e -> exportRevenueToCSV());
-        btnExportMembers.setOnAction(e -> exportMembersToCSV());
-        btnExportPackages.setOnAction(e -> exportPackagesToCSV());
-        btnExportPayments.setOnAction(e -> exportPaymentsToCSV());
+        btnExportRevenue.setOnAction(e -> exportRevenueToExcel());
+        btnExportMembers.setOnAction(e -> exportMembersToExcel());
+        btnExportPackages.setOnAction(e -> exportPackagesToExcel());
+        btnExportPayments.setOnAction(e -> exportPaymentsToExcel());
 
         // Load initial data
         applyFilter();
@@ -230,12 +231,12 @@ public class ReportsController {
 
     private void applyFilter() {
         if (dateFrom.getValue() == null || dateTo.getValue() == null) {
-            showAlert("⚠️ Vui lòng chọn khoảng thời gian!");
+            showWarning("⚠️ Vui lòng chọn khoảng thời gian!");
             return;
         }
 
         if (dateFrom.getValue().isAfter(dateTo.getValue())) {
-            showAlert("⚠️ Ngày bắt đầu phải nhỏ hơn hoặc bằng ngày kết thúc!");
+            showWarning("⚠️ Ngày bắt đầu phải nhỏ hơn hoặc bằng ngày kết thúc!");
             return;
         }
 
@@ -286,10 +287,10 @@ public class ReportsController {
         var summary = service.getRevenueSummary(from, to);
         var reports = service.getRevenueReport(from, to);
 
-        lblTotalRevenue.setText(String.format("%,.0f VNĐ", summary.getTotalRevenue().doubleValue()));
-        lblTotalInvoices.setText(String.valueOf(summary.getTotalInvoices()));
-        lblTotalPayments.setText(String.valueOf(summary.getTotalPayments()));
-        lblAvgInvoice.setText(String.format("%,.0f VNĐ", summary.getAvgInvoice().doubleValue()));
+        lblTotalRevenue.setText(String.format("%,.0f VNĐ", summary.totalRevenue.doubleValue()));
+        lblTotalInvoices.setText(String.valueOf(summary.totalInvoices));
+        lblTotalPayments.setText(String.valueOf(summary.totalPayments));
+        lblAvgInvoice.setText(String.format("%,.0f VNĐ", summary.avgInvoice.doubleValue()));
 
         ObservableList<RevenueReport> data = FXCollections.observableArrayList(reports);
         tblRevenue.setItems(data);
@@ -299,10 +300,10 @@ public class ReportsController {
         var summary = service.getMemberSummary(from, to);
         var reports = service.getMemberReport(from, to);
 
-        lblTotalMembers.setText(String.valueOf(summary.getTotalMembers()));
-        lblNewMembers.setText(String.valueOf(summary.getNewMembers()));
-        lblActiveMembers.setText(String.valueOf(summary.getActiveMembers()));
-        lblExpiredMembers.setText(String.valueOf(summary.getExpiredMembers()));
+        lblTotalMembers.setText(String.valueOf(summary.totalMembers));
+        lblNewMembers.setText(String.valueOf(summary.newMembers));
+        lblActiveMembers.setText(String.valueOf(summary.activeMembers));
+        lblExpiredMembers.setText(String.valueOf(summary.expiredMembers));
 
         ObservableList<MemberReport> data = FXCollections.observableArrayList(reports);
         tblMembers.setItems(data);
@@ -318,105 +319,97 @@ public class ReportsController {
         var summary = service.getPaymentSummary(from, to);
         var reports = service.getPaymentReport(from, to);
 
-        lblCashTotal.setText(String.format("%,.0f VNĐ", summary.getCashTotal().doubleValue()));
-        lblBankTotal.setText(String.format("%,.0f VNĐ", summary.getBankTotal().doubleValue()));
-        lblQRTotal.setText(String.format("%,.0f VNĐ", summary.getQrTotal().doubleValue()));
+        lblCashTotal.setText(String.format("%,.0f VNĐ", summary.cashTotal.doubleValue()));
+        lblBankTotal.setText(String.format("%,.0f VNĐ", summary.bankTotal.doubleValue()));
+        lblQRTotal.setText(String.format("%,.0f VNĐ", summary.qrTotal.doubleValue()));
 
         ObservableList<PaymentReport> data = FXCollections.observableArrayList(reports);
         tblPayments.setItems(data);
     }
 
-    private void exportRevenueToCSV() {
-        exportToCSV("BaoCaoDoanhThu", tblRevenue.getItems(), 
-            "Số HĐ,Ngày,Hội viên,Mã HV,Gói tập,Tạm tính,Giảm giá,Tổng cộng,Trạng thái",
-            report -> String.format("%s,%s,%s,%s,%s,%.0f,%.0f,%.0f,%s",
-                report.getInvoiceNo(),
-                report.getInvoiceDate() != null ? report.getInvoiceDate().format(dateFormatter) : "",
-                report.getMemberName() != null ? report.getMemberName() : "",
-                report.getMemberCode() != null ? report.getMemberCode() : "",
-                report.getPackageName() != null ? report.getPackageName() : "",
-                report.getSubtotal() != null ? report.getSubtotal().doubleValue() : 0,
-                report.getDiscount() != null ? report.getDiscount().doubleValue() : 0,
-                report.getTotal() != null ? report.getTotal().doubleValue() : 0,
-                report.getStatus() != null ? report.getStatus() : ""
-            ));
-    }
-
-    private void exportMembersToCSV() {
-        exportToCSV("BaoCaoHoiVien", tblMembers.getItems(),
-            "Mã HV,Họ tên,SĐT,Email,Trạng thái,Gói tập,Ngày bắt đầu,Ngày kết thúc,Ngày tạo",
-            report -> String.format("%s,%s,%s,%s,%s,%s,%s,%s,%s",
-                report.getMemberCode() != null ? report.getMemberCode() : "",
-                report.getMemberName() != null ? report.getMemberName() : "",
-                report.getPhone() != null ? report.getPhone() : "",
-                report.getEmail() != null ? report.getEmail() : "",
-                report.getStatus() != null ? report.getStatus() : "",
-                report.getPackageName() != null ? report.getPackageName() : "",
-                report.getStartDate() != null ? report.getStartDate().format(dateFormatter) : "",
-                report.getEndDate() != null ? report.getEndDate().format(dateFormatter) : "",
-                report.getCreatedAt() != null ? report.getCreatedAt().format(dateFormatter) : ""
-            ));
-    }
-
-    private void exportPackagesToCSV() {
-        exportToCSV("BaoCaoGoiTap", tblPackages.getItems(),
-            "Tên gói,Giá,Số lượng bán,Doanh thu,Trung bình/HĐ,Trạng thái",
-            report -> String.format("%s,%.0f,%d,%.0f,%.0f,%s",
-                report.getPackageName() != null ? report.getPackageName() : "",
-                report.getPrice() != null ? report.getPrice().doubleValue() : 0,
-                report.getSoldCount(),
-                report.getRevenue() != null ? report.getRevenue().doubleValue() : 0,
-                report.getAvgRevenue() != null ? report.getAvgRevenue().doubleValue() : 0,
-                report.getStatus() != null ? report.getStatus() : ""
-            ));
-    }
-
-    private void exportPaymentsToCSV() {
-        exportToCSV("BaoCaoThanhToan", tblPayments.getItems(),
-            "Mã TT,Ngày TT,Số HĐ,Hội viên,Số tiền,Phương thức,Ghi chú",
-            report -> String.format("%d,%s,%s,%s,%.0f,%s,%s",
-                report.getPaymentId(),
-                report.getPaymentDate() != null ? report.getPaymentDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")) : "",
-                report.getInvoiceNo() != null ? report.getInvoiceNo() : "",
-                report.getMemberName() != null ? report.getMemberName() : "",
-                report.getAmount() != null ? report.getAmount().doubleValue() : 0,
-                report.getMethodName() != null ? report.getMethodName() : "",
-                report.getNote() != null ? report.getNote() : ""
-            ));
-    }
-
-    private <T> void exportToCSV(String fileName, ObservableList<T> items, String header, java.util.function.Function<T, String> rowMapper) {
+    private void exportRevenueToExcel() {
         try {
             FileChooser fileChooser = new FileChooser();
-            fileChooser.setTitle("Lưu báo cáo");
-            fileChooser.setInitialFileName(fileName + ".csv");
-            fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV Files", "*.csv"));
+            fileChooser.setTitle("Lưu báo cáo Doanh thu");
+            fileChooser.setInitialFileName("BaoCaoDoanhThu.xlsx");
+            fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Excel Files", "*.xlsx"));
 
             File file = fileChooser.showSaveDialog(btnExportRevenue.getScene().getWindow());
             if (file != null) {
-                try (PrintWriter writer = new PrintWriter(
-                        new OutputStreamWriter(new FileOutputStream(file), "UTF-8"))) {
-
-                    writer.write('\uFEFF'); // BOM for Excel
-                    writer.println(header);
-
-                    for (T item : items) {
-                        writer.println(rowMapper.apply(item));
-                    }
-                }
-
-                showAlert("✅ Xuất thành công: " + file.getAbsolutePath());
+                excelExportService.exportRevenueReport(
+                    tblRevenue.getItems().stream().toList(),
+                    file.getAbsolutePath()
+                );
+                showAlert("✅ Xuất Excel thành công: " + file.getAbsolutePath());
             }
         } catch (Exception ex) {
             ex.printStackTrace();
-            showAlert("❌ Lỗi khi xuất file: " + ex.getMessage());
+            showError("❌ Lỗi khi xuất Excel: " + ex.getMessage());
         }
     }
 
-    private void showAlert(String message) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
+    private void exportMembersToExcel() {
+        try {
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Lưu báo cáo Hội viên");
+            fileChooser.setInitialFileName("BaoCaoHoiVien.xlsx");
+            fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Excel Files", "*.xlsx"));
+
+            File file = fileChooser.showSaveDialog(btnExportMembers.getScene().getWindow());
+            if (file != null) {
+                excelExportService.exportMemberReport(
+                    tblMembers.getItems().stream().toList(),
+                    file.getAbsolutePath()
+                );
+                showAlert("✅ Xuất Excel thành công: " + file.getAbsolutePath());
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            showError("❌ Lỗi khi xuất Excel: " + ex.getMessage());
+        }
     }
+
+    private void exportPackagesToExcel() {
+        try {
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Lưu báo cáo Gói tập");
+            fileChooser.setInitialFileName("BaoCaoGoiTap.xlsx");
+            fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Excel Files", "*.xlsx"));
+
+            File file = fileChooser.showSaveDialog(btnExportPackages.getScene().getWindow());
+            if (file != null) {
+                excelExportService.exportPackageReport(
+                    tblPackages.getItems().stream().toList(),
+                    file.getAbsolutePath()
+                );
+                showAlert("✅ Xuất Excel thành công: " + file.getAbsolutePath());
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            showError("❌ Lỗi khi xuất Excel: " + ex.getMessage());
+        }
+    }
+
+    private void exportPaymentsToExcel() {
+        try {
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Lưu báo cáo Thanh toán");
+            fileChooser.setInitialFileName("BaoCaoThanhToan.xlsx");
+            fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Excel Files", "*.xlsx"));
+
+            File file = fileChooser.showSaveDialog(btnExportPayments.getScene().getWindow());
+            if (file != null) {
+                excelExportService.exportPaymentReport(
+                    tblPayments.getItems().stream().toList(),
+                    file.getAbsolutePath()
+                );
+                showAlert("✅ Xuất Excel thành công: " + file.getAbsolutePath());
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            showError("❌ Lỗi khi xuất Excel: " + ex.getMessage());
+        }
+    }
+
+    // Helper methods đã được kế thừa từ BaseController
 }

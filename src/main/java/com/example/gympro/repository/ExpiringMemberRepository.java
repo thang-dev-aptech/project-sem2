@@ -17,8 +17,8 @@ public class ExpiringMemberRepository {
     public ObservableList<ExpiringMember> getExpiringMembers(int maxDayLeft) {
         ObservableList<ExpiringMember> list = FXCollections.observableArrayList();
         
-        // Lấy reminder days từ settings (nếu maxDayLeft = 0 hoặc null thì dùng default)
-        int reminderDays = maxDayLeft > 0 ? maxDayLeft : 7; // Default 7 nếu không chỉ định
+        // Sử dụng maxDayLeft trực tiếp (default 7 nếu không chỉ định)
+        int maxDays = maxDayLeft > 0 ? maxDayLeft : 7;
         
         // Lấy members sắp hết hạn (trong vòng maxDayLeft ngày) hoặc đã hết hạn (trong vòng 30 ngày qua)
         String sql = """
@@ -45,7 +45,7 @@ public class ExpiringMemberRepository {
 
         try (Connection conn = DatabaseConnection.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, reminderDays);
+            ps.setInt(1, maxDays);
             System.out.println("🔍 Query expiring members với maxDayLeft = " + maxDayLeft);
             ResultSet rs = ps.executeQuery();
 

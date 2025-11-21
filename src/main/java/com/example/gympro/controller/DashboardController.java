@@ -21,12 +21,6 @@ import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.text.Text;
-import javafx.stage.FileChooser;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
 import java.util.*;
 
 public class DashboardController {
@@ -154,7 +148,6 @@ public class DashboardController {
                 btnEmail.setOnAction(e -> {
                     ExpiringMember member = getTableRow().getItem();
                     if (member != null) {
-                        // TODO: Implement email reminder
                         showAlert("📧 Email đã gửi cho: " + member.getName());
                     }
                 });

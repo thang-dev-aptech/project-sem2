@@ -33,7 +33,7 @@
                 <Separator orientation="VERTICAL"/>
                 <Button text="➕ Thêm Hội viên" styleClass="icon-button, success" onAction="#handleNewMember"/>
                 <Button text="🔄 Làm mới" styleClass="icon-button" onAction="#loadMembers"/>
-                <Button text="📤 Xuất Excel" styleClass="icon-button" disable="true"/>
+                <Button fx:id="exportButton" text="📤 Xuất Excel" styleClass="icon-button" onAction="#handleExportExcel"/>
             </items>
         </ToolBar>
 

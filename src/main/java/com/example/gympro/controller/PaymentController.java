@@ -1,12 +1,13 @@
 package com.example.gympro.controller;
 
+import com.example.gympro.service.PaymentMethodService;
 import com.example.gympro.service.PaymentService;
 import com.example.gympro.service.PaymentServiceInterface;
+import com.example.gympro.service.SessionManager;
 import com.example.gympro.service.VietQRService;
 import com.example.gympro.viewModel.Invoice;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -36,15 +37,17 @@ public class PaymentController {
 
     // --- Service ---
     private final PaymentServiceInterface paymentService = new PaymentService();
+    private final PaymentMethodService paymentMethodService = new PaymentMethodService();
+    private PaymentMethodService.PaymentMethodIds paymentMethodIds;
 
 
     // --- Helpers ---
     private final DecimalFormat moneyFormatter = new DecimalFormat("₫#,###");
-    private final long CURRENT_USER_ID = 1; // TODO: Lấy ID user thật
-    private final long CURRENT_SHIFT_ID = 0; // TODO: Lấy ID ca thật
-    private final long PAYMENT_METHOD_CASH_ID = 1; // TODO: Lấy ID từ CSDL
-    private final long PAYMENT_METHOD_CARD_ID = 2; // TODO: Lấy ID từ CSDL
-    private final long PAYMENT_METHOD_BANK_ID = 3; // TODO: Lấy ID từ CSDL
+    
+    private long getCurrentUserId() {
+        var currentUser = SessionManager.getInstance().getCurrentUser();
+        return currentUser != null ? currentUser.getId() : 0;
+    }
 
     // CAU HINH TAI KHOAN NHAN TIEN
     private final VietQRService vietQRService = new VietQRService();
@@ -54,6 +57,9 @@ public class PaymentController {
 
     @FXML
     private void initialize() {
+        // Load payment method IDs từ database
+        paymentMethodIds = paymentMethodService.getCommonPaymentMethodIds();
+        
         setupInvoiceComboBox();
         loadUnpaidInvoices();
 
@@ -109,7 +115,18 @@ public class PaymentController {
             showQRCodeDialog(selectedInvoice);
         } else {
             // Thanh toán thường (Tiền mặt / Thẻ)
-            long methodId = methodText.equals("Credit Card") ? 2 : 1;
+            long methodId = 0;
+            if (methodText.equals("Credit Card")) {
+                methodId = paymentMethodIds != null ? paymentMethodIds.getCardId() : 0;
+            } else if (methodText.equals("Cash")) {
+                methodId = paymentMethodIds != null ? paymentMethodIds.getCashId() : 0;
+            }
+            
+            if (methodId == 0) {
+                showAlert(Alert.AlertType.ERROR, "Lỗi", "Không tìm thấy phương thức thanh toán. Vui lòng thử lại.");
+                return;
+            }
+            
             executePaymentTransaction(selectedInvoice, methodId);
         }
     }
@@ -170,20 +187,31 @@ public class PaymentController {
         // Chờ người dùng xác nhận
         qrDialog.showAndWait().ifPresent(type -> {
             if (type == btnPaid) {
-                // Nếu nhân viên bấm Đã nhận -> Lưu vào Database (ID 3 = Transfer)
-                executePaymentTransaction(invoice, 3);
+                // Nếu nhân viên bấm Đã nhận -> Lưu vào Database (BANK hoặc QR)
+                long methodId = paymentMethodIds != null ? paymentMethodIds.getBankId() : 0;
+                if (methodId == 0) {
+                    // Fallback: thử QR nếu BANK không có
+                    methodId = paymentMethodIds != null ? paymentMethodIds.getQrId() : 0;
+                }
+                if (methodId == 0) {
+                    showAlert(Alert.AlertType.ERROR, "Lỗi", "Không tìm thấy phương thức thanh toán chuyển khoản.");
+                    return;
+                }
+                executePaymentTransaction(invoice, methodId);
             }
         });
     }
     private void executePaymentTransaction(Invoice invoice, long methodId) {
-        // Để shiftId = 0 (hoặc null) như bạn yêu cầu để tránh lỗi Foreign Key
-        long shiftId = 0;
+        long userId = getCurrentUserId();
+        if (userId == 0) {
+            showAlert(Alert.AlertType.ERROR, "Lỗi phiên đăng nhập", "Vui lòng đăng nhập lại.");
+            return;
+        }
 
         boolean success = paymentService.processPayment(
                 invoice,
                 methodId,
-                shiftId,
-                CURRENT_USER_ID
+                userId
         );
 
         if (success) {
