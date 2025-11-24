@@ -82,9 +82,9 @@ public class MemberReportTabController extends BaseController {
         if (file != null) {
             try {
                 excelExportService.exportMemberReport(memberList, file.getAbsolutePath());
-                showAlert("✅ Xuất Excel thành công!");
+                showAlert("✅ Excel export successful!");
             } catch (Exception e) {
-                showError("❌ Lỗi khi xuất Excel: " + e.getMessage());
+                showError("❌ Error exporting Excel: " + e.getMessage());
             }
         }
     }

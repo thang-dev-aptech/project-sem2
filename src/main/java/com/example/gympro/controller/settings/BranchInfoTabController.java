@@ -7,7 +7,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 
 /**
- * Controller cho Tab "Thông tin phòng gym" trong Settings
+ * Controller for "Gym Information" tab in Settings
  */
 public class BranchInfoTabController extends BaseController {
     
@@ -40,14 +40,14 @@ public class BranchInfoTabController extends BaseController {
         String phone = txtGymPhone.getText().trim();
         
         if (isEmpty(name)) {
-            showWarning("⚠️ Vui lòng nhập tên phòng gym!");
+            showWarning("⚠️ Please enter gym name!");
             return;
         }
         
         if (settingsService.updateBranchInfo(name, address, phone)) {
-            showAlert("✅ Lưu thông tin phòng gym thành công!");
+            showAlert("✅ Gym information saved successfully!");
         } else {
-            showError("❌ Lỗi khi lưu thông tin phòng gym!");
+            showError("❌ Error saving gym information!");
         }
     }
 }

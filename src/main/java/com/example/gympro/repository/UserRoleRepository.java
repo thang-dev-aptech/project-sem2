@@ -8,7 +8,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 /**
- * UserRoleRepository - Quản lý bảng user_roles (many-to-many)
+ * UserRoleRepository - Manages user_roles table (many-to-many)
  */
 public class UserRoleRepository {
 
@@ -19,29 +19,29 @@ public class UserRoleRepository {
             "INSERT INTO user_roles (user_id, role_id) VALUES (?, ?)";
 
     /**
-     * Xóa tất cả roles của user
+     * Delete all roles of a user
      */
     public boolean deleteByUserId(Long userId) {
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(SQL_DELETE_BY_USER_ID)) {
             ps.setLong(1, userId);
-            return ps.executeUpdate() >= 0; // Có thể không có role nào
+            return ps.executeUpdate() >= 0; // May have no roles
         } catch (SQLException e) {
             throw new RuntimeException("Failed to delete user roles", e);
         }
     }
 
     /**
-     * Gán roles cho user (xóa cũ và thêm mới)
+     * Assign roles to user (delete old and add new)
      */
     public boolean assignRoles(Long userId, List<Long> roleIds) {
         try (Connection conn = DatabaseConnection.getConnection()) {
             conn.setAutoCommit(false);
             try {
-                // Xóa roles cũ
+                // Delete old roles
                 deleteByUserId(userId);
 
-                // Thêm roles mới
+                // Add new roles
                 if (roleIds != null && !roleIds.isEmpty()) {
                     try (PreparedStatement ps = conn.prepareStatement(SQL_INSERT)) {
                         for (Long roleId : roleIds) {

@@ -78,7 +78,7 @@ public class UserService {
         }
 
         if (savedUser.isPresent() && roleIds != null) {
-            // Gán roles
+            // Assign roles
             userRoleRepository.assignRoles(savedUser.get().getId(), roleIds);
             return Optional.of(UserMapper.toViewModel(savedUser.get()));
         }
@@ -87,7 +87,7 @@ public class UserService {
     }
 
     public boolean deleteUser(Long id) {
-        // Không cho phép xóa chính mình
+        // Don't allow deleting yourself
         User currentUser = SessionManager.getInstance().getCurrentUser();
         if (currentUser != null && currentUser.getId().equals(id)) {
             return false;

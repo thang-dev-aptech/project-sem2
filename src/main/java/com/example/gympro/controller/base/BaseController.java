@@ -6,12 +6,12 @@ import javafx.scene.control.ButtonType;
 import java.util.Optional;
 
 /**
- * Base controller chứa các methods chung cho tất cả controllers
+ * Base controller containing common methods for all controllers
  */
 public abstract class BaseController {
     
     /**
-     * Hiển thị alert thông tin
+     * Show information alert
      */
     protected void showAlert(String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
@@ -21,7 +21,7 @@ public abstract class BaseController {
     }
     
     /**
-     * Hiển thị alert cảnh báo
+     * Show warning alert
      */
     protected void showWarning(String message) {
         Alert alert = new Alert(Alert.AlertType.WARNING);
@@ -31,7 +31,7 @@ public abstract class BaseController {
     }
     
     /**
-     * Hiển thị alert lỗi
+     * Show error alert
      */
     protected void showError(String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -41,7 +41,7 @@ public abstract class BaseController {
     }
     
     /**
-     * Hiển thị confirmation dialog
+     * Show confirmation dialog
      */
     protected Optional<ButtonType> showConfirmation(String title, String header, String content) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
@@ -52,14 +52,14 @@ public abstract class BaseController {
     }
     
     /**
-     * Kiểm tra input có rỗng không
+     * Check if input is empty
      */
     protected boolean isEmpty(String value) {
         return value == null || value.trim().isEmpty();
     }
     
     /**
-     * Parse integer với validation
+     * Parse integer with validation
      */
     protected Optional<Integer> parseInteger(String value) {
         try {
@@ -70,7 +70,7 @@ public abstract class BaseController {
     }
     
     /**
-     * Parse double với validation
+     * Parse double with validation
      */
     protected Optional<Double> parseDouble(String value) {
         try {

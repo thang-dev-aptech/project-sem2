@@ -6,7 +6,7 @@ import com.example.gympro.service.SessionManager;
 import com.example.gympro.viewModel.ExpiringMember;
 import com.example.gympro.viewModel.Member;
 import com.example.gympro.viewModel.Plan;
-import javafx.collections.FXCollections; // <-- Quan trọng
+import javafx.collections.FXCollections; // <-- Important
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -15,7 +15,7 @@ import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.List; // <-- Quan trọng
+import java.util.List; // <-- Important
 
 public class RegistrationController {
 
@@ -73,23 +73,23 @@ public class RegistrationController {
 
     private void loadMemberData() {
         try {
-            // 1. Lấy List từ Service
+            // 1. Get List from Service
             List<Member> members = registrationService.getMembersForRegistration();
-            // 2. Chuyển sang ObservableList cho JavaFX
+            // 2. Convert to ObservableList for JavaFX
             memberComboBox.setItems(FXCollections.observableArrayList(members));
         } catch (Exception e) {
-            showAlert(Alert.AlertType.ERROR, "Lỗi tải hội viên", e.getMessage());
+            showAlert(Alert.AlertType.ERROR, "Error Loading Members", e.getMessage());
         }
     }
 
     private void loadPackageData() {
         try {
-            // 1. Lấy List từ Service
+            // 1. Get List from Service
             List<Plan> plans = registrationService.getPlansForRegistration();
-            // 2. Chuyển sang ObservableList cho JavaFX
+            // 2. Convert to ObservableList for JavaFX
             packageComboBox.setItems(FXCollections.observableArrayList(plans));
         } catch (Exception e) {
-            showAlert(Alert.AlertType.ERROR, "Lỗi tải gói tập", e.getMessage());
+            showAlert(Alert.AlertType.ERROR, "Error Loading Packages", e.getMessage());
         }
     }
 
@@ -103,18 +103,18 @@ public class RegistrationController {
         try {
             endDate = LocalDate.parse(endDateField.getText(), summaryDateFormatter);
         } catch (Exception e) {
-            // Bỏ qua, validation ở dưới sẽ bắt
+            // Skip, validation below will catch
         }
 
         if (selectedMember == null || selectedPlan == null || startDate == null || endDate == null) {
-            showAlert(Alert.AlertType.WARNING, "Thiếu thông tin", "Vui lòng chọn đầy đủ hội viên, gói tập và ngày.");
+            showAlert(Alert.AlertType.WARNING, "Missing Information", "Please select member, package and dates.");
             return;
         }
 
-        // Gọi Service (Bộ não)
+        // Call Service (Brain)
         long userId = getCurrentUserId();
         if (userId == 0) {
-            showAlert(Alert.AlertType.ERROR, "Lỗi phiên đăng nhập", "Vui lòng đăng nhập lại.");
+            showAlert(Alert.AlertType.ERROR, "Session Error", "Please login again.");
             return;
         }
         
@@ -122,21 +122,21 @@ public class RegistrationController {
                 selectedMember, selectedPlan, startDate, endDate, userId);
 
         if (success) {
-            showAlert(Alert.AlertType.INFORMATION, "Thành công",
-                    "Đã tạo Hóa đơn (chờ thanh toán) cho: " + selectedMember.getFullName());
+            showAlert(Alert.AlertType.INFORMATION, "Success",
+                    "Invoice created (pending payment) for: " + selectedMember.getFullName());
             clearForm();
         } else {
-            showAlert(Alert.AlertType.ERROR, "Lỗi CSDL", "Không thể lưu đăng ký.");
+            showAlert(Alert.AlertType.ERROR, "Database Error", "Cannot save registration.");
         }
     }
 
-    // --- CÁC HÀM TIỆN ÍCH (HELPER METHODS) ---
+    // --- HELPER METHODS ---
 
     private void setupMemberComboBox() {
         memberComboBox.setConverter(new StringConverter<>() {
             @Override
             public String toString(Member member) {
-                return (member == null) ? "Chọn hội viên..." : member.getFullName() + " (ID: " + member.getId() + ")";
+                return (member == null) ? "Select member..." : member.getFullName() + " (ID: " + member.getId() + ")";
             }
 
             @Override
@@ -144,7 +144,7 @@ public class RegistrationController {
                 return null;
             }
         });
-        memberComboBox.setPromptText("Chọn hội viên...");
+        memberComboBox.setPromptText("Select member...");
     }
 
     private void setupPackageComboBox() {
@@ -152,8 +152,8 @@ public class RegistrationController {
             @Override
             public String toString(Plan plan) {
                 if (plan == null)
-                    return "Chọn gói tập...";
-                return plan.getName() + " - " + plan.getDurationDays() + " ngày ("
+                    return "Select package...";
+                return plan.getName() + " - " + plan.getDurationDays() + " days ("
                         + moneyFormatter.format(plan.getPrice()) + ")";
             }
 
@@ -162,7 +162,7 @@ public class RegistrationController {
                 return null;
             }
         });
-        packageComboBox.setPromptText("Chọn gói tập...");
+        packageComboBox.setPromptText("Select package...");
     }
 
     private void updateSummary() {
@@ -174,12 +174,12 @@ public class RegistrationController {
 
         if (plan != null) {
             summaryPackageLabel.setText(plan.getName());
-            summaryDurationLabel.setText(plan.getDurationDays() + " ngày");
+            summaryDurationLabel.setText(plan.getDurationDays() + " days");
             summaryAmountLabel.setText(moneyFormatter.format(plan.getPrice()));
         } else {
             summaryPackageLabel.setText("None");
             summaryDurationLabel.setText("N/A");
-            summaryAmountLabel.setText("đ 0");
+            summaryAmountLabel.setText("₫ 0");
         }
 
         if (startDate != null) {
@@ -239,8 +239,8 @@ public class RegistrationController {
             if (foundMember != null) {
                 memberComboBox.setValue(foundMember);
             } else {
-                showAlert(Alert.AlertType.WARNING, "Không tìm thấy hội viên",
-                        "Không tìm thấy hội viên với mã: " + memberCode);
+                showAlert(Alert.AlertType.WARNING, "Member Not Found",
+                        "Cannot find member with code: " + memberCode);
             }
         }
 
@@ -262,7 +262,7 @@ public class RegistrationController {
             ex.printStackTrace();
         }
 
-        // Lấy Grace Days từ settings
+        // Get Grace Days from settings
         com.example.gympro.service.settings.SettingsService settingsService = new com.example.gympro.service.settings.SettingsService();
         int graceDays = settingsService.getGraceDays();
         
@@ -270,12 +270,12 @@ public class RegistrationController {
         LocalDate startDate;
         
         if (currentEndDate != null) {
-            // Nếu còn hạn hoặc hết hạn trong vòng grace days → gia hạn từ ngày hết hạn + 1
+            // If still valid or expired within grace days → renew from expiry date + 1
             if (currentEndDate.isAfter(today) || 
                 (currentEndDate.isBefore(today) && java.time.temporal.ChronoUnit.DAYS.between(currentEndDate, today) <= graceDays)) {
                 startDate = currentEndDate.plusDays(1);
             } else {
-                // Hết hạn quá lâu → gia hạn từ hôm nay
+                // Expired too long → renew from today
                 startDate = today;
             }
         } else {

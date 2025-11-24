@@ -41,7 +41,7 @@ public class MemberRepository implements MemberRepositoryInterface {
         StringBuilder sqlBuilder = new StringBuilder(BASE_SELECT_SQL);
         List<Object> params = new ArrayList<>();
 
-        if (status != null && !status.isBlank() && !"Tất cả".equalsIgnoreCase(status)) {
+        if (status != null && !status.isBlank() && !"All".equalsIgnoreCase(status) && !"Tất cả".equalsIgnoreCase(status)) {
             sqlBuilder.append(" AND status = ?");
             params.add(status);
         }
@@ -70,7 +70,7 @@ public class MemberRepository implements MemberRepositoryInterface {
                 }
             }
         } catch (SQLException e) {
-            System.err.println("Lỗi khi tải hội viên: " + e.getMessage());
+            System.err.println("Error loading members: " + e.getMessage());
             e.printStackTrace();
         }
         return members;
@@ -93,7 +93,7 @@ public class MemberRepository implements MemberRepositoryInterface {
                 }
             }
         } catch (SQLException e) {
-            System.err.println("Lỗi khi thêm hội viên: " + e.getMessage());
+            System.err.println("Error adding member: " + e.getMessage());
             e.printStackTrace();
         }
         return Optional.empty();
@@ -117,7 +117,7 @@ public class MemberRepository implements MemberRepositoryInterface {
 
             return pstmt.executeUpdate() > 0;
         } catch (SQLException e) {
-            System.err.println("Lỗi khi cập nhật hội viên: " + e.getMessage());
+            System.err.println("Error updating member: " + e.getMessage());
             e.printStackTrace();
             return false;
         }
@@ -130,7 +130,7 @@ public class MemberRepository implements MemberRepositoryInterface {
             pstmt.setLong(1, id);
             return pstmt.executeUpdate() > 0;
         } catch (SQLException e) {
-            System.err.println("Lỗi khi xóa hội viên: " + e.getMessage());
+            System.err.println("Error deleting member: " + e.getMessage());
             return false;
         }
     }
@@ -147,7 +147,7 @@ public class MemberRepository implements MemberRepositoryInterface {
                 }
             }
         } catch (SQLException e) {
-            System.err.println("Lỗi khi tìm hội viên: " + e.getMessage());
+            System.err.println("Error finding member: " + e.getMessage());
         }
         return Optional.empty();
     }

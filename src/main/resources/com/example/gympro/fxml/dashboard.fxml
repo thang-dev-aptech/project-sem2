@@ -40,17 +40,17 @@
             <VBox styleClass="card" spacing="10" GridPane.columnIndex="0">
                  <BarChart fx:id="revenueBarChart" prefWidth="600" prefHeight="400">
             <xAxis>
-                <CategoryAxis fx:id="xAxis" label="Tháng"/>
+                <CategoryAxis fx:id="xAxis" label="Month"/>
             </xAxis>
             <yAxis>
-                <NumberAxis fx:id="yAxis" label="Doanh thu (VNĐ)"/>
+                <NumberAxis fx:id="yAxis" label="Revenue (VND)"/>
             </yAxis>
         </BarChart>
             </VBox> 
 
             <!-- Member Status Chart -->
             <VBox styleClass="card" spacing="10" GridPane.columnIndex="1">
-                        <PieChart fx:id="memberPieChart" prefWidth="400" prefHeight="400" title="Trạng thái hội viên"/>
+                        <PieChart fx:id="memberPieChart" prefWidth="400" prefHeight="400" title="Member Status"/>
 
             </VBox>
 

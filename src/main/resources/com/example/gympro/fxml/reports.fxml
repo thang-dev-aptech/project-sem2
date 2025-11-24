@@ -16,18 +16,18 @@
 
         <!-- Header -->
         <VBox spacing="5">
-            <Label text="📊 Báo Cáo Chi Tiết" styleClass="page-title"/>
-            <Label text="Xem và xuất báo cáo theo khoảng thời gian" styleClass="page-subtitle"/>
+            <Label text="📊 Detailed Reports" styleClass="page-title"/>
+            <Label text="View and export reports by date range" styleClass="page-subtitle"/>
         </VBox>
 
         <!-- Date Range Filter -->
         <HBox spacing="15" alignment="CENTER_LEFT" styleClass="card" style="-fx-padding: 15;">
-            <Label text="📅 Khoảng thời gian:" style="-fx-font-weight: bold;"/>
-            <DatePicker fx:id="dateFrom" promptText="Từ ngày"/>
+            <Label text="📅 Date Range:" style="-fx-font-weight: bold;"/>
+            <DatePicker fx:id="dateFrom" promptText="From Date"/>
             <Label text="→"/>
-            <DatePicker fx:id="dateTo" promptText="Đến ngày"/>
-            <Button fx:id="btnFilter" text="🔍 Lọc" style="-fx-background-color: #2196F3; -fx-text-fill: white;"/>
-            <Button fx:id="btnReset" text="🔄 Đặt lại" style="-fx-background-color: #757575; -fx-text-fill: white;"/>
+            <DatePicker fx:id="dateTo" promptText="To Date"/>
+            <Button fx:id="btnFilter" text="🔍 Filter" style="-fx-background-color: #2196F3; -fx-text-fill: white;"/>
+            <Button fx:id="btnReset" text="🔄 Reset" style="-fx-background-color: #757575; -fx-text-fill: white;"/>
             <Region HBox.hgrow="ALWAYS"/>
             <Label fx:id="lblSummary" text="" style="-fx-font-weight: bold; -fx-text-fill: #4CAF50;"/>
         </HBox>
@@ -36,11 +36,11 @@
         <TabPane fx:id="tabPane" tabClosingPolicy="UNAVAILABLE">
             
             <!-- Tab 1: Revenue Report -->
-            <Tab text="💰 Doanh Thu" closable="false">
+            <Tab text="💰 Revenue" closable="false">
                 <VBox spacing="15" style="-fx-padding: 15;">
                     <HBox spacing="10" alignment="CENTER_RIGHT">
                         <Region HBox.hgrow="ALWAYS"/>
-                        <Button fx:id="btnExportRevenue" text="📤 Xuất Excel" 
+                        <Button fx:id="btnExportRevenue" text="📤 Export Excel" 
                                 style="-fx-background-color: #4CAF50; -fx-text-fill: white;"/>
                     </HBox>
                     
@@ -54,49 +54,49 @@
                         </columnConstraints>
                         
                         <VBox styleClass="card" spacing="5" style="-fx-padding: 15;" GridPane.columnIndex="0">
-                            <Label text="Tổng doanh thu" style="-fx-font-size: 12; -fx-text-fill: #757575;"/>
-                            <Label fx:id="lblTotalRevenue" text="0 VNĐ" style="-fx-font-size: 18; -fx-font-weight: bold; -fx-text-fill: #4CAF50;"/>
+                            <Label text="Total Revenue" style="-fx-font-size: 12; -fx-text-fill: #757575;"/>
+                            <Label fx:id="lblTotalRevenue" text="0 VND" style="-fx-font-size: 18; -fx-font-weight: bold; -fx-text-fill: #4CAF50;"/>
                         </VBox>
                         
                         <VBox styleClass="card" spacing="5" style="-fx-padding: 15;" GridPane.columnIndex="1">
-                            <Label text="Số hóa đơn" style="-fx-font-size: 12; -fx-text-fill: #757575;"/>
+                            <Label text="Total Invoices" style="-fx-font-size: 12; -fx-text-fill: #757575;"/>
                             <Label fx:id="lblTotalInvoices" text="0" style="-fx-font-size: 18; -fx-font-weight: bold; -fx-text-fill: #2196F3;"/>
                         </VBox>
                         
                         <VBox styleClass="card" spacing="5" style="-fx-padding: 15;" GridPane.columnIndex="2">
-                            <Label text="Số thanh toán" style="-fx-font-size: 12; -fx-text-fill: #757575;"/>
+                            <Label text="Total Payments" style="-fx-font-size: 12; -fx-text-fill: #757575;"/>
                             <Label fx:id="lblTotalPayments" text="0" style="-fx-font-size: 18; -fx-font-weight: bold; -fx-text-fill: #FF9800;"/>
                         </VBox>
                         
                         <VBox styleClass="card" spacing="5" style="-fx-padding: 15;" GridPane.columnIndex="3">
-                            <Label text="Trung bình/HĐ" style="-fx-font-size: 12; -fx-text-fill: #757575;"/>
-                            <Label fx:id="lblAvgInvoice" text="0 VNĐ" style="-fx-font-size: 18; -fx-font-weight: bold; -fx-text-fill: #9C27B0;"/>
+                            <Label text="Avg/Invoice" style="-fx-font-size: 12; -fx-text-fill: #757575;"/>
+                            <Label fx:id="lblAvgInvoice" text="0 VND" style="-fx-font-size: 18; -fx-font-weight: bold; -fx-text-fill: #9C27B0;"/>
                         </VBox>
                     </GridPane>
 
                     <!-- Revenue Details Table -->
                     <TableView fx:id="tblRevenue" prefHeight="400">
                         <columns>
-                            <TableColumn fx:id="colInvoiceNo" text="Số HĐ" prefWidth="100"/>
-                            <TableColumn fx:id="colInvoiceDate" text="Ngày" prefWidth="120"/>
-                            <TableColumn fx:id="colMemberName" text="Hội viên" prefWidth="150"/>
-                            <TableColumn fx:id="colMemberCode" text="Mã HV" prefWidth="100"/>
-                            <TableColumn fx:id="colPackageName" text="Gói tập" prefWidth="120"/>
-                            <TableColumn fx:id="colSubtotal" text="Tạm tính" prefWidth="120"/>
-                            <TableColumn fx:id="colDiscount" text="Giảm giá" prefWidth="100"/>
-                            <TableColumn fx:id="colTotal" text="Tổng cộng" prefWidth="120"/>
-                            <TableColumn fx:id="colStatus" text="Trạng thái" prefWidth="100"/>
+                            <TableColumn fx:id="colInvoiceNo" text="Invoice #" prefWidth="100"/>
+                            <TableColumn fx:id="colInvoiceDate" text="Date" prefWidth="120"/>
+                            <TableColumn fx:id="colMemberName" text="Member" prefWidth="150"/>
+                            <TableColumn fx:id="colMemberCode" text="Member Code" prefWidth="100"/>
+                            <TableColumn fx:id="colPackageName" text="Package" prefWidth="120"/>
+                            <TableColumn fx:id="colSubtotal" text="Subtotal" prefWidth="120"/>
+                            <TableColumn fx:id="colDiscount" text="Discount" prefWidth="100"/>
+                            <TableColumn fx:id="colTotal" text="Total" prefWidth="120"/>
+                            <TableColumn fx:id="colStatus" text="Status" prefWidth="100"/>
                         </columns>
                     </TableView>
                 </VBox>
             </Tab>
 
             <!-- Tab 2: Member Report -->
-            <Tab text="👥 Hội Viên" closable="false">
+            <Tab text="👥 Members" closable="false">
                 <VBox spacing="15" style="-fx-padding: 15;">
                     <HBox spacing="10" alignment="CENTER_RIGHT">
                         <Region HBox.hgrow="ALWAYS"/>
-                        <Button fx:id="btnExportMembers" text="📤 Xuất Excel" 
+                        <Button fx:id="btnExportMembers" text="📤 Export Excel" 
                                 style="-fx-background-color: #4CAF50; -fx-text-fill: white;"/>
                     </HBox>
                     
@@ -110,22 +110,22 @@
                         </columnConstraints>
                         
                         <VBox styleClass="card" spacing="5" style="-fx-padding: 15;" GridPane.columnIndex="0">
-                            <Label text="Tổng hội viên" style="-fx-font-size: 12; -fx-text-fill: #757575;"/>
+                            <Label text="Total Members" style="-fx-font-size: 12; -fx-text-fill: #757575;"/>
                             <Label fx:id="lblTotalMembers" text="0" style="-fx-font-size: 18; -fx-font-weight: bold; -fx-text-fill: #4CAF50;"/>
                         </VBox>
                         
                         <VBox styleClass="card" spacing="5" style="-fx-padding: 15;" GridPane.columnIndex="1">
-                            <Label text="Hội viên mới" style="-fx-font-size: 12; -fx-text-fill: #757575;"/>
+                            <Label text="New Members" style="-fx-font-size: 12; -fx-text-fill: #757575;"/>
                             <Label fx:id="lblNewMembers" text="0" style="-fx-font-size: 18; -fx-font-weight: bold; -fx-text-fill: #2196F3;"/>
                         </VBox>
                         
                         <VBox styleClass="card" spacing="5" style="-fx-padding: 15;" GridPane.columnIndex="2">
-                            <Label text="Đang hoạt động" style="-fx-font-size: 12; -fx-text-fill: #757575;"/>
+                            <Label text="Active Members" style="-fx-font-size: 12; -fx-text-fill: #757575;"/>
                             <Label fx:id="lblActiveMembers" text="0" style="-fx-font-size: 18; -fx-font-weight: bold; -fx-text-fill: #FF9800;"/>
                         </VBox>
                         
                         <VBox styleClass="card" spacing="5" style="-fx-padding: 15;" GridPane.columnIndex="3">
-                            <Label text="Hết hạn" style="-fx-font-size: 12; -fx-text-fill: #757575;"/>
+                            <Label text="Expired Members" style="-fx-font-size: 12; -fx-text-fill: #757575;"/>
                             <Label fx:id="lblExpiredMembers" text="0" style="-fx-font-size: 18; -fx-font-weight: bold; -fx-text-fill: #F44336;"/>
                         </VBox>
                     </GridPane>
@@ -133,49 +133,49 @@
                     <!-- Member Details Table -->
                     <TableView fx:id="tblMembers" prefHeight="400">
                         <columns>
-                            <TableColumn fx:id="colMemberCode2" text="Mã HV" prefWidth="100"/>
-                            <TableColumn fx:id="colMemberName2" text="Họ tên" prefWidth="150"/>
-                            <TableColumn fx:id="colMemberPhone2" text="SĐT" prefWidth="120"/>
+                            <TableColumn fx:id="colMemberCode2" text="Member Code" prefWidth="100"/>
+                            <TableColumn fx:id="colMemberName2" text="Full Name" prefWidth="150"/>
+                            <TableColumn fx:id="colMemberPhone2" text="Phone" prefWidth="120"/>
                             <TableColumn fx:id="colMemberEmail2" text="Email" prefWidth="150"/>
-                            <TableColumn fx:id="colMemberStatus2" text="Trạng thái" prefWidth="100"/>
-                            <TableColumn fx:id="colMemberPackage2" text="Gói hiện tại" prefWidth="120"/>
-                            <TableColumn fx:id="colMemberStartDate" text="Ngày bắt đầu" prefWidth="120"/>
-                            <TableColumn fx:id="colMemberEndDate" text="Ngày kết thúc" prefWidth="120"/>
-                            <TableColumn fx:id="colMemberCreated" text="Ngày tạo" prefWidth="120"/>
+                            <TableColumn fx:id="colMemberStatus2" text="Status" prefWidth="100"/>
+                            <TableColumn fx:id="colMemberPackage2" text="Current Package" prefWidth="120"/>
+                            <TableColumn fx:id="colMemberStartDate" text="Start Date" prefWidth="120"/>
+                            <TableColumn fx:id="colMemberEndDate" text="End Date" prefWidth="120"/>
+                            <TableColumn fx:id="colMemberCreated" text="Created Date" prefWidth="120"/>
                         </columns>
                     </TableView>
                 </VBox>
             </Tab>
 
             <!-- Tab 3: Package Report -->
-            <Tab text="📦 Gói Tập" closable="false">
+            <Tab text="📦 Packages" closable="false">
                 <VBox spacing="15" style="-fx-padding: 15;">
                     <HBox spacing="10" alignment="CENTER_RIGHT">
                         <Region HBox.hgrow="ALWAYS"/>
-                        <Button fx:id="btnExportPackages" text="📤 Xuất Excel" 
+                        <Button fx:id="btnExportPackages" text="📤 Export Excel" 
                                 style="-fx-background-color: #4CAF50; -fx-text-fill: white;"/>
                     </HBox>
 
                     <!-- Package Sales Table -->
                     <TableView fx:id="tblPackages" prefHeight="500">
                         <columns>
-                            <TableColumn fx:id="colPackageName2" text="Tên gói" prefWidth="150"/>
-                            <TableColumn fx:id="colPackagePrice" text="Giá" prefWidth="120"/>
-                            <TableColumn fx:id="colPackageSold" text="Số lượng bán" prefWidth="120"/>
-                            <TableColumn fx:id="colPackageRevenue" text="Doanh thu" prefWidth="150"/>
-                            <TableColumn fx:id="colPackageAvg" text="TB/HĐ" prefWidth="120"/>
-                            <TableColumn fx:id="colPackageStatus" text="Trạng thái" prefWidth="100"/>
+                            <TableColumn fx:id="colPackageName2" text="Package Name" prefWidth="150"/>
+                            <TableColumn fx:id="colPackagePrice" text="Price" prefWidth="120"/>
+                            <TableColumn fx:id="colPackageSold" text="Quantity Sold" prefWidth="120"/>
+                            <TableColumn fx:id="colPackageRevenue" text="Revenue" prefWidth="150"/>
+                            <TableColumn fx:id="colPackageAvg" text="Avg/Invoice" prefWidth="120"/>
+                            <TableColumn fx:id="colPackageStatus" text="Status" prefWidth="100"/>
                         </columns>
                     </TableView>
                 </VBox>
             </Tab>
 
             <!-- Tab 4: Payment Report -->
-            <Tab text="💳 Thanh Toán" closable="false">
+            <Tab text="💳 Payments" closable="false">
                 <VBox spacing="15" style="-fx-padding: 15;">
                     <HBox spacing="10" alignment="CENTER_RIGHT">
                         <Region HBox.hgrow="ALWAYS"/>
-                        <Button fx:id="btnExportPayments" text="📤 Xuất Excel" 
+                        <Button fx:id="btnExportPayments" text="📤 Export Excel" 
                                 style="-fx-background-color: #4CAF50; -fx-text-fill: white;"/>
                     </HBox>
 
@@ -188,31 +188,31 @@
                         </columnConstraints>
                         
                         <VBox styleClass="card" spacing="5" style="-fx-padding: 15;" GridPane.columnIndex="0">
-                            <Label text="Tiền mặt" style="-fx-font-size: 12; -fx-text-fill: #757575;"/>
-                            <Label fx:id="lblCashTotal" text="0 VNĐ" style="-fx-font-size: 18; -fx-font-weight: bold; -fx-text-fill: #4CAF50;"/>
+                            <Label text="Cash" style="-fx-font-size: 12; -fx-text-fill: #757575;"/>
+                            <Label fx:id="lblCashTotal" text="0 VND" style="-fx-font-size: 18; -fx-font-weight: bold; -fx-text-fill: #4CAF50;"/>
                         </VBox>
                         
                         <VBox styleClass="card" spacing="5" style="-fx-padding: 15;" GridPane.columnIndex="1">
-                            <Label text="Chuyển khoản" style="-fx-font-size: 12; -fx-text-fill: #757575;"/>
-                            <Label fx:id="lblBankTotal" text="0 VNĐ" style="-fx-font-size: 18; -fx-font-weight: bold; -fx-text-fill: #2196F3;"/>
+                            <Label text="Bank Transfer" style="-fx-font-size: 12; -fx-text-fill: #757575;"/>
+                            <Label fx:id="lblBankTotal" text="0 VND" style="-fx-font-size: 18; -fx-font-weight: bold; -fx-text-fill: #2196F3;"/>
                         </VBox>
                         
                         <VBox styleClass="card" spacing="5" style="-fx-padding: 15;" GridPane.columnIndex="2">
                             <Label text="QR Code" style="-fx-font-size: 12; -fx-text-fill: #757575;"/>
-                            <Label fx:id="lblQRTotal" text="0 VNĐ" style="-fx-font-size: 18; -fx-font-weight: bold; -fx-text-fill: #FF9800;"/>
+                            <Label fx:id="lblQRTotal" text="0 VND" style="-fx-font-size: 18; -fx-font-weight: bold; -fx-text-fill: #FF9800;"/>
                         </VBox>
                     </GridPane>
 
                     <!-- Payment Details Table -->
                     <TableView fx:id="tblPayments" prefHeight="400">
                         <columns>
-                            <TableColumn fx:id="colPaymentId" text="Mã TT" prefWidth="100"/>
-                            <TableColumn fx:id="colPaymentDate" text="Ngày TT" prefWidth="120"/>
-                            <TableColumn fx:id="colPaymentInvoice" text="Số HĐ" prefWidth="100"/>
-                            <TableColumn fx:id="colPaymentMember" text="Hội viên" prefWidth="150"/>
-                            <TableColumn fx:id="colPaymentAmount" text="Số tiền" prefWidth="120"/>
-                            <TableColumn fx:id="colPaymentMethod" text="Phương thức" prefWidth="120"/>
-                            <TableColumn fx:id="colPaymentNote" text="Ghi chú" prefWidth="200"/>
+                            <TableColumn fx:id="colPaymentId" text="Payment ID" prefWidth="100"/>
+                            <TableColumn fx:id="colPaymentDate" text="Payment Date" prefWidth="120"/>
+                            <TableColumn fx:id="colPaymentInvoice" text="Invoice #" prefWidth="100"/>
+                            <TableColumn fx:id="colPaymentMember" text="Member" prefWidth="150"/>
+                            <TableColumn fx:id="colPaymentAmount" text="Amount" prefWidth="120"/>
+                            <TableColumn fx:id="colPaymentMethod" text="Method" prefWidth="120"/>
+                            <TableColumn fx:id="colPaymentNote" text="Notes" prefWidth="200"/>
                         </columns>
                     </TableView>
                 </VBox>

@@ -20,8 +20,8 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 /**
- * Controller cho màn hình Báo cáo
- * Sử dụng BaseController cho common methods
+ * Controller for Reports screen
+ * Uses BaseController for common methods
  */
 public class ReportsController extends BaseController {
 
@@ -231,12 +231,12 @@ public class ReportsController extends BaseController {
 
     private void applyFilter() {
         if (dateFrom.getValue() == null || dateTo.getValue() == null) {
-            showWarning("⚠️ Vui lòng chọn khoảng thời gian!");
+            showWarning("⚠️ Please select a date range!");
             return;
         }
 
         if (dateFrom.getValue().isAfter(dateTo.getValue())) {
-            showWarning("⚠️ Ngày bắt đầu phải nhỏ hơn hoặc bằng ngày kết thúc!");
+            showWarning("⚠️ Start date must be less than or equal to end date!");
             return;
         }
 
@@ -244,7 +244,7 @@ public class ReportsController extends BaseController {
         LocalDate to = dateTo.getValue();
 
         // Update summary label
-        lblSummary.setText(String.format("📊 Báo cáo từ %s đến %s", 
+        lblSummary.setText(String.format("📊 Report from %s to %s", 
             from.format(dateFormatter), to.format(dateFormatter)));
 
         // Load data for current tab
@@ -268,16 +268,16 @@ public class ReportsController extends BaseController {
         if (from == null || to == null) return;
 
         switch (tabText) {
-            case "💰 Doanh Thu":
+            case "💰 Revenue":
                 loadRevenueData(from, to);
                 break;
-            case "👥 Hội Viên":
+            case "👥 Members":
                 loadMemberData(from, to);
                 break;
-            case "📦 Gói Tập":
+            case "📦 Packages":
                 loadPackageData(from, to);
                 break;
-            case "💳 Thanh Toán":
+            case "💳 Payments":
                 loadPaymentData(from, to);
                 break;
         }
@@ -330,8 +330,8 @@ public class ReportsController extends BaseController {
     private void exportRevenueToExcel() {
         try {
             FileChooser fileChooser = new FileChooser();
-            fileChooser.setTitle("Lưu báo cáo Doanh thu");
-            fileChooser.setInitialFileName("BaoCaoDoanhThu.xlsx");
+            fileChooser.setTitle("Save Revenue Report");
+            fileChooser.setInitialFileName("RevenueReport.xlsx");
             fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Excel Files", "*.xlsx"));
 
             File file = fileChooser.showSaveDialog(btnExportRevenue.getScene().getWindow());
@@ -340,19 +340,19 @@ public class ReportsController extends BaseController {
                     tblRevenue.getItems().stream().toList(),
                     file.getAbsolutePath()
                 );
-                showAlert("✅ Xuất Excel thành công: " + file.getAbsolutePath());
+                showAlert("✅ Excel export successful: " + file.getAbsolutePath());
             }
         } catch (Exception ex) {
             ex.printStackTrace();
-            showError("❌ Lỗi khi xuất Excel: " + ex.getMessage());
+            showError("❌ Error exporting Excel: " + ex.getMessage());
         }
     }
 
     private void exportMembersToExcel() {
         try {
             FileChooser fileChooser = new FileChooser();
-            fileChooser.setTitle("Lưu báo cáo Hội viên");
-            fileChooser.setInitialFileName("BaoCaoHoiVien.xlsx");
+            fileChooser.setTitle("Save Member Report");
+            fileChooser.setInitialFileName("MemberReport.xlsx");
             fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Excel Files", "*.xlsx"));
 
             File file = fileChooser.showSaveDialog(btnExportMembers.getScene().getWindow());
@@ -361,19 +361,19 @@ public class ReportsController extends BaseController {
                     tblMembers.getItems().stream().toList(),
                     file.getAbsolutePath()
                 );
-                showAlert("✅ Xuất Excel thành công: " + file.getAbsolutePath());
+                showAlert("✅ Excel export successful: " + file.getAbsolutePath());
             }
         } catch (Exception ex) {
             ex.printStackTrace();
-            showError("❌ Lỗi khi xuất Excel: " + ex.getMessage());
+            showError("❌ Error exporting Excel: " + ex.getMessage());
         }
     }
 
     private void exportPackagesToExcel() {
         try {
             FileChooser fileChooser = new FileChooser();
-            fileChooser.setTitle("Lưu báo cáo Gói tập");
-            fileChooser.setInitialFileName("BaoCaoGoiTap.xlsx");
+            fileChooser.setTitle("Save Package Report");
+            fileChooser.setInitialFileName("PackageReport.xlsx");
             fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Excel Files", "*.xlsx"));
 
             File file = fileChooser.showSaveDialog(btnExportPackages.getScene().getWindow());
@@ -382,19 +382,19 @@ public class ReportsController extends BaseController {
                     tblPackages.getItems().stream().toList(),
                     file.getAbsolutePath()
                 );
-                showAlert("✅ Xuất Excel thành công: " + file.getAbsolutePath());
+                showAlert("✅ Excel export successful: " + file.getAbsolutePath());
             }
         } catch (Exception ex) {
             ex.printStackTrace();
-            showError("❌ Lỗi khi xuất Excel: " + ex.getMessage());
+            showError("❌ Error exporting Excel: " + ex.getMessage());
         }
     }
 
     private void exportPaymentsToExcel() {
         try {
             FileChooser fileChooser = new FileChooser();
-            fileChooser.setTitle("Lưu báo cáo Thanh toán");
-            fileChooser.setInitialFileName("BaoCaoThanhToan.xlsx");
+            fileChooser.setTitle("Save Payment Report");
+            fileChooser.setInitialFileName("PaymentReport.xlsx");
             fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Excel Files", "*.xlsx"));
 
             File file = fileChooser.showSaveDialog(btnExportPayments.getScene().getWindow());
@@ -403,13 +403,13 @@ public class ReportsController extends BaseController {
                     tblPayments.getItems().stream().toList(),
                     file.getAbsolutePath()
                 );
-                showAlert("✅ Xuất Excel thành công: " + file.getAbsolutePath());
+                showAlert("✅ Excel export successful: " + file.getAbsolutePath());
             }
         } catch (Exception ex) {
             ex.printStackTrace();
-            showError("❌ Lỗi khi xuất Excel: " + ex.getMessage());
+            showError("❌ Error exporting Excel: " + ex.getMessage());
         }
     }
 
-    // Helper methods đã được kế thừa từ BaseController
+    // Helper methods inherited from BaseController
 }

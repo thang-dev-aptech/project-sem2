@@ -14,13 +14,13 @@ public class MemberService implements MemberServiceInterface {
 
     @Override
     public List<Member> getAllMembers() {
-        return getFilteredMembers(null, "Tất cả");
+        return getFilteredMembers(null, "All");
     }
 
     @Override
     public List<Member> getFilteredMembers(String searchTerm, String statusFilter) {
-        String status = "Tất cả";
-        if (statusFilter != null && !"Tất cả".equals(statusFilter)) {
+        String status = "All";
+        if (statusFilter != null && !"All".equalsIgnoreCase(statusFilter) && !"Tất cả".equals(statusFilter)) {
             if (statusFilter.contains("(")) {
                 status = statusFilter.substring(statusFilter.indexOf("(") + 1, statusFilter.indexOf(")")).toUpperCase();
             } else {

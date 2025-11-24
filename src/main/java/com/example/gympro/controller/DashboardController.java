@@ -140,7 +140,7 @@ public class DashboardController {
                         if (mainController != null) {
                             mainController.navigateToRegistration(member);
                         } else {
-                            showAlert("❌ Không thể chuyển trang. Vui lòng thử lại.");
+                            showAlert("❌ Cannot navigate. Please try again.");
                         }
                     }
                 });
@@ -148,7 +148,7 @@ public class DashboardController {
                 btnEmail.setOnAction(e -> {
                     ExpiringMember member = getTableRow().getItem();
                     if (member != null) {
-                        showAlert("📧 Email đã gửi cho: " + member.getName());
+                        showAlert("📧 Email sent to: " + member.getName());
                     }
                 });
 

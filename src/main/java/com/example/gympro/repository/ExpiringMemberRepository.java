@@ -20,7 +20,7 @@ public class ExpiringMemberRepository {
         // Sử dụng maxDayLeft trực tiếp (default 7 nếu không chỉ định)
         int maxDays = maxDayLeft > 0 ? maxDayLeft : 7;
         
-        // Lấy members sắp hết hạn (trong vòng maxDayLeft ngày) hoặc đã hết hạn (trong vòng 30 ngày qua)
+        // Get members expiring soon (within maxDayLeft days) or expired (within last 30 days)
         String sql = """
                       SELECT
                       m.member_code,

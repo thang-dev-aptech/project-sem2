@@ -43,17 +43,6 @@ SELECT 'CARD', 'Thẻ tín dụng'
 WHERE NOT EXISTS (SELECT 1 FROM payment_methods WHERE code = 'CARD');
 
 -- =====================================================================
--- 4. DISCOUNT POLICIES (Chính sách chiết khấu)
--- =====================================================================
-INSERT INTO discount_policies (role_name, max_percent, max_amount)
-SELECT 'STAFF', 10.00, 100000.00
-WHERE NOT EXISTS (SELECT 1 FROM discount_policies WHERE role_name = 'STAFF');
-
-INSERT INTO discount_policies (role_name, max_percent, max_amount)
-SELECT 'OWNER', NULL, NULL
-WHERE NOT EXISTS (SELECT 1 FROM discount_policies WHERE role_name = 'OWNER');
-
--- =====================================================================
 -- 5. SETTINGS (Cấu hình hệ thống)
 -- =====================================================================
 INSERT INTO settings (key_name, value_str, value_num)

@@ -9,7 +9,7 @@ import javafx.scene.control.TextField;
 import java.util.Optional;
 
 /**
- * Controller cho Tab "Cấu hình nghiệp vụ" trong Settings
+ * Controller for "Business Configuration" tab in Settings
  */
 public class BusinessSettingsTabController extends BaseController {
     
@@ -37,7 +37,7 @@ public class BusinessSettingsTabController extends BaseController {
     private void saveBusinessSettings() {
         Optional<Integer> graceDaysOpt = parseInteger(txtGraceDays.getText());
         if (graceDaysOpt.isEmpty() || graceDaysOpt.get() < 0) {
-            showWarning("⚠️ Số ngày phải >= 0!");
+            showWarning("⚠️ Days must be >= 0!");
             return;
         }
         
@@ -46,7 +46,7 @@ public class BusinessSettingsTabController extends BaseController {
         String currencySymbol = txtCurrencySymbol.getText().trim();
         
         if (isEmpty(memberPrefix) || isEmpty(invoicePrefix) || isEmpty(currencySymbol)) {
-            showWarning("⚠️ Vui lòng điền đầy đủ thông tin!");
+            showWarning("⚠️ Please fill in all information!");
             return;
         }
         
@@ -56,9 +56,9 @@ public class BusinessSettingsTabController extends BaseController {
                 && settingsService.setCurrencySymbol(currencySymbol);
         
         if (success) {
-            showAlert("✅ Lưu cấu hình nghiệp vụ thành công!");
+            showAlert("✅ Business configuration saved successfully!");
         } else {
-            showError("❌ Lỗi khi lưu cấu hình nghiệp vụ!");
+            showError("❌ Error saving business configuration!");
         }
     }
 }

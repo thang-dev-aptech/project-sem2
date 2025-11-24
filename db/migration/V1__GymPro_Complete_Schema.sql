@@ -49,20 +49,6 @@ CREATE TABLE settings (
   updated_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB COLLATE=utf8mb4_0900_ai_ci;
 
--- counters: Bộ đếm sinh mã tự động
-CREATE TABLE counters (
-  counter_key   VARCHAR(64) PRIMARY KEY,
-  current_value BIGINT NOT NULL
-) ENGINE=InnoDB COLLATE=utf8mb4_0900_ai_ci;
-
--- discount_policies: Chính sách giới hạn chiết khấu theo vai trò
-CREATE TABLE discount_policies (
-  id           BIGINT PRIMARY KEY AUTO_INCREMENT,
-  role_name    VARCHAR(50) NOT NULL UNIQUE,
-  max_percent  DECIMAL(5,2) NULL,
-  max_amount   DECIMAL(12,2) NULL
-) ENGINE=InnoDB COLLATE=utf8mb4_0900_ai_ci;
-
 -- =====================================================================
 -- NGƯỜI DÙNG & PHÂN QUYỀN
 -- =====================================================================

@@ -68,7 +68,7 @@ public class PackageRepository implements PackageRepositoryInterface {
                 }
             }
         } catch (SQLException e) {
-            System.err.println("Lỗi khi tải gói tập: " + e.getMessage());
+            System.err.println("Error loading packages: " + e.getMessage());
         }
         return plans;
     }
@@ -96,7 +96,7 @@ public class PackageRepository implements PackageRepositoryInterface {
                 }
             }
         } catch (SQLException e) {
-            System.err.println("Lỗi khi thêm gói tập: " + e.getMessage());
+            System.err.println("Error adding package: " + e.getMessage());
         }
         return Optional.empty();
     }
@@ -116,7 +116,7 @@ public class PackageRepository implements PackageRepositoryInterface {
 
             return pstmt.executeUpdate() > 0;
         } catch (SQLException e) {
-            System.err.println("Lỗi khi cập nhật gói tập: " + e.getMessage());
+            System.err.println("Error updating package: " + e.getMessage());
             return false;
         }
     }
@@ -128,7 +128,7 @@ public class PackageRepository implements PackageRepositoryInterface {
             pstmt.setLong(1, id);
             return pstmt.executeUpdate() > 0;
         } catch (SQLException e) {
-            System.err.println("Lỗi khi xóa gói tập: " + e.getMessage());
+            System.err.println("Error deleting package: " + e.getMessage());
             return false;
         }
     }

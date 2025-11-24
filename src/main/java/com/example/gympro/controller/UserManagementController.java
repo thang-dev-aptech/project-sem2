@@ -58,9 +58,9 @@ public class UserManagementController {
     private List<Role> allRoles = new ArrayList<>();
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
-    // Dữ liệu cho ComboBoxes
+    // Data for ComboBoxes
     private final ObservableList<String> statusList = FXCollections.observableArrayList(
-            "Tất cả", "Hoạt động", "Vô hiệu hóa"
+            "All", "Active", "Inactive"
     );
 
     @FXML
@@ -78,11 +78,11 @@ public class UserManagementController {
         statusFilter.setItems(statusList);
         statusFilter.getSelectionModel().selectFirst();
 
-        // Khởi tạo ComboBox status trong Form
-        ObservableList<String> formStatusList = FXCollections.observableArrayList("Hoạt động", "Vô hiệu hóa");
+        // Initialize ComboBox status in Form
+        ObservableList<String> formStatusList = FXCollections.observableArrayList("Active", "Inactive");
         statusComboBox.setItems(formStatusList);
 
-        // Listener cho Tìm kiếm và Lọc
+        // Listener for Search and Filter
         searchField.textProperty().addListener((obs, oldV, newV) -> handleFilter());
         statusFilter.getSelectionModel().selectedItemProperty().addListener((obs, oldV, newV) -> handleFilter());
 
@@ -127,7 +127,7 @@ public class UserManagementController {
         userData.clear();
         List<UserViewModel> allUsers = userService.getAllUsers();
 
-        // Lọc theo search term
+        // Filter by search term
         if (searchTerm != null && !searchTerm.trim().isEmpty()) {
             String lowerSearch = searchTerm.toLowerCase();
             allUsers = allUsers.stream()
@@ -137,9 +137,9 @@ public class UserManagementController {
                     .collect(Collectors.toList());
         }
 
-        // Lọc theo status
-        if (status != null && !"Tất cả".equals(status)) {
-            boolean isActive = "Hoạt động".equals(status);
+        // Filter by status
+        if (status != null && !"All".equalsIgnoreCase(status)) {
+            boolean isActive = "Active".equalsIgnoreCase(status);
             allUsers = allUsers.stream()
                     .filter(u -> u.isActive() == isActive)
                     .collect(Collectors.toList());
@@ -159,28 +159,28 @@ public class UserManagementController {
     private void showUserDetails(UserViewModel user) {
         if (user != null) {
             selectedUser = user;
-            formTitle.setText("Chi tiết User: " + user.getFullName());
+            formTitle.setText("User Details: " + user.getFullName());
 
             // Load data
             usernameField.setText(user.getUsername());
             fullNameField.setText(user.getFullName());
             emailField.setText(user.getEmail());
             phoneField.setText(user.getPhone());
-            passwordField.clear(); // Không hiển thị password
-            statusComboBox.setValue(user.isActive() ? "Hoạt động" : "Vô hiệu hóa");
+            passwordField.clear(); // Don't display password
+            statusComboBox.setValue(user.isActive() ? "Active" : "Inactive");
 
             // Load roles
             List<Role> userRoles = userService.getUserRoles(user.getId());
             roleOwnerCheckBox.setSelected(userRoles.stream().anyMatch(r -> "OWNER".equals(r.getName())));
             roleStaffCheckBox.setSelected(userRoles.stream().anyMatch(r -> "STAFF".equals(r.getName())));
 
-            // Thiết lập chế độ XEM
+            // Set VIEW mode
             setFormEditable(false);
             deleteButton.setVisible(true);
-            saveButton.setText("💾 Lưu Thay đổi");
+            saveButton.setText("💾 Save Changes");
         } else {
             selectedUser = null;
-            formTitle.setText("Chi tiết Người dùng");
+            formTitle.setText("User Details");
             setFormEditable(false);
             clearFormFields();
             deleteButton.setVisible(false);
@@ -191,22 +191,22 @@ public class UserManagementController {
         if (user == null) return;
 
         usersTable.getSelectionModel().select(user);
-        formTitle.setText("CHỈNH SỬA USER: " + user.getFullName());
+        formTitle.setText("EDIT USER: " + user.getFullName());
         setFormEditable(true);
         deleteButton.setDisable(false);
-        saveButton.setText("💾 Lưu Thay đổi");
+        saveButton.setText("💾 Save Changes");
     }
 
     @FXML
     private void handleNewUser() {
         usersTable.getSelectionModel().clearSelection();
         selectedUser = new UserViewModel();
-        formTitle.setText("➕ Thêm User Mới");
+        formTitle.setText("➕ Add New User");
         setFormEditable(true);
         clearFormFields();
         detailPane.setDisable(false);
         deleteButton.setVisible(false);
-        saveButton.setText("💾 Thêm User");
+        saveButton.setText("💾 Add User");
         usernameField.setEditable(true);
     }
 
@@ -220,11 +220,11 @@ public class UserManagementController {
     @FXML
     private void handleSave() {
         if (!isInputValid()) {
-            new Alert(Alert.AlertType.WARNING, "Vui lòng kiểm tra lại dữ liệu nhập. Username, Họ tên không được trống.").showAndWait();
+            new Alert(Alert.AlertType.WARNING, "Please check your input. Username and Full Name cannot be empty.").showAndWait();
             return;
         }
 
-        // Áp dụng dữ liệu từ Form vào Model
+        // Apply data from Form to Model
         if (selectedUser == null) {
             selectedUser = new UserViewModel();
         }
@@ -233,15 +233,15 @@ public class UserManagementController {
         selectedUser.setFullName(fullNameField.getText());
         selectedUser.setEmail(emailField.getText());
         selectedUser.setPhone(phoneField.getText());
-        selectedUser.setIsActive("Hoạt động".equals(statusComboBox.getValue()));
+        selectedUser.setIsActive("Active".equalsIgnoreCase(statusComboBox.getValue()));
 
-        // Password chỉ set khi có giá trị
+        // Password only set when there is a value
         String password = passwordField.getText();
         if (password != null && !password.trim().isEmpty()) {
             selectedUser.setPassword(password);
         }
 
-        // Lấy role IDs
+        // Get role IDs
         List<Long> roleIds = new ArrayList<>();
         if (roleOwnerCheckBox.isSelected()) {
             allRoles.stream().filter(r -> "OWNER".equals(r.getName())).findFirst()
@@ -252,23 +252,23 @@ public class UserManagementController {
                     .ifPresent(r -> roleIds.add(r.getId()));
         }
 
-        // Lưu vào Database
+        // Save to Database
         Optional<UserViewModel> savedUser = userService.saveUser(selectedUser, roleIds);
 
         if (savedUser.isPresent()) {
             if (selectedUser.getId() == 0) {
                 userData.add(savedUser.get());
                 usersTable.getSelectionModel().select(savedUser.get());
-                new Alert(Alert.AlertType.INFORMATION, "Thêm user thành công!").showAndWait();
+                new Alert(Alert.AlertType.INFORMATION, "User added successfully!").showAndWait();
             } else {
                 usersTable.refresh();
-                new Alert(Alert.AlertType.INFORMATION, "Cập nhật thành công!").showAndWait();
+                new Alert(Alert.AlertType.INFORMATION, "Update successful!").showAndWait();
             }
             setFormEditable(false);
             deleteButton.setDisable(true);
             usernameField.setEditable(false);
         } else {
-            new Alert(Alert.AlertType.ERROR, "Lỗi khi lưu/cập nhật user.").showAndWait();
+            new Alert(Alert.AlertType.ERROR, "Error saving/updating user.").showAndWait();
         }
     }
 
@@ -276,17 +276,17 @@ public class UserManagementController {
     private void handleDelete() {
         if (selectedUser == null || selectedUser.getId() == 0) return;
 
-        // Không cho phép xóa chính mình
+        // Don't allow deleting yourself
         com.example.gympro.domain.User currentUser = com.example.gympro.service.SessionManager.getInstance().getCurrentUser();
         if (currentUser != null && currentUser.getId().equals(selectedUser.getId())) {
-            new Alert(Alert.AlertType.WARNING, "Bạn không thể xóa chính mình!").showAndWait();
+            new Alert(Alert.AlertType.WARNING, "You cannot delete yourself!").showAndWait();
             return;
         }
 
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION,
-                "Bạn có chắc chắn muốn xóa user " + selectedUser.getFullName() + "?",
+                "Are you sure you want to delete user " + selectedUser.getFullName() + "?",
                 ButtonType.YES, ButtonType.NO);
-        confirm.setTitle("Xác nhận Xóa");
+        confirm.setTitle("Confirm Delete");
         Optional<ButtonType> result = confirm.showAndWait();
 
         if (result.isPresent() && result.get() == ButtonType.YES) {
@@ -294,9 +294,9 @@ public class UserManagementController {
                 userData.remove(selectedUser);
                 usersTable.getSelectionModel().clearSelection();
                 showUserDetails(null);
-                new Alert(Alert.AlertType.INFORMATION, "Xóa user thành công!").showAndWait();
+                new Alert(Alert.AlertType.INFORMATION, "User deleted successfully!").showAndWait();
             } else {
-                new Alert(Alert.AlertType.ERROR, "Lỗi khi xóa user.").showAndWait();
+                new Alert(Alert.AlertType.ERROR, "Error deleting user.").showAndWait();
             }
         }
     }
@@ -331,7 +331,7 @@ public class UserManagementController {
 
     private TableCell<UserViewModel, Void> createActionCell() {
         return new TableCell<>() {
-            private final Button editButton = new Button("Chỉnh sửa");
+            private final Button editButton = new Button("Edit");
             private final HBox pane = new HBox(5, editButton);
             {
                 editButton.getStyleClass().add("icon-small-button");
@@ -357,7 +357,7 @@ public class UserManagementController {
                 if (empty || item == null) {
                     setText(null);
                 } else {
-                    setText(item ? "🟢 Hoạt động" : "🔴 Vô hiệu hóa");
+                    setText(item ? "🟢 Active" : "🔴 Inactive");
                     getStyleClass().add(item ? "status-active" : "status-inactive");
                 }
             }

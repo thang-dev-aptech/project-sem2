@@ -38,7 +38,7 @@ public class PackagesController {
     @FXML private TextField searchField;
     @FXML private ComboBox<String> statusFilter;
 
-    // === FXML - FORM CHI TIẾT ===
+    // === FXML - DETAIL FORM ===
     @FXML private Label formTitle;
     @FXML private TextField codeField;
     @FXML private TextField nameField;
@@ -65,15 +65,15 @@ public class PackagesController {
     private void initialize() {
         initializeColumns();
 
-        // Khởi tạo ComboBox filter
+        // Initialize ComboBox filter
         statusFilter.setItems(FXCollections.observableArrayList(
-                "Tất cả",
-                "Hiển thị (Active)",
-                "Ẩn (Inactive)"
+                "All",
+                "Active",
+                "Inactive"
         ));
         statusFilter.getSelectionModel().selectFirst();
 
-        // Listener cho Tìm kiếm và Lọc
+        // Listener for Search and Filter
         searchField.textProperty().addListener((obs, oldV, newV) -> handleFilter());
         statusFilter.getSelectionModel().selectedItemProperty().addListener((obs, oldV, newV) -> handleFilter());
 
@@ -86,7 +86,7 @@ public class PackagesController {
             exportButton.setDisable(false);
         }
 
-        // Listener chọn hàng: CHỈ TẢI DATA VÀO FORM, KHÔNG KÍCH HOẠT CHẾ ĐỘ CHỈNH SỬA
+        // Row selection listener: ONLY LOAD DATA INTO FORM, DO NOT ACTIVATE EDIT MODE
         packagesTable.getSelectionModel().selectedItemProperty().addListener(
                 (observable, oldValue, newValue) -> {
                     showPackageDetails(newValue);
@@ -94,12 +94,12 @@ public class PackagesController {
                 }
         );
 
-        // Thiết lập trạng thái ban đầu: Vô hiệu hóa form
+        // Set initial state: Disable form
         setFormEditable(false);
         detailPane.setDisable(true);
         deleteButton.setVisible(false);
         
-        // Chỉ OWNER mới quản lý được gói tập
+        // Only OWNER can manage packages
         if (!authService.canManagePackages()) {
             detailPane.setDisable(true);
             detailPane.setVisible(false);
@@ -124,7 +124,7 @@ public class PackagesController {
         colActions.setCellFactory(col -> createActionCell());
     }
 
-    // Hàm xử lý Lọc và Tìm kiếm
+    // Filter and Search handler
     @FXML
     private void handleFilter() {
         String searchTerm = searchField.getText();
@@ -138,19 +138,19 @@ public class PackagesController {
         detailPane.setDisable(true);
     }
 
-    // Tải/Làm mới dữ liệu
+    // Load/Refresh data
     @FXML
     public void loadPackages() {
         handleFilter();
     }
 
     /**
-     * Tải dữ liệu từ Model vào Form và thiết lập chế độ XEM (Read-only).
+     * Load data from Model into Form and set VIEW mode (Read-only).
      */
     private void showPackageDetails(Package pkg) {
         if (pkg != null) {
             selectedPackage = pkg;
-            formTitle.setText("Chi tiết Gói: " + pkg.getName());
+            formTitle.setText("Package Details: " + pkg.getName());
 
             // Load data
             codeField.setText(pkg.getCode());
@@ -160,16 +160,16 @@ public class PackagesController {
             descriptionArea.setText(pkg.getDescription());
             isActiveCheckbox.setSelected(pkg.isActive());
 
-            // Thiết lập chế độ XEM (Read-only) mặc định
+            // Set VIEW mode (Read-only) by default
             setFormEditable(false);
             deleteButton.setVisible(true);
-            deleteButton.setDisable(true); // Vô hiệu hóa nút xóa trong chế độ xem
-            saveButton.setText("💾 Lưu Thay đổi");
+            deleteButton.setDisable(true); // Disable delete button in view mode
+            saveButton.setText("💾 Save Changes");
 
         } else {
-            // Trường hợp không có gì được chọn (sau khi xóa, hủy)
+            // Case when nothing is selected (after delete, cancel)
             selectedPackage = null;
-            formTitle.setText("Chi tiết Gói tập");
+            formTitle.setText("Package Details");
             setFormEditable(false);
             clearFormFields();
             deleteButton.setVisible(false);
@@ -177,21 +177,21 @@ public class PackagesController {
     }
 
     /**
-     * Chuyển Form sang chế độ Chỉnh sửa. Được gọi bởi nút "✏️".
+     * Switch Form to Edit mode. Called by "✏️" button.
      */
     private void startEditMode(Package pkg) {
         if (pkg == null) return;
 
-        packagesTable.getSelectionModel().select(pkg); // Đảm bảo hàng được chọn
-        formTitle.setText("CHỈNH SỬA GÓI: " + pkg.getName());
+        packagesTable.getSelectionModel().select(pkg); // Ensure row is selected
+        formTitle.setText("EDIT PACKAGE: " + pkg.getName());
 
-        setFormEditable(true); // BẬT CHẾ ĐỘ CHỈNH SỬA
-        deleteButton.setDisable(false); // Kích hoạt nút xóa
-        saveButton.setText("💾 Lưu Thay đổi");
+        setFormEditable(true); // ENABLE EDIT MODE
+        deleteButton.setDisable(false); // Enable delete button
+        saveButton.setText("💾 Save Changes");
     }
 
 
-    // --- CÁC HÀM THAO TÁC FORM ---
+    // --- FORM OPERATION METHODS ---
 
     @FXML
     private void handleNewPackage() {
@@ -202,17 +202,17 @@ public class PackagesController {
         
         packagesTable.getSelectionModel().clearSelection();
         selectedPackage = new Package();
-        formTitle.setText("➕ Thêm Gói tập Mới");
-        setFormEditable(true); // Chế độ Thêm mới phải là editable
+        formTitle.setText("➕ Add New Package");
+        setFormEditable(true); // Add mode must be editable
         clearFormFields();
         detailPane.setDisable(false);
         deleteButton.setVisible(false);
-        saveButton.setText("💾 Thêm Gói");
+        saveButton.setText("💾 Add Package");
     }
 
     @FXML
     private void handleCancel() {
-        // Quay về trạng thái không chọn/vô hiệu hóa
+        // Return to unselected/disabled state
         packagesTable.getSelectionModel().clearSelection();
         showPackageDetails(null);
         detailPane.setDisable(true);
@@ -226,11 +226,11 @@ public class PackagesController {
         }
         
         if (!isInputValid()) {
-            new Alert(Alert.AlertType.WARNING, "Vui lòng kiểm tra lại dữ liệu nhập. Tên, Code, Giá và Số ngày không được để trống/sai định dạng.").showAndWait();
+            new Alert(Alert.AlertType.WARNING, "Please check your input. Name, Code, Price and Duration cannot be empty/invalid format.").showAndWait();
             return;
         }
 
-        // 1. Áp dụng dữ liệu từ Form vào Model
+        // 1. Apply data from Form to Model
         selectedPackage.setCode(codeField.getText());
         selectedPackage.setName(nameField.getText());
         selectedPackage.setDescription(descriptionArea.getText());
@@ -238,23 +238,23 @@ public class PackagesController {
         selectedPackage.setDurationDays(Integer.parseInt(durationField.getText()));
         selectedPackage.setIsActive(isActiveCheckbox.isSelected());
 
-        // 2. Lưu vào Database (GỌI SERVICE)
+        // 2. Save to Database (CALL SERVICE)
         Optional<Package> savedPkg = packageService.savePackage(selectedPackage);
 
         if (savedPkg.isPresent()) {
             if (selectedPackage.getId() == 0) {
                 packageData.add(savedPkg.get());
                 packagesTable.getSelectionModel().select(savedPkg.get());
-                new Alert(Alert.AlertType.INFORMATION, "Thêm gói tập thành công!").showAndWait();
+                new Alert(Alert.AlertType.INFORMATION, "Package added successfully!").showAndWait();
             } else {
                 packagesTable.refresh();
-                new Alert(Alert.AlertType.INFORMATION, "Cập nhật thành công!").showAndWait();
+                new Alert(Alert.AlertType.INFORMATION, "Update successful!").showAndWait();
             }
-            // Sau khi lưu, chuyển về chế độ XEM
+            // After saving, switch back to VIEW mode
             setFormEditable(false);
             deleteButton.setDisable(true);
         } else {
-            new Alert(Alert.AlertType.ERROR, "Lỗi khi lưu/cập nhật gói tập vào Database.").showAndWait();
+            new Alert(Alert.AlertType.ERROR, "Error saving/updating package to Database.").showAndWait();
         }
     }
 
@@ -267,8 +267,8 @@ public class PackagesController {
         
         if (selectedPackage == null || selectedPackage.getId() == 0) return;
 
-        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION, "Bạn có chắc chắn muốn xóa gói tập " + selectedPackage.getName() + "?", ButtonType.YES, ButtonType.NO);
-        confirm.setTitle("Xác nhận Xóa");
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION, "Are you sure you want to delete package " + selectedPackage.getName() + "?", ButtonType.YES, ButtonType.NO);
+        confirm.setTitle("Confirm Delete");
         Optional<ButtonType> result = confirm.showAndWait();
 
         if (result.isPresent() && result.get() == ButtonType.YES) {
@@ -276,26 +276,26 @@ public class PackagesController {
                 packageData.remove(selectedPackage);
                 packagesTable.getSelectionModel().clearSelection();
                 showPackageDetails(null);
-                new Alert(Alert.AlertType.INFORMATION, "Xóa gói tập thành công!").showAndWait();
+                new Alert(Alert.AlertType.INFORMATION, "Package deleted successfully!").showAndWait();
             } else {
-                new Alert(Alert.AlertType.ERROR, "Lỗi khi xóa gói tập. (Kiểm tra quy tắc nghiệp vụ/khóa ngoại)").showAndWait();
+                new Alert(Alert.AlertType.ERROR, "Error deleting package. (Check business rules/foreign keys)").showAndWait();
             }
         }
     }
 
-    // --- HÀM TIỆN ÍCH CHO CELL FACTORY ---
+    // --- UTILITY METHODS FOR CELL FACTORY ---
 
     private TableCell<Package, Void> createActionCell() {
         return new TableCell<>() {
-            private final Button editButton = new Button("Chỉnh sửa");
+            private final Button editButton = new Button("Edit");
             private final HBox pane = new HBox(5, editButton);
 
             {
                 editButton.getStyleClass().add("icon-small-button");
-                // Khi nhấn nút SỬA, gọi hàm startEditMode
+                // When clicking EDIT button, call startEditMode
                 editButton.setOnAction(event -> {
                     Package pkg = getTableView().getItems().get(getIndex());
-                    startEditMode(pkg); // <--- KÍCH HOẠT CHẾ ĐỘ CHỈNH SỬA
+                    startEditMode(pkg); // <--- ACTIVATE EDIT MODE
                 });
             }
 
@@ -327,14 +327,14 @@ public class PackagesController {
                 if (empty || item == null) {
                     setText(null);
                 } else {
-                    setText(item ? "🟢 Hiển thị" : "🔴 Ẩn");
+                    setText(item ? "🟢 Active" : "🔴 Inactive");
                     getStyleClass().add(item ? "status-active" : "status-inactive");
                 }
             }
         };
     }
 
-    // --- CÁC HÀM TIỆN ÍCH FORM ---
+    // --- FORM UTILITY METHODS ---
 
     private void clearFormFields() {
         codeField.clear();
@@ -346,10 +346,10 @@ public class PackagesController {
     }
 
     /**
-     * Điều khiển khả năng chỉnh sửa của các trường Form và nút Lưu.
+     * Control the editability of Form fields and Save button.
      */
     private void setFormEditable(boolean editable) {
-        // Cho phép chỉnh sửa Code chỉ khi Thêm mới (ID=0)
+        // Allow editing Code only when Adding new (ID=0)
         codeField.setEditable(editable && (selectedPackage != null && selectedPackage.getId() == 0));
         nameField.setEditable(editable);
         priceField.setEditable(editable);
@@ -379,8 +379,8 @@ public class PackagesController {
     private void handleExportExcel() {
         try {
             FileChooser fileChooser = new FileChooser();
-            fileChooser.setTitle("Xuất danh sách Gói tập");
-            fileChooser.setInitialFileName("DanhSachGoiTap.xlsx");
+            fileChooser.setTitle("Export Package List");
+            fileChooser.setInitialFileName("PackageList.xlsx");
             fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Excel Files", "*.xlsx"));
 
             File file = fileChooser.showSaveDialog(packagesTable.getScene().getWindow());
@@ -389,13 +389,13 @@ public class PackagesController {
                     packageData.stream().toList(),
                     file.getAbsolutePath()
                 );
-                showAlert(Alert.AlertType.INFORMATION, "Thành công", 
-                    "✅ Xuất Excel thành công: " + file.getAbsolutePath());
+                showAlert(Alert.AlertType.INFORMATION, "Success", 
+                    "✅ Excel export successful: " + file.getAbsolutePath());
             }
         } catch (Exception ex) {
             ex.printStackTrace();
-            showAlert(Alert.AlertType.ERROR, "Lỗi", 
-                "❌ Lỗi khi xuất Excel: " + ex.getMessage());
+            showAlert(Alert.AlertType.ERROR, "Error", 
+                "❌ Error exporting Excel: " + ex.getMessage());
         }
     }
 

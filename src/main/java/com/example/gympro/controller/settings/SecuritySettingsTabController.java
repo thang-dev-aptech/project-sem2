@@ -9,7 +9,7 @@ import javafx.scene.control.TextField;
 import java.util.Optional;
 
 /**
- * Controller cho Tab "Bảo mật" trong Settings
+ * Controller for "Security" tab in Settings
  */
 public class SecuritySettingsTabController extends BaseController {
     
@@ -37,13 +37,13 @@ public class SecuritySettingsTabController extends BaseController {
     private void saveSecuritySettings() {
         Optional<Integer> passwordMinLengthOpt = parseInteger(txtPasswordMinLength.getText());
         if (passwordMinLengthOpt.isEmpty() || passwordMinLengthOpt.get() < 6 || passwordMinLengthOpt.get() > 20) {
-            showWarning("⚠️ Độ dài mật khẩu phải từ 6-20 ký tự!");
+            showWarning("⚠️ Password length must be 6-20 characters!");
             return;
         }
         
         Optional<Integer> sessionTimeoutOpt = parseInteger(txtSessionTimeout.getText());
         if (sessionTimeoutOpt.isEmpty() || sessionTimeoutOpt.get() < 5 || sessionTimeoutOpt.get() > 120) {
-            showWarning("⚠️ Thời gian timeout phải từ 5-120 phút!");
+            showWarning("⚠️ Timeout must be 5-120 minutes!");
             return;
         }
         
@@ -51,7 +51,7 @@ public class SecuritySettingsTabController extends BaseController {
         Optional<Integer> lockoutDurationOpt = parseInteger(txtLockoutDuration.getText());
         
         if (maxLoginAttemptsOpt.isEmpty() || lockoutDurationOpt.isEmpty()) {
-            showWarning("⚠️ Vui lòng nhập số hợp lệ!");
+            showWarning("⚠️ Please enter a valid number!");
             return;
         }
         
@@ -61,9 +61,9 @@ public class SecuritySettingsTabController extends BaseController {
                 && settingsService.setLockoutDuration(lockoutDurationOpt.get());
         
         if (success) {
-            showAlert("✅ Lưu cấu hình bảo mật thành công!");
+            showAlert("✅ Security configuration saved successfully!");
         } else {
-            showError("❌ Lỗi khi lưu cấu hình bảo mật!");
+            showError("❌ Error saving security configuration!");
         }
     }
 }

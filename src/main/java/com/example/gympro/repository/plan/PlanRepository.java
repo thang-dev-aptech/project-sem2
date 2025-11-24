@@ -26,7 +26,7 @@ public class PlanRepository implements PlanRepositoryInterface {
                 planList.add(mapResultSetToPlan(rs));
             }
         } catch (SQLException e) {
-            System.err.println("Lỗi khi lấy danh sách gói tập: " + e.getMessage());
+            System.err.println("Error loading package list: " + e.getMessage());
             e.printStackTrace();
         }
         return planList;

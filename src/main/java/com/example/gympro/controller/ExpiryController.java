@@ -60,8 +60,8 @@ public class ExpiryController {
     private void exportMembersToExcel() {
         try {
             FileChooser fileChooser = new FileChooser();
-            fileChooser.setTitle("Xuất danh sách Hội viên sắp hết hạn");
-            fileChooser.setInitialFileName("HoiVienSapHetHan.xlsx");
+            fileChooser.setTitle("Export Expiring Members List");
+            fileChooser.setInitialFileName("ExpiringMembers.xlsx");
             fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Excel Files", "*.xlsx"));
 
             File file = fileChooser.showSaveDialog(btnExport.getScene().getWindow());
@@ -70,11 +70,11 @@ public class ExpiryController {
                     memberList.stream().toList(),
                     file.getAbsolutePath()
                 );
-                showAlert("✅ Xuất Excel thành công: " + file.getAbsolutePath());
+                showAlert("✅ Excel export successful: " + file.getAbsolutePath());
             }
         } catch (Exception ex) {
             ex.printStackTrace();
-            showAlert("❌ Lỗi khi xuất Excel: " + ex.getMessage());
+            showAlert("❌ Error exporting Excel: " + ex.getMessage());
         }
     }
 
@@ -95,18 +95,18 @@ public class ExpiryController {
     }
 
     private void setupFilter() {
-        cbFilter.getItems().addAll("Tất cả", "≤ 3 ngày", "≤ 7 ngày", "≤ 14 ngày");
-        cbFilter.setValue("Tất cả");
+        cbFilter.getItems().addAll("All", "≤ 3 days", "≤ 7 days", "≤ 14 days");
+        cbFilter.setValue("All");
         cbFilter.setOnAction(e -> {
             int days = switch (cbFilter.getValue()) {
-                case "≤ 3 ngày" -> 3;
-                case "≤ 7 ngày" -> 7;
-                case "≤ 14 ngày" -> 14;
+                case "≤ 3 days" -> 3;
+                case "≤ 7 days" -> 7;
+                case "≤ 14 days" -> 14;
                 default -> 14;
             };
             memberList = service.getExpiringMembers(days);
             tblExpiry.setItems(memberList);
-            // Reset search khi filter
+            // Reset search when filter
             txtSearch.clear();
         });
     }
@@ -114,10 +114,10 @@ public class ExpiryController {
     private void setupSearch() {
         txtSearch.textProperty().addListener((obs, oldText, newText) -> {
             if (newText == null || newText.trim().isEmpty()) {
-                // Nếu search rỗng, hiển thị lại memberList gốc
+                // If search is empty, show original memberList
                 tblExpiry.setItems(memberList);
             } else {
-                // Search trên memberList hiện tại
+                // Search on current memberList
                 ObservableList<ExpiringMember> filtered = service.search(memberList, newText);
                 tblExpiry.setItems(filtered);
             }
@@ -133,7 +133,7 @@ public class ExpiryController {
 
     private void addActionButtonsToTable() {
         colActions.setCellFactory(param -> new TableCell<>() {
-            private final Button btnExtend = new Button("📝 Gia hạn");
+            private final Button btnExtend = new Button("📝 Renew");
             private final Button btnEmail = new Button("📧 Email");
 
             private final HBox container = new HBox(5, btnExtend, btnEmail);
@@ -146,7 +146,7 @@ public class ExpiryController {
                         if (mainController != null) {
                             mainController.navigateToRegistration(member);
                         } else {
-                            showAlert("❌ Không thể chuyển trang. Vui lòng thử lại.");
+                            showAlert("❌ Cannot navigate. Please try again.");
                         }
                     }
                 });
@@ -154,7 +154,7 @@ public class ExpiryController {
                 btnEmail.setOnAction(e -> {
                     ExpiringMember member = getTableRow().getItem();
                     if (member != null) {
-                        showAlert("📧 Email đã gửi cho: " + member.getName());
+                        showAlert("📧 Email sent to: " + member.getName());
                     }
                 });
 

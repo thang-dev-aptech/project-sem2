@@ -14,7 +14,7 @@ public class PackageService implements PackageServiceInterface {
 
     @Override
     public List<Package> getAllPackages() {
-        return getFilteredPackages(null, "Tất cả");
+        return getFilteredPackages(null, "All");
     }
 
     @Override
@@ -22,9 +22,9 @@ public class PackageService implements PackageServiceInterface {
 
         Boolean isActive = null;
 
-        if ("Hiển thị (Active)".equals(statusFilter)) {
+        if ("Active".equalsIgnoreCase(statusFilter) || "Show (Active)".equals(statusFilter)) {
             isActive = true;
-        } else if ("Ẩn (Inactive)".equals(statusFilter)) {
+        } else if ("Inactive".equalsIgnoreCase(statusFilter) || "Hide (Inactive)".equals(statusFilter)) {
             isActive = false;
         }
 
@@ -36,7 +36,7 @@ public class PackageService implements PackageServiceInterface {
     public Optional<Package> savePackage(Package pkg) {
 
         if (pkg.getName() == null || pkg.getName().trim().isEmpty() || pkg.getPrice().doubleValue() < 0) {
-            System.err.println("Validation Error: Dữ liệu gói tập không hợp lệ.");
+            System.err.println("Validation Error: Invalid package data.");
             return Optional.empty();
         }
 

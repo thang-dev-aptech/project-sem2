@@ -43,7 +43,7 @@ public class RegistrationRepository implements RegistrationRepositoryInterface {
                 if (keys.next()) {
                     return keys.getLong(1);
                 }
-                throw new SQLException("Tạo subscription thất bại, không lấy được ID.");
+                throw new SQLException("Failed to create subscription, could not get ID.");
             }
         }
     }
@@ -51,7 +51,7 @@ public class RegistrationRepository implements RegistrationRepositoryInterface {
     @Override
     public long createInvoice(Connection conn, Member member, Plan plan, long subscriptionId, long createdByUserId)
             throws SQLException {
-        // Lấy invoice prefix từ settings
+        // Get invoice prefix from settings
         SettingsService settingsService = new SettingsService();
         String invoicePrefix = settingsService.getInvoicePrefix();
         String invoiceNo = invoicePrefix + "-" + System.currentTimeMillis();
@@ -67,7 +67,7 @@ public class RegistrationRepository implements RegistrationRepositoryInterface {
                 if (keys.next()) {
                     return keys.getLong(1);
                 }
-                throw new SQLException("Tạo invoice thất bại, không lấy được ID.");
+                throw new SQLException("Failed to create invoice, could not get ID.");
             }
         }
     }

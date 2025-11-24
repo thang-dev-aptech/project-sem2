@@ -34,25 +34,25 @@ public class AuthService {
 
     public AuthResult authenticate(String username, String rawPassword) {
         if (username == null || username.isBlank() || rawPassword == null || rawPassword.isBlank()) {
-            return new AuthResult(false, "Vui lòng nhập username và password", null, null);
+            return new AuthResult(false, "Please enter username and password", null, null);
         }
 
         User user = userRepository.findByUsername(username.trim());
         if (user == null) {
-            return new AuthResult(false, "Tài khoản không tồn tại", null, null);
+            return new AuthResult(false, "Account does not exist", null, null);
         }
         if (Boolean.FALSE.equals(user.getIsActive())) {
-            return new AuthResult(false, "Tài khoản đã bị vô hiệu hóa", null, null);
+            return new AuthResult(false, "Account has been disabled", null, null);
         }
 
         String hash = user.getPasswordHash();
         if (hash == null || hash.isBlank()) {
-            return new AuthResult(false, "Tài khoản không có mật khẩu", null, null);
+            return new AuthResult(false, "Account has no password", null, null);
         }
         
         boolean passwordOk = false;
         try {
-            // Trim hash để tránh khoảng trắng từ DB
+            // Trim hash to avoid whitespace from DB
             hash = hash.trim();
             passwordOk = BCrypt.checkpw(rawPassword, hash);
         } catch (IllegalArgumentException e) {
@@ -66,11 +66,11 @@ public class AuthService {
         }
         
         if (!passwordOk) {
-            return new AuthResult(false, "Mật khẩu không đúng", null, null);
+            return new AuthResult(false, "Incorrect password", null, null);
         }
 
         List<Role> roles = roleRepository.findRolesByUserId(user.getId());
-        return new AuthResult(true, "Đăng nhập thành công", user, roles);
+        return new AuthResult(true, "Login successful", user, roles);
     }
 }
 

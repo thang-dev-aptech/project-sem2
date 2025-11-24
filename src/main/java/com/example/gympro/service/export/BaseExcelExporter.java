@@ -270,10 +270,10 @@ public abstract class BaseExcelExporter {
     protected String formatStatus(String status) {
         if (status == null) return "";
         return switch (status.toUpperCase()) {
-            case "ACTIVE" -> "Hoạt động";
-            case "INACTIVE" -> "Không hoạt động";
-            case "EXPIRED" -> "Hết hạn";
-            case "PENDING" -> "Chờ xử lý";
+            case "ACTIVE" -> "Active";
+            case "INACTIVE" -> "Inactive";
+            case "EXPIRED" -> "Expired";
+            case "PENDING" -> "Pending";
             default -> status;
         };
     }

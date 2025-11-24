@@ -6,10 +6,10 @@
 <?import java.lang.String?>
 
 <!--
-  ĐÃ SỬA LẠI:
-  1. Thay đổi SplitPane sang chiều dọc (orientation="VERTICAL").
-  2. Bố cục sẽ là Hàng Trên (Bảng) và Hàng Dưới (Chi tiết).
-  3. Xóa minWidths, thêm minHeight (tùy chọn) để đảm bảo nội dung hiển thị.
+  UPDATED:
+  1. Changed SplitPane to vertical orientation (orientation="VERTICAL").
+  2. Layout will be Top Row (Table) and Bottom Row (Details).
+  3. Removed minWidths, added minHeight (optional) to ensure content display.
 -->
 
 <ScrollPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
@@ -21,42 +21,42 @@
             <Insets top="30" left="30" right="30" bottom="10"/>
         </padding>
 
-        <!-- HEADER (Giữ nguyên) -->
+        <!-- HEADER -->
         <VBox spacing="5">
-            <Label text="Quản lý Gói tập" styleClass="page-title"/>
-            <Label text="Tạo và quản lý các gói tập thành viên." styleClass="page-subtitle"/>
+            <Label text="Package Management" styleClass="page-title"/>
+            <Label text="Create and manage membership packages." styleClass="page-subtitle"/>
         </VBox>
 
-        <!-- TOOLBAR (Giữ nguyên) -->
+        <!-- TOOLBAR -->
         <ToolBar styleClass="tool-bar">
             <items>
-                <TextField promptText="🔍 Tìm kiếm gói tập..." fx:id="searchField" prefWidth="250" onKeyReleased="#handleFilter"/>
-                <ComboBox fx:id="statusFilter" promptText="📊 Trạng thái" prefWidth="120"/>
+                <TextField promptText="🔍 Search packages..." fx:id="searchField" prefWidth="250" onKeyReleased="#handleFilter"/>
+                <ComboBox fx:id="statusFilter" promptText="📊 Status" prefWidth="120"/>
                 <Separator orientation="VERTICAL"/>
-                <Button text="➕ Thêm gói" styleClass="icon-button, success" onAction="#handleNewPackage"/>
-                <Button text="🔄 Làm mới" styleClass="icon-button" onAction="#loadPackages"/>
-                <Button fx:id="exportButton" text="📤 Xuất Excel" styleClass="icon-button" onAction="#handleExportExcel"/>
+                <Button text="➕ Add Package" styleClass="icon-button, success" onAction="#handleNewPackage"/>
+                <Button text="🔄 Refresh" styleClass="icon-button" onAction="#loadPackages"/>
+                <Button fx:id="exportButton" text="📤 Export Excel" styleClass="icon-button" onAction="#handleExportExcel"/>
             </items>
         </ToolBar>
 
         <!--
-          SPLIT PANE (CHIA DỌC)
+          SPLIT PANE (VERTICAL)
           - orientation="VERTICAL"
-          - dividerPositions="0.60" (60% cho hàng trên, 40% cho hàng dưới)
+          - dividerPositions="0.60" (60% for top row, 40% for bottom row)
         -->
         <SplitPane VBox.vgrow="ALWAYS" dividerPositions="0.45" orientation="VERTICAL" styleClass="main-split-pane">
 
-            <!-- HÀNG 1: TABLE VIEW (Danh sách Gói tập) -->
+            <!-- ROW 1: TABLE VIEW (Package List) -->
             <VBox spacing="10" styleClass="card, table-view-container" minHeight="400">
-                <Label text="Bảng danh sách gói tập" styleClass="card-title"/>
+                <Label text="Package List" styleClass="card-title"/>
                 <TableView fx:id="packagesTable" VBox.vgrow="ALWAYS">
                     <columns>
-                        <TableColumn text="Mã" prefWidth="100" fx:id="colCode"/>
-                        <TableColumn text="Tên gói" prefWidth="150" fx:id="colName"/>
-                        <TableColumn text="Thời hạn" prefWidth="80" fx:id="colDuration"/>
-                        <TableColumn text="Giá" prefWidth="120" fx:id="colPrice"/>
-                        <TableColumn text="Trạng thái" prefWidth="100" fx:id="colStatus"/>
-                        <TableColumn text="Mô tả" prefWidth="200" fx:id="colDescription"/>
+                        <TableColumn text="Code" prefWidth="100" fx:id="colCode"/>
+                        <TableColumn text="Package Name" prefWidth="150" fx:id="colName"/>
+                        <TableColumn text="Duration" prefWidth="80" fx:id="colDuration"/>
+                        <TableColumn text="Price" prefWidth="120" fx:id="colPrice"/>
+                        <TableColumn text="Status" prefWidth="100" fx:id="colStatus"/>
+                        <TableColumn text="Description" prefWidth="200" fx:id="colDescription"/>
                         <TableColumn text="Created At" prefWidth="150" fx:id="colCreatedAt"/>
                         <TableColumn text="Updated At" prefWidth="150" fx:id="colUpdatedAt"/>
                         <TableColumn text=" " prefWidth="78" fx:id="colActions"/>
@@ -64,58 +64,58 @@
                 </TableView>
             </VBox>
 
-            <!-- HÀNG 2: FORM CHI TIẾT (Bố cục VBox) -->
+            <!-- ROW 2: DETAIL FORM (VBox Layout) -->
             <VBox fx:id="detailPane" spacing="15" styleClass="card" minHeight="300">
                 <padding>
                     <Insets top="20" right="20" bottom="20" left="20"/>
                 </padding>
 
-                <Label fx:id="formTitle" text="Chi tiết Gói tập" styleClass="card-title"/>
+                <Label fx:id="formTitle" text="Package Details" styleClass="card-title"/>
                 <Separator styleClass="form-separator"/>
 
                 <!-- FORM INPUTS (GridPane) -->
                 <GridPane hgap="10" vgap="10">
                     <columnConstraints>
-                        <!-- Chia 3 cột cho form ngang -->
+                        <!-- Divide into 4 columns for horizontal form -->
                         <ColumnConstraints percentWidth="15"/>
                         <ColumnConstraints percentWidth="35"/>
                         <ColumnConstraints percentWidth="15"/>
                         <ColumnConstraints percentWidth="35"/>
                     </columnConstraints>
 
-                    <!-- Cột 1 -->
-                    <Label text="Mã Code:" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
-                    <TextField fx:id="codeField" promptText="Ví dụ: PLAN-001" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                    <!-- Column 1 -->
+                    <Label text="Code:" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                    <TextField fx:id="codeField" promptText="e.g: PLAN-001" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
 
-                    <Label text="Tên Gói:" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
-                    <TextField fx:id="nameField" promptText="Gói 1 tháng" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                    <Label text="Package Name:" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                    <TextField fx:id="nameField" promptText="1 Month Package" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
 
-                    <Label text="Trạng thái:" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+                    <Label text="Status:" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
                     <HBox spacing="10" GridPane.columnIndex="1" GridPane.rowIndex="2">
-                        <CheckBox fx:id="isActiveCheckbox" text="🟢 Hiển thị"/>
+                        <CheckBox fx:id="isActiveCheckbox" text="🟢 Active"/>
                     </HBox>
 
-                    <!-- Cột 2 -->
-                    <Label text="Giá (VND):" GridPane.columnIndex="2" GridPane.rowIndex="0"/>
+                    <!-- Column 2 -->
+                    <Label text="Price (VND):" GridPane.columnIndex="2" GridPane.rowIndex="0"/>
                     <TextField fx:id="priceField" promptText="500000" GridPane.columnIndex="3" GridPane.rowIndex="0"/>
 
-                    <Label text="Thời hạn (Ngày):" GridPane.columnIndex="2" GridPane.rowIndex="1"/>
+                    <Label text="Duration (Days):" GridPane.columnIndex="2" GridPane.rowIndex="1"/>
                     <TextField fx:id="durationField" promptText="30" GridPane.columnIndex="3" GridPane.rowIndex="1"/>
 
-                    <!-- Mô tả chiếm cả 4 cột -->
-                    <Label text="Mô tả:" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
+                    <!-- Description spans all 4 columns -->
+                    <Label text="Description:" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
                     <TextArea fx:id="descriptionArea" wrapText="true" prefHeight="80"
                               GridPane.columnIndex="1" GridPane.rowIndex="3"
                               GridPane.columnSpan="3"/>
                 </GridPane>
 
                 <!--
-                  SỬA LẠI: Thêm VBox.margin với top margin âm để giảm khoảng cách
+                  UPDATED: Added VBox.margin with negative top margin to reduce spacing
                 -->
                 <HBox spacing="10" alignment="CENTER_RIGHT" styleClass="button-group">
-                    <Button fx:id="deleteButton" text="Xóa" styleClass="delete-button" onAction="#handleDelete"/>
-                    <Button text="Hủy" styleClass="secondary-button" onAction="#handleCancel"/>
-                    <Button fx:id="saveButton" text="Lưu" styleClass="primary-button" onAction="#handleSave"/>
+                    <Button fx:id="deleteButton" text="Delete" styleClass="delete-button" onAction="#handleDelete"/>
+                    <Button text="Cancel" styleClass="secondary-button" onAction="#handleCancel"/>
+                    <Button fx:id="saveButton" text="Save" styleClass="primary-button" onAction="#handleSave"/>
                 </HBox>
             </VBox>
         </SplitPane>

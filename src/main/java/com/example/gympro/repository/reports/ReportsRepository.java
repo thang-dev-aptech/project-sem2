@@ -238,7 +238,7 @@ public class ReportsRepository {
                     THEN COALESCE(SUM(i.total_amount), 0) / COUNT(DISTINCT s.id)
                     ELSE 0 
                 END AS avg_revenue,
-                CASE WHEN p.is_active = 1 THEN 'Hoạt động' ELSE 'Ngừng' END AS status
+                CASE WHEN p.is_active = 1 THEN 'Active' ELSE 'Inactive' END AS status
             FROM plans p
             LEFT JOIN subscriptions s ON p.id = s.plan_id
             LEFT JOIN invoices i ON s.id = i.subscription_id AND i.status = 'ISSUED'

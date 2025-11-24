@@ -38,7 +38,7 @@ public class MembersController {
     @FXML private TextField searchField;
     @FXML private ComboBox<String> statusFilter;
 
-    // === FXML - FORM CHI TIẾT ===
+    // === FXML - DETAIL FORM ===
     @FXML private Label formTitle;
     @FXML private TextField codeField;
     @FXML private TextField fullNameField;
@@ -66,31 +66,31 @@ public class MembersController {
     // === FXML - EXPORT BUTTON ===
     @FXML private Button exportButton;
 
-    // Dữ liệu cho ComboBoxes
+    // Data for ComboBoxes
     private final ObservableList<String> statusList = FXCollections.observableArrayList(
-            "Tất cả", "Chờ (PENDING)", "Kích hoạt (ACTIVE)", "Hết hạn (EXPIRED)", "Tạm dừng (PAUSED)", "Gia hạn (RENEWED)"
+            "All", "Pending (PENDING)", "Active (ACTIVE)", "Expired (EXPIRED)", "Paused (PAUSED)", "Renewed (RENEWED)"
     );
     private final ObservableList<String> genderList = FXCollections.observableArrayList(
-            "Nam (MALE)", "Nữ (FEMALE)", "Khác (OTHER)"
+            "Male (MALE)", "Female (FEMALE)", "Other (OTHER)"
     );
 
     @FXML
     private void initialize() {
         initializeColumns();
 
-        // Khởi tạo ComboBox filter
+        // Initialize ComboBox filter
         statusFilter.setItems(statusList);
         statusFilter.getSelectionModel().selectFirst();
 
-        // Khởi tạo ComboBoxes trong Form
+        // Initialize ComboBoxes in Form
         genderComboBox.setItems(genderList);
-        // Lấy danh sách trạng thái cho Form (bỏ "Tất cả")
+        // Get status list for Form (remove "All")
         ObservableList<String> formStatusList = FXCollections.observableArrayList(statusList);
-        formStatusList.remove(0); // Xóa "Tất cả"
+        formStatusList.remove(0); // Remove "All"
         statusComboBox.setItems(formStatusList);
 
 
-        // Listener cho Tìm kiếm và Lọc
+        // Listener for Search and Filter
         searchField.textProperty().addListener((obs, oldV, newV) -> handleFilter());
         statusFilter.getSelectionModel().selectedItemProperty().addListener((obs, oldV, newV) -> handleFilter());
 
@@ -103,7 +103,7 @@ public class MembersController {
             exportButton.setDisable(false);
         }
 
-        // Listener chọn hàng: CHỈ TẢI DATA VÀO FORM (chế độ XEM)
+        // Row selection listener: ONLY LOAD DATA INTO FORM (VIEW mode)
         membersTable.getSelectionModel().selectedItemProperty().addListener(
                 (observable, oldValue, newValue) -> {
                     showMemberDetails(newValue);
@@ -111,12 +111,12 @@ public class MembersController {
                 }
         );
 
-        // Thiết lập trạng thái ban đầu: Vô hiệu hóa form
+        // Set initial state: Disable form
         setFormEditable(false);
         detailPane.setDisable(true);
         deleteButton.setVisible(false);
         
-        // Ẩn nút xóa nếu user không có quyền
+        // Hide delete button if user doesn't have permission
         if (!authService.canDelete()) {
             deleteButton.setVisible(false);
         }
@@ -138,14 +138,14 @@ public class MembersController {
         colCreatedAt.setCellValueFactory(new PropertyValueFactory<>("createdAt"));
         colCreatedAt.setCellFactory(this::formatDateTimeCell);
 
-        // ĐÃ THÊM: Ánh xạ cột Cập nhật
+        // ADDED: Map Updated column
         colUpdatedAt.setCellValueFactory(new PropertyValueFactory<>("updatedAt"));
         colUpdatedAt.setCellFactory(this::formatDateTimeCell);
 
         colActions.setCellFactory(col -> createActionCell());
     }
 
-    // Hàm xử lý Lọc và Tìm kiếm
+    // Filter and Search handler
     @FXML
     private void handleFilter() {
         String searchTerm = searchField.getText();
@@ -160,19 +160,19 @@ public class MembersController {
         detailPane.setDisable(true);
     }
 
-    // Tải/Làm mới dữ liệu
+    // Load/Refresh data
     @FXML
     public void loadMembers() {
         handleFilter();
     }
 
     /**
-     * Tải dữ liệu từ Model vào Form và thiết lập chế độ XEM (Read-only).
+     * Load data from Model into Form and set VIEW mode (Read-only).
      */
     private void showMemberDetails(Member member) {
         if (member != null) {
             selectedMember = member;
-            formTitle.setText("Chi tiết Hội viên: " + member.getFullName());
+            formTitle.setText("Member Details: " + member.getFullName());
 
             // Load data
             codeField.setText(member.getMemberCode());
@@ -183,20 +183,20 @@ public class MembersController {
             addressArea.setText(member.getAddress());
             noteArea.setText(member.getNote());
 
-            // Xử lý ComboBox (tìm đúng giá trị dựa trên DB)
+            // Handle ComboBox (find correct value based on DB)
             genderComboBox.setValue(findComboBoxValue(genderList, member.getGender()));
             statusComboBox.setValue(findComboBoxValue(statusList, member.getStatus()));
 
-            // Thiết lập chế độ XEM (Read-only) mặc định
+            // Set VIEW mode (Read-only) by default
             setFormEditable(false);
             deleteButton.setVisible(true);
             deleteButton.setDisable(true);
-            saveButton.setText("💾 Lưu Thay đổi");
+            saveButton.setText("💾 Save Changes");
 
         } else {
-            // Trường hợp không có gì được chọn
+            // Case when nothing is selected
             selectedMember = null;
-            formTitle.setText("Chi tiết Hội viên");
+            formTitle.setText("Member Details");
             setFormEditable(false);
             clearFormFields();
             deleteButton.setVisible(false);
@@ -204,33 +204,33 @@ public class MembersController {
     }
 
     /**
-     * Chuyển Form sang chế độ Chỉnh sửa. Được gọi bởi nút "✏️".
+     * Switch Form to Edit mode. Called by "✏️" button.
      */
     private void startEditMode(Member member) {
         if (member == null) return;
 
         membersTable.getSelectionModel().select(member);
-        formTitle.setText("CHỈNH SỬA HỘI VIÊN: " + member.getFullName());
+        formTitle.setText("EDIT MEMBER: " + member.getFullName());
 
         setFormEditable(true);
         deleteButton.setDisable(false);
-        saveButton.setText("💾 Lưu Thay đổi");
+        saveButton.setText("💾 Save Changes");
 
         detailPane.requestFocus();
     }
 
-    // --- CÁC HÀM THAO TÁC FORM ---
+    // --- FORM OPERATION METHODS ---
 
     @FXML
     private void handleNewMember() {
         membersTable.getSelectionModel().clearSelection();
         selectedMember = new Member();
-        formTitle.setText("➕ Thêm Hội viên Mới");
+        formTitle.setText("➕ Add New Member");
         setFormEditable(true);
         clearFormFields();
         detailPane.setDisable(false);
         deleteButton.setVisible(false);
-        saveButton.setText("💾 Thêm Hội viên");
+        saveButton.setText("💾 Add Member");
 
         detailPane.requestFocus();
     }
@@ -245,11 +245,11 @@ public class MembersController {
     @FXML
     private void handleSave() {
         if (!isInputValid()) {
-            new Alert(Alert.AlertType.WARNING, "Vui lòng kiểm tra lại dữ liệu nhập. Mã HV, Tên, SĐT không được trống.").showAndWait();
+            new Alert(Alert.AlertType.WARNING, "Please check your input. Member Code, Name, Phone cannot be empty.").showAndWait();
             return;
         }
 
-        // 1. Áp dụng dữ liệu từ Form vào Model
+        // 1. Apply data from Form to Model
         selectedMember.setMemberCode(codeField.getText());
         selectedMember.setFullName(fullNameField.getText());
         selectedMember.setPhone(phoneField.getText());
@@ -258,29 +258,29 @@ public class MembersController {
         selectedMember.setAddress(addressArea.getText());
         selectedMember.setNote(noteArea.getText());
 
-        // Lấy giá trị ENUM từ ComboBox
+        // Get ENUM value from ComboBox
         selectedMember.setGender(extractValueFromComboBox(genderComboBox.getValue(), "OTHER"));
         selectedMember.setStatus(extractValueFromComboBox(statusComboBox.getValue(), "PENDING"));
 
-        // 2. Lưu vào Database (GỌI SERVICE)
+        // 2. Save to Database (CALL SERVICE)
         Optional<Member> savedMember = memberService.saveMember(selectedMember);
 
         if (savedMember.isPresent()) {
             if (selectedMember.getId() == 0) {
-                // Thêm mới
-                loadMembers(); // Tải lại để lấy ID và timestamp mới
-                new Alert(Alert.AlertType.INFORMATION, "Thêm hội viên thành công!").showAndWait();
+                // Add new
+                loadMembers(); // Reload to get new ID and timestamp
+                new Alert(Alert.AlertType.INFORMATION, "Member added successfully!").showAndWait();
             } else {
-                // Cập nhật
-                // ĐÃ SỬA: Tải lại toàn bộ danh sách để lấy timestamp "updated_at" mới
+                // Update
+                // FIXED: Reload entire list to get new "updated_at" timestamp
                 loadMembers();
-                new Alert(Alert.AlertType.INFORMATION, "Cập nhật thành công!").showAndWait();
+                new Alert(Alert.AlertType.INFORMATION, "Update successful!").showAndWait();
             }
-            // Sau khi lưu, chuyển về chế độ XEM
+            // After saving, switch back to VIEW mode
             setFormEditable(false);
             deleteButton.setDisable(true);
         } else {
-            new Alert(Alert.AlertType.ERROR, "Lỗi khi lưu/cập nhật hội viên.").showAndWait();
+            new Alert(Alert.AlertType.ERROR, "Error saving/updating member.").showAndWait();
         }
     }
 
@@ -293,8 +293,8 @@ public class MembersController {
         
         if (selectedMember == null || selectedMember.getId() == 0) return;
 
-        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION, "Bạn có chắc chắn muốn xóa hội viên " + selectedMember.getFullName() + "? (Hành động này sẽ chuyển trạng thái sang EXPIRED và ẩn đi)", ButtonType.YES, ButtonType.NO);
-        confirm.setTitle("Xác nhận Xóa");
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION, "Are you sure you want to delete member " + selectedMember.getFullName() + "? (This action will change status to EXPIRED and hide)", ButtonType.YES, ButtonType.NO);
+        confirm.setTitle("Confirm Delete");
         Optional<ButtonType> result = confirm.showAndWait();
 
         if (result.isPresent() && result.get() == ButtonType.YES) {
@@ -302,18 +302,18 @@ public class MembersController {
                 memberData.remove(selectedMember);
                 membersTable.getSelectionModel().clearSelection();
                 showMemberDetails(null);
-                new Alert(Alert.AlertType.INFORMATION, "Xóa hội viên thành công!").showAndWait();
+                new Alert(Alert.AlertType.INFORMATION, "Member deleted successfully!").showAndWait();
             } else {
-                new Alert(Alert.AlertType.ERROR, "Lỗi khi xóa hội viên.").showAndWait();
+                new Alert(Alert.AlertType.ERROR, "Error deleting member.").showAndWait();
             }
         }
     }
 
-    // --- HÀM TIỆN ÍCH CHO CELL FACTORY ---
+    // --- UTILITY METHODS FOR CELL FACTORY ---
 
     private TableCell<Member, Void> createActionCell() {
         return new TableCell<>() {
-            private final Button editButton = new Button("Chỉnh sửa");
+            private final Button editButton = new Button("Edit");
             private final HBox pane = new HBox(5, editButton);
             {
                 editButton.getStyleClass().add("icon-small-button");
@@ -361,7 +361,7 @@ public class MembersController {
                     setText(null);
                 } else {
                     setText(item);
-                    // Thêm style CSS dựa trên trạng thái
+                    // Add CSS style based on status
                     switch (item.toUpperCase()) {
                         case "ACTIVE":
                         case "RENEWED":
@@ -380,7 +380,7 @@ public class MembersController {
         };
     }
 
-    // --- CÁC HÀM TIỆN ÍCH FORM ---
+    // --- FORM UTILITY METHODS ---
 
     private void clearFormFields() {
         codeField.clear();
@@ -413,7 +413,7 @@ public class MembersController {
                 phoneField.getText() == null || phoneField.getText().isEmpty());
     }
 
-    // Tìm giá trị hiển thị ("Nam (MALE)") dựa trên giá trị DB ("MALE")
+    // Find display value ("Male (MALE)") based on DB value ("MALE")
     private String findComboBoxValue(ObservableList<String> list, String dbValue) {
         if (dbValue == null) return null;
         return list.stream()
@@ -422,7 +422,7 @@ public class MembersController {
                 .orElse(null);
     }
 
-    // Trích xuất giá trị DB ("MALE") từ giá trị hiển thị ("Nam (MALE)")
+    // Extract DB value ("MALE") from display value ("Male (MALE)")
     private String extractValueFromComboBox(String comboBoxValue, String defaultValue) {
         if (comboBoxValue == null) return defaultValue;
         if (comboBoxValue.contains("(")) {
@@ -435,8 +435,8 @@ public class MembersController {
     private void handleExportExcel() {
         try {
             FileChooser fileChooser = new FileChooser();
-            fileChooser.setTitle("Xuất danh sách Hội viên");
-            fileChooser.setInitialFileName("DanhSachHoiVien.xlsx");
+            fileChooser.setTitle("Export Member List");
+            fileChooser.setInitialFileName("MemberList.xlsx");
             fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Excel Files", "*.xlsx"));
 
             File file = fileChooser.showSaveDialog(membersTable.getScene().getWindow());
@@ -445,13 +445,13 @@ public class MembersController {
                     memberData.stream().toList(),
                     file.getAbsolutePath()
                 );
-                showAlert(Alert.AlertType.INFORMATION, "Thành công", 
-                    "✅ Xuất Excel thành công: " + file.getAbsolutePath());
+                showAlert(Alert.AlertType.INFORMATION, "Success", 
+                    "✅ Excel export successful: " + file.getAbsolutePath());
             }
         } catch (Exception ex) {
             ex.printStackTrace();
-            showAlert(Alert.AlertType.ERROR, "Lỗi", 
-                "❌ Lỗi khi xuất Excel: " + ex.getMessage());
+            showAlert(Alert.AlertType.ERROR, "Error", 
+                "❌ Error exporting Excel: " + ex.getMessage());
         }
     }
 

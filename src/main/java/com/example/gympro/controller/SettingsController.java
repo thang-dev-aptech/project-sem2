@@ -12,35 +12,35 @@ import java.sql.DatabaseMetaData;
 import java.util.Properties;
 
 /**
- * Controller cho màn hình Settings
- * Sử dụng BaseController cho common methods
+ * Controller for Settings screen
+ * Uses BaseController for common methods
  */
 public class SettingsController extends BaseController {
 
     @FXML private TabPane tabPane;
 
-    // Tab 1: Thông tin phòng gym
+    // Tab 1: Gym information
     @FXML private TextField txtGymName;
     @FXML private TextField txtGymAddress;
     @FXML private TextField txtGymPhone;
     @FXML private TextField txtGymEmail;
     @FXML private Button btnSaveBranch;
 
-    // Tab 2: Cấu hình nghiệp vụ
+    // Tab 2: Business configuration
     @FXML private TextField txtGraceDays;
     @FXML private TextField txtMemberCodePrefix;
     @FXML private TextField txtInvoicePrefix;
     @FXML private TextField txtCurrencySymbol;
     @FXML private Button btnSaveBusiness;
 
-    // Tab 3: Bảo mật
+    // Tab 3: Security
     @FXML private TextField txtPasswordMinLength;
     @FXML private TextField txtSessionTimeout;
     @FXML private TextField txtMaxLoginAttempts;
     @FXML private TextField txtLockoutDuration;
     @FXML private Button btnSaveSecurity;
 
-    // Tab 4: Hệ thống
+    // Tab 4: System
     @FXML private Label lblAppVersion;
     @FXML private Label lblDbVersion;
     @FXML private Label lblDbInfo;
@@ -50,14 +50,14 @@ public class SettingsController extends BaseController {
 
     @FXML
     private void initialize() {
-        // Kiểm tra quyền truy cập
+        // Check access permission
         if (!authService.canManageSettings()) {
             authService.showAccessDeniedAlert();
             tabPane.setDisable(true);
             return;
         }
 
-        // Load dữ liệu cho tất cả tabs
+        // Load data for all tabs
         loadBranchInfo();
         loadBusinessSettings();
         loadSecuritySettings();
@@ -69,7 +69,7 @@ public class SettingsController extends BaseController {
         btnSaveSecurity.setOnAction(e -> saveSecuritySettings());
     }
 
-    // ========== Tab 1: Thông tin phòng gym ==========
+    // ========== Tab 1: Gym information ==========
     private void loadBranchInfo() {
         com.example.gympro.repository.settings.SettingsRepository.BranchInfo branch = settingsService.getBranchInfo();
         if (branch != null) {
@@ -85,18 +85,18 @@ public class SettingsController extends BaseController {
         String phone = txtGymPhone.getText().trim();
 
         if (name.isEmpty()) {
-            showAlert("⚠️ Vui lòng nhập tên phòng gym!");
+            showAlert("⚠️ Please enter gym name!");
             return;
         }
 
         if (settingsService.updateBranchInfo(name, address, phone)) {
-            showAlert("✅ Lưu thông tin phòng gym thành công!");
+            showAlert("✅ Gym information saved successfully!");
         } else {
-            showAlert("❌ Lỗi khi lưu thông tin phòng gym!");
+            showAlert("❌ Error saving gym information!");
         }
     }
 
-    // ========== Tab 2: Cấu hình nghiệp vụ ==========
+    // ========== Tab 2: Business configuration ==========
     private void loadBusinessSettings() {
         txtGraceDays.setText(String.valueOf(settingsService.getGraceDays()));
         txtMemberCodePrefix.setText(settingsService.getMemberCodePrefix());
@@ -112,12 +112,12 @@ public class SettingsController extends BaseController {
             String currencySymbol = txtCurrencySymbol.getText().trim();
 
             if (graceDays < 0) {
-                showAlert("⚠️ Số ngày phải >= 0!");
+                showAlert("⚠️ Days must be >= 0!");
                 return;
             }
 
             if (memberPrefix.isEmpty() || invoicePrefix.isEmpty() || currencySymbol.isEmpty()) {
-                showAlert("⚠️ Vui lòng điền đầy đủ thông tin!");
+                showAlert("⚠️ Please fill in all information!");
                 return;
             }
 
@@ -127,16 +127,16 @@ public class SettingsController extends BaseController {
                     && settingsService.setCurrencySymbol(currencySymbol);
 
             if (success) {
-                showAlert("✅ Lưu cấu hình nghiệp vụ thành công!");
+                showAlert("✅ Business configuration saved successfully!");
             } else {
-                showAlert("❌ Lỗi khi lưu cấu hình nghiệp vụ!");
+                showAlert("❌ Error saving business configuration!");
             }
         } catch (NumberFormatException e) {
-            showAlert("⚠️ Vui lòng nhập số hợp lệ!");
+            showAlert("⚠️ Please enter a valid number!");
         }
     }
 
-    // ========== Tab 3: Bảo mật ==========
+    // ========== Tab 3: Security ==========
     private void loadSecuritySettings() {
         txtPasswordMinLength.setText(String.valueOf(settingsService.getPasswordMinLength()));
         txtSessionTimeout.setText(String.valueOf(settingsService.getSessionTimeout()));
@@ -152,12 +152,12 @@ public class SettingsController extends BaseController {
             int lockoutDuration = Integer.parseInt(txtLockoutDuration.getText().trim());
 
             if (passwordMinLength < 6 || passwordMinLength > 20) {
-                showAlert("⚠️ Độ dài mật khẩu phải từ 6-20 ký tự!");
+                showAlert("⚠️ Password length must be 6-20 characters!");
                 return;
             }
 
             if (sessionTimeout < 5 || sessionTimeout > 120) {
-                showAlert("⚠️ Thời gian timeout phải từ 5-120 phút!");
+                showAlert("⚠️ Timeout must be 5-120 minutes!");
                 return;
             }
 
@@ -167,16 +167,16 @@ public class SettingsController extends BaseController {
                     && settingsService.setLockoutDuration(lockoutDuration);
 
             if (success) {
-                showAlert("✅ Lưu cấu hình bảo mật thành công!");
+                showAlert("✅ Security configuration saved successfully!");
             } else {
-                showAlert("❌ Lỗi khi lưu cấu hình bảo mật!");
+                showAlert("❌ Error saving security configuration!");
             }
         } catch (NumberFormatException e) {
-            showAlert("⚠️ Vui lòng nhập số hợp lệ!");
+            showAlert("⚠️ Please enter a valid number!");
         }
     }
 
-    // ========== Tab 4: Hệ thống ==========
+    // ========== Tab 4: System ==========
     private void loadSystemInfo() {
         // Load app version from pom.xml
         try {
@@ -209,5 +209,5 @@ public class SettingsController extends BaseController {
         }
     }
 
-    // Helper methods đã được kế thừa từ BaseController
+    // Helper methods inherited from BaseController
 }

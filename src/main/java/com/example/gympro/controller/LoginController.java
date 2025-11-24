@@ -25,7 +25,7 @@ public class LoginController {
         String password = passwordField.getText();
 
         if (username == null || username.isBlank() || password == null || password.isBlank()) {
-            showError("Vui lòng nhập đầy đủ username và password");
+            showError("Please enter both username and password");
             return;
         }
 
@@ -47,17 +47,17 @@ public class LoginController {
         } catch (RuntimeException e) {
             e.printStackTrace();
             if (e.getCause() instanceof java.sql.SQLException) {
-                showError("Lỗi kết nối database: " + e.getCause().getMessage() + 
-                         "\nVui lòng kiểm tra:\n- MySQL đã chạy?\n- application.properties đã cấu hình đúng?");
+                showError("Database connection error: " + e.getCause().getMessage() + 
+                         "\nPlease check:\n- Is MySQL running?\n- Is application.properties configured correctly?");
             } else {
-                showError("Lỗi: " + e.getMessage());
+                showError("Error: " + e.getMessage());
             }
         } catch (IOException e) {
             e.printStackTrace();
-            showError("Không thể tải màn hình chính: " + e.getMessage());
+            showError("Cannot load main screen: " + e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            showError("Lỗi không xác định: " + e.getMessage());
+            showError("Unknown error: " + e.getMessage());
         }
     }
 

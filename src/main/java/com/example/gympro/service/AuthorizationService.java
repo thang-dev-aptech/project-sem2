@@ -1,11 +1,11 @@
 package com.example.gympro.service;
 
 /**
- * AuthorizationService - Kiểm tra quyền truy cập của user
+ * AuthorizationService - Check user access permissions
  * 
- * Quy tắc phân quyền:
- * - OWNER: Toàn quyền (CRUD tất cả)
- * - STAFF: Chỉ xem và tạo mới, không được xóa/sửa một số module nhạy cảm
+ * Permission rules:
+ * - OWNER: Full access (CRUD all)
+ * - STAFF: View and create only, cannot delete/edit some sensitive modules
  */
 public class AuthorizationService {
     
@@ -16,107 +16,107 @@ public class AuthorizationService {
     }
     
     /**
-     * Kiểm tra user có role cụ thể không
+     * Check if user has a specific role
      */
     public boolean hasRole(String roleName) {
         return sessionManager.hasRole(roleName);
     }
     
     /**
-     * Kiểm tra user có phải OWNER không
+     * Check if user is OWNER
      */
     public boolean isOwner() {
         return hasRole("OWNER");
     }
     
     /**
-     * Kiểm tra user có phải STAFF không
+     * Check if user is STAFF
      */
     public boolean isStaff() {
         return hasRole("STAFF");
     }
     
     /**
-     * Kiểm tra user có quyền xem (tất cả roles đều có)
+     * Check if user has view permission (all roles have this)
      */
     public boolean canView() {
         return sessionManager.getCurrentUser() != null;
     }
     
     /**
-     * Kiểm tra user có quyền tạo mới
-     * OWNER: Có, STAFF: Có (trừ một số module đặc biệt)
+     * Check if user has create permission
+     * OWNER: Yes, STAFF: Yes (except some special modules)
      */
     public boolean canCreate() {
         return canView();
     }
     
     /**
-     * Kiểm tra user có quyền chỉnh sửa
-     * OWNER: Có, STAFF: Có (trừ một số module đặc biệt)
+     * Check if user has edit permission
+     * OWNER: Yes, STAFF: Yes (except some special modules)
      */
     public boolean canEdit() {
         return canView();
     }
     
     /**
-     * Kiểm tra user có quyền xóa
-     * OWNER: Có, STAFF: Không
+     * Check if user has delete permission
+     * OWNER: Yes, STAFF: No
      */
     public boolean canDelete() {
         return isOwner();
     }
     
     /**
-     * Kiểm tra user có quyền quản lý gói tập (Packages)
-     * OWNER: Toàn quyền, STAFF: Chỉ xem
+     * Check if user can manage packages
+     * OWNER: Full access, STAFF: View only
      */
     public boolean canManagePackages() {
         return isOwner();
     }
     
     /**
-     * Kiểm tra user có quyền quản lý cấu hình hệ thống
-     * Chỉ OWNER mới có quyền
+     * Check if user can manage system settings
+     * Only OWNER has this permission
      */
     public boolean canManageSettings() {
         return isOwner();
     }
     
     /**
-     * Kiểm tra user có quyền xem báo cáo
-     * OWNER: Có, STAFF: Có
+     * Check if user can view reports
+     * OWNER: Yes, STAFF: Yes
      */
     public boolean canViewReports() {
         return canView();
     }
     
     /**
-     * Kiểm tra user có quyền xuất báo cáo/Excel
-     * OWNER: Có, STAFF: Có
+     * Check if user can export reports/Excel
+     * OWNER: Yes, STAFF: Yes
      */
     public boolean canExportReports() {
         return canView();
     }
     
     /**
-     * Kiểm tra user có quyền áp dụng chiết khấu
-     * OWNER: Có, STAFF: Có (nhưng có thể giới hạn %)
+     * Check if user can apply discount
+     * OWNER: Yes, STAFF: Yes (but may be limited by %)
      */
     public boolean canApplyDiscount() {
         return canView();
     }
     
     /**
-     * Hiển thị thông báo lỗi khi không có quyền
+     * Show error message when user doesn't have permission
      */
     public void showAccessDeniedAlert() {
         javafx.scene.control.Alert alert = new javafx.scene.control.Alert(
             javafx.scene.control.Alert.AlertType.WARNING
         );
-        alert.setTitle("Không có quyền truy cập");
+        alert.setTitle("Access Denied");
         alert.setHeaderText(null);
-        alert.setContentText("Bạn không có quyền thực hiện thao tác này. Vui lòng liên hệ quản trị viên.");
+        alert.setContentText("You do not have permission to perform this action. Please contact administrator.");
         alert.showAndWait();
     }
 }
