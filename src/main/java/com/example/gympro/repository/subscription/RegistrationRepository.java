@@ -19,9 +19,8 @@ public class RegistrationRepository implements RegistrationRepositoryInterface {
             """;
 
     private static final String INSERT_INVOICE_SQL = """
-            INSERT INTO invoices (member_id, subscription_id, invoice_no, subtotal_amount, discount_type, discount_value,
-                                  total_amount, status, created_by, issue_date)
-            VALUES (?, ?, ?, ?, 'NONE', 0, ?, 'ISSUED', ?, CURRENT_DATE)
+            INSERT INTO invoices (member_id, subscription_id, invoice_no, subtotal_amount, total_amount, created_by, issue_date)
+            VALUES (?, ?, ?, ?, ?, ?, CURRENT_DATE)
             """;
 
     private static final String INSERT_INVOICE_ITEM_SQL = """

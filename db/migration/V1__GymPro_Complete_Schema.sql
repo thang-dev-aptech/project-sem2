@@ -39,12 +39,14 @@ CREATE TABLE payment_methods (
 ) ENGINE=InnoDB COLLATE=utf8mb4_0900_ai_ci;
 
 -- settings: Cấu hình hệ thống
+-- Lưu các cấu hình hệ thống dạng key-value
+-- value_str: Lưu giá trị string (ví dụ: "GYM", "INV")
+-- value_num: Lưu giá trị số (ví dụ: 6 cho password min length)
 CREATE TABLE settings (
   id           BIGINT PRIMARY KEY AUTO_INCREMENT,
-  key_name     VARCHAR(100) NOT NULL UNIQUE,
-  value_str    VARCHAR(255),
-  value_num    DECIMAL(18,6),
-  value_json   JSON,
+  key_name     VARCHAR(100) NOT NULL UNIQUE COMMENT 'Tên setting (ví dụ: MEMBER_CODE_PREFIX)',
+  value_str    VARCHAR(255) COMMENT 'Giá trị dạng string',
+  value_num    DECIMAL(18,6) COMMENT 'Giá trị dạng số',
   created_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB COLLATE=utf8mb4_0900_ai_ci;
@@ -112,7 +114,7 @@ CREATE TABLE members (
   gender        ENUM('MALE','FEMALE','OTHER') DEFAULT 'OTHER',
   dob           DATE,
   address       VARCHAR(500),
-  status        ENUM('PENDING','ACTIVE','EXPIRED','PAUSED','RENEWED') DEFAULT 'PENDING',
+  status        ENUM('PENDING','ACTIVE','EXPIRED','PAUSED') DEFAULT 'PENDING',
   note          VARCHAR(500),
   is_deleted    TINYINT(1) DEFAULT 0,
   created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -155,13 +157,7 @@ CREATE TABLE invoices (
   invoice_no       VARCHAR(50) NOT NULL UNIQUE,
   issue_date       DATE DEFAULT (CURRENT_DATE),
   subtotal_amount  DECIMAL(12,2) NOT NULL,
-  discount_type    ENUM('NONE','PERCENT','AMOUNT') DEFAULT 'NONE',
-  discount_value   DECIMAL(12,2) DEFAULT 0,
   total_amount     DECIMAL(12,2) NOT NULL,
-  status           ENUM('ISSUED','VOIDED') DEFAULT 'ISSUED',
-  void_reason      VARCHAR(255) NULL,
-  void_by          BIGINT NULL,
-  void_at          TIMESTAMP NULL,
   created_by       BIGINT,
   created_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -169,11 +165,9 @@ CREATE TABLE invoices (
     ON UPDATE CASCADE ON DELETE RESTRICT,
   CONSTRAINT fk_inv_sub FOREIGN KEY (subscription_id) REFERENCES subscriptions(id)
     ON UPDATE CASCADE ON DELETE SET NULL,
-  CONSTRAINT fk_inv_void_by FOREIGN KEY (void_by) REFERENCES users(id)
-    ON UPDATE CASCADE ON DELETE SET NULL,
   CONSTRAINT fk_inv_created_by FOREIGN KEY (created_by) REFERENCES users(id)
     ON UPDATE CASCADE ON DELETE SET NULL,
-  CONSTRAINT chk_inv_amounts CHECK (subtotal_amount >= 0 AND total_amount >= 0 AND discount_value >= 0)
+  CONSTRAINT chk_inv_amounts CHECK (subtotal_amount >= 0 AND total_amount >= 0)
 ) ENGINE=InnoDB COLLATE=utf8mb4_0900_ai_ci;
 
 -- invoice_items: Dòng chi tiết hóa đơn
@@ -220,8 +214,34 @@ CREATE INDEX idx_members_branch_phone ON members(branch_id, phone);
 CREATE INDEX idx_subscriptions_member ON subscriptions(member_id);
 CREATE INDEX idx_subscriptions_status ON subscriptions(status);
 CREATE INDEX idx_subscriptions_end_date ON subscriptions(end_date);
-CREATE INDEX idx_invoices_status ON invoices(status);
 CREATE INDEX idx_invoices_created_at ON invoices(created_at);
 CREATE INDEX idx_payments_created_at ON payments(paid_at);
 CREATE INDEX idx_members_phone ON members(phone);
 CREATE INDEX idx_members_email ON members(email);
+
+-- =====================================================================
+-- VIEWS CHO QUERY DỄ DÀNG
+-- =====================================================================
+
+-- View cho invoice với thông tin đầy đủ
+CREATE OR REPLACE VIEW v_invoices_detail AS
+SELECT 
+    i.id,
+    i.invoice_no,
+    i.issue_date,
+    i.subtotal_amount,
+    i.total_amount,
+    m.member_code,
+    m.full_name AS member_name,
+    p.name AS plan_name,
+    COUNT(DISTINCT pay.id) AS payment_count,
+    COALESCE(SUM(CASE WHEN pay.is_refund = 0 THEN pay.paid_amount ELSE 0 END), 0) AS total_paid,
+    (i.total_amount - COALESCE(SUM(CASE WHEN pay.is_refund = 0 THEN pay.paid_amount ELSE 0 END), 0)) AS remaining_amount
+FROM invoices i
+JOIN members m ON i.member_id = m.id
+LEFT JOIN subscriptions s ON i.subscription_id = s.id
+LEFT JOIN plans p ON s.plan_id = p.id
+LEFT JOIN payments pay ON pay.invoice_id = i.id
+GROUP BY i.id, i.invoice_no, i.issue_date, i.subtotal_amount, i.total_amount, 
+         m.member_code, m.full_name, p.name;
+

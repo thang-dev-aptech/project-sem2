@@ -26,7 +26,7 @@ public class PaymentReportRepository {
                 i.invoice_no,
                 m.full_name AS member_name,
                 p.paid_amount,
-                pm.name AS method_name,
+                pm.display_name AS method_name,
                 p.reference_code AS note
             FROM payments p
             JOIN invoices i ON p.invoice_id = i.id

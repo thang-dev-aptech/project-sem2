@@ -15,7 +15,6 @@ import java.util.List;
 public class PaymentService implements PaymentServiceInterface {
 
     private final PaymentRepositoryInterface paymentRepository = new PaymentRepository();
-    private final DatabaseConnection dbConnection = DatabaseConnection.getInstance();
 
     @Override
     public List<Invoice> getUnpaidInvoices() {
@@ -28,7 +27,7 @@ public class PaymentService implements PaymentServiceInterface {
         var domainInvoice = InvoiceMapper.toDomain(invoice);
         Connection conn = null;
         try {
-            conn = dbConnection.getConnection();
+            conn = DatabaseConnection.getConnection();
             conn.setAutoCommit(false);
 
             Payment payment = new Payment.Builder()
@@ -43,8 +42,12 @@ public class PaymentService implements PaymentServiceInterface {
             boolean paymentCreated = paymentRepository.createPayment(conn, payment);
             boolean subUpdated = domainInvoice.getSubscriptionId() == null
                     || paymentRepository.updateSubscriptionStatus(conn, domainInvoice.getSubscriptionId());
+            // Update member status to ACTIVE when payment is completed
+            // Use memberId from invoice, not subscriptionId
+            boolean memberUpdated = domainInvoice.getMember() == null
+                    || paymentRepository.updateMemberStatus(conn, domainInvoice.getMember().getId());
 
-            if (paymentCreated && subUpdated) {
+            if (paymentCreated && subUpdated && memberUpdated) {
                 conn.commit();
                 return true;
             } else {

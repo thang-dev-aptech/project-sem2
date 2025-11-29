@@ -28,15 +28,12 @@ public class RevenueReportRepository {
                 m.member_code,
                 p.name AS package_name,
                 i.subtotal_amount,
-                i.discount_value,
-                i.total_amount,
-                i.status
+                i.total_amount
             FROM invoices i
             JOIN members m ON i.member_id = m.id
             LEFT JOIN subscriptions s ON i.subscription_id = s.id
             LEFT JOIN plans p ON s.plan_id = p.id
             WHERE i.issue_date BETWEEN ? AND ?
-              AND i.status = 'ISSUED'
             ORDER BY i.issue_date DESC, i.invoice_no DESC
         """;
 
@@ -55,9 +52,8 @@ public class RevenueReportRepository {
                         rs.getString("member_code"),
                         rs.getString("package_name"),
                         rs.getBigDecimal("subtotal_amount"),
-                        rs.getBigDecimal("discount_value"),
                         rs.getBigDecimal("total_amount"),
-                        rs.getString("status")
+                        "ISSUED"
                     );
                     reports.add(report);
                 }
@@ -86,7 +82,6 @@ public class RevenueReportRepository {
             FROM invoices i
             LEFT JOIN payments p ON i.id = p.invoice_id AND p.is_refund = 0
             WHERE i.issue_date BETWEEN ? AND ?
-              AND i.status = 'ISSUED'
         """;
 
         try (Connection conn = DatabaseConnection.getConnection();

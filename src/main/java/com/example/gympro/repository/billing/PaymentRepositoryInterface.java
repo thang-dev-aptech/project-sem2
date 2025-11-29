@@ -13,5 +13,7 @@ public interface PaymentRepositoryInterface {
     boolean createPayment(Connection conn, Payment payment) throws SQLException;
 
     boolean updateSubscriptionStatus(Connection conn, long subscriptionId) throws SQLException;
+
+    boolean updateMemberStatus(Connection conn, long subscriptionId) throws SQLException;
 }
 

@@ -81,7 +81,7 @@
                     </columnConstraints>
 
                     <Label text="Member Code:" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
-                    <TextField fx:id="codeField" promptText="MEM-001" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                    <TextField fx:id="codeField" promptText="Auto-generated" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="0" style="-fx-background-color: #f0f0f0;"/>
 
                     <Label text="Status:" GridPane.columnIndex="2" GridPane.rowIndex="0"/>
                     <ComboBox fx:id="statusComboBox" prefWidth="Infinity" GridPane.columnIndex="3" GridPane.rowIndex="0"/>

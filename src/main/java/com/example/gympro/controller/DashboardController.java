@@ -74,6 +74,16 @@ public class DashboardController {
         loadRevenueChart();
         loadMemberPieChart();
     }
+    
+    /**
+     * Public method to refresh dashboard data (useful when settings change)
+     */
+    public void refresh() {
+        loadDashboardStats();
+        loadMembers();
+        loadRevenueChart();
+        loadMemberPieChart();
+    }
 
     private void loadDashboardStats() {
         List<DashboardStat> stats = dashboardService.getDashboardStats();
@@ -114,7 +124,9 @@ public class DashboardController {
     }
 
     private void loadMembers() {
-        memberList = memberService.getExpiringMembers(3);
+        // Use default Grace Days (5 days)
+        int graceDays = com.example.gympro.service.settings.SettingsService.DEFAULT_GRACE_DAYS;
+        memberList = memberService.getExpiringMembers(graceDays);
         tblExpiry.setItems(memberList);
     }
 
@@ -127,7 +139,7 @@ public class DashboardController {
 
     private void addActionButtonsToTable() {
         colActions.setCellFactory(param -> new TableCell<>() {
-            private final Button btnExtend = new Button("📝 Gia hạn");
+            private final Button btnExtend = new Button("📝 Extend");
             private final Button btnEmail = new Button("📧 Email");
 
             private final HBox container = new HBox(5, btnExtend, btnEmail);
@@ -169,7 +181,7 @@ public class DashboardController {
         var revenueList = dashboardService.getMonthlyRevenue();
 
         XYChart.Series<String, Number> series = new XYChart.Series<>();
-        series.setName("Doanh thu theo tháng");
+        series.setName("Monthly Revenue");
 
         for (RevenueData data : revenueList) {
             String monthLabel = data.getLabel();
@@ -180,7 +192,7 @@ public class DashboardController {
         revenueBarChart.getData().clear();
         revenueBarChart.getData().add(series);
 
-        revenueBarChart.setTitle("Doanh thu theo tháng");
+        revenueBarChart.setTitle("Monthly Revenue");
 
     }
 

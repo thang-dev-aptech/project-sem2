@@ -40,6 +40,8 @@ public class ExpiryController {
     private TextField txtSearch;
     @FXML
     private Button btnExport;
+    @FXML
+    private Button btnRefresh;
 
     private ObservableList<ExpiringMember> memberList = FXCollections.observableArrayList();
     private ExpiringMemberService service = new ExpiringMemberService();
@@ -53,7 +55,19 @@ public class ExpiryController {
         setupSearch();
         addActionButtonsToTable();
         btnExport.setOnAction(e -> exportMembersToExcel());
-
+        
+        // Add refresh button if it exists in FXML
+        if (btnRefresh != null) {
+            btnRefresh.setOnAction(e -> loadMembers());
+        }
+    }
+    
+    /**
+     * Public method to refresh expiring members data (useful when settings change)
+     */
+    public void refresh() {
+        loadMembers();
+        setupFilter(); // Re-setup filter to update Grace Days option
     }
 
     @FXML
@@ -90,20 +104,38 @@ public class ExpiryController {
     }
 
     private void loadMembers() {
-        memberList = service.getExpiringMembers(14);
+        // Use default Grace Days (5 days) + buffer days for "upcoming" members
+        int graceDays = com.example.gympro.service.settings.SettingsService.DEFAULT_GRACE_DAYS;
+        // Show members expiring within grace days + 7 days ahead
+        int maxDays = Math.max(graceDays, 7);
+        memberList = service.getExpiringMembers(maxDays);
         tblExpiry.setItems(memberList);
     }
 
     private void setupFilter() {
-        cbFilter.getItems().addAll("All", "≤ 3 days", "≤ 7 days", "≤ 14 days");
+        int graceDays = com.example.gympro.service.settings.SettingsService.DEFAULT_GRACE_DAYS;
+        String gracePeriodLabel = "≤ " + graceDays + " days (Grace Period)";
+        cbFilter.getItems().clear();
+        cbFilter.getItems().addAll("All", "≤ 3 days", "≤ 7 days", gracePeriodLabel, "≤ 14 days");
         cbFilter.setValue("All");
         cbFilter.setOnAction(e -> {
-            int days = switch (cbFilter.getValue()) {
-                case "≤ 3 days" -> 3;
-                case "≤ 7 days" -> 7;
-                case "≤ 14 days" -> 14;
-                default -> 14;
-            };
+            String selectedValue = cbFilter.getValue();
+            int days;
+            
+            if ("≤ 3 days".equals(selectedValue)) {
+                days = 3;
+            } else if ("≤ 7 days".equals(selectedValue)) {
+                days = 7;
+            } else if (gracePeriodLabel.equals(selectedValue)) {
+                days = com.example.gympro.service.settings.SettingsService.DEFAULT_GRACE_DAYS;
+            } else if ("≤ 14 days".equals(selectedValue)) {
+                days = 14;
+            } else {
+                // "All" - use grace days + buffer
+                int currentGraceDays = com.example.gympro.service.settings.SettingsService.DEFAULT_GRACE_DAYS;
+                days = Math.max(currentGraceDays, 14);
+            }
+            
             memberList = service.getExpiringMembers(days);
             tblExpiry.setItems(memberList);
             // Reset search when filter

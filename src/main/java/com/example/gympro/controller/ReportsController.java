@@ -44,7 +44,6 @@ public class ReportsController extends BaseController {
     @FXML private TableColumn<RevenueReport, String> colMemberCode;
     @FXML private TableColumn<RevenueReport, String> colPackageName;
     @FXML private TableColumn<RevenueReport, BigDecimal> colSubtotal;
-    @FXML private TableColumn<RevenueReport, BigDecimal> colDiscount;
     @FXML private TableColumn<RevenueReport, BigDecimal> colTotal;
     @FXML private TableColumn<RevenueReport, String> colStatus;
     @FXML private Button btnExportRevenue;
@@ -133,19 +132,11 @@ public class ReportsController extends BaseController {
         colMemberCode.setCellValueFactory(new PropertyValueFactory<>("memberCode"));
         colPackageName.setCellValueFactory(new PropertyValueFactory<>("packageName"));
         colSubtotal.setCellValueFactory(new PropertyValueFactory<>("subtotal"));
-        colDiscount.setCellValueFactory(new PropertyValueFactory<>("discount"));
         colTotal.setCellValueFactory(new PropertyValueFactory<>("total"));
         colStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
 
         // Format currency columns
         colSubtotal.setCellFactory(column -> new TableCell<>() {
-            @Override
-            protected void updateItem(BigDecimal item, boolean empty) {
-                super.updateItem(item, empty);
-                setText(empty || item == null ? "" : String.format("%,.0f VNĐ", item.doubleValue()));
-            }
-        });
-        colDiscount.setCellFactory(column -> new TableCell<>() {
             @Override
             protected void updateItem(BigDecimal item, boolean empty) {
                 super.updateItem(item, empty);

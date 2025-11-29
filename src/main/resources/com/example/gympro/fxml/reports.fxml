@@ -83,7 +83,6 @@
                             <TableColumn fx:id="colMemberCode" text="Member Code" prefWidth="100"/>
                             <TableColumn fx:id="colPackageName" text="Package" prefWidth="120"/>
                             <TableColumn fx:id="colSubtotal" text="Subtotal" prefWidth="120"/>
-                            <TableColumn fx:id="colDiscount" text="Discount" prefWidth="100"/>
                             <TableColumn fx:id="colTotal" text="Total" prefWidth="120"/>
                             <TableColumn fx:id="colStatus" text="Status" prefWidth="100"/>
                         </columns>

@@ -4,6 +4,7 @@ import com.example.gympro.service.ExcelExportService;
 import com.example.gympro.service.PackageServiceInterface;
 import com.example.gympro.service.PackageService;
 import com.example.gympro.service.AuthorizationService;
+import com.example.gympro.utils.ValidationUtils;
 import com.example.gympro.viewModel.Package;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -360,18 +361,38 @@ public class PackagesController {
     }
 
     private boolean isInputValid() {
-        if (nameField.getText() == null || nameField.getText().isEmpty() ||
-                codeField.getText() == null || codeField.getText().isEmpty()) {
+        // Validate Code
+        String code = codeField.getText();
+        if (!ValidationUtils.isValidCode(code)) {
+            showAlert(Alert.AlertType.WARNING, "Validation Error", 
+                "Package Code is required and must be 2-50 alphanumeric characters (may include dash/underscore).");
             return false;
         }
-
-        try {
-            new BigDecimal(priceField.getText());
-            if (Integer.parseInt(durationField.getText()) <= 0) return false;
-        } catch (NumberFormatException e) {
+        
+        // Validate Name
+        String name = nameField.getText();
+        if (!ValidationUtils.isValidName(name)) {
+            showAlert(Alert.AlertType.WARNING, "Validation Error", 
+                "Package Name is required and must be 2-100 characters.");
             return false;
         }
-
+        
+        // Validate Price
+        String priceStr = priceField.getText();
+        if (!ValidationUtils.isValidPrice(priceStr)) {
+            showAlert(Alert.AlertType.WARNING, "Validation Error", 
+                "Price is required and must be a positive number (max 1,000,000,000).");
+            return false;
+        }
+        
+        // Validate Duration
+        String durationStr = durationField.getText();
+        if (!ValidationUtils.isValidDuration(durationStr)) {
+            showAlert(Alert.AlertType.WARNING, "Validation Error", 
+                "Duration is required and must be a positive integer (1-3650 days).");
+            return false;
+        }
+        
         return true;
     }
 

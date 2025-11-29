@@ -14,9 +14,6 @@ import java.util.Optional;
 public class SecuritySettingsTabController extends BaseController {
     
     @FXML private TextField txtPasswordMinLength;
-    @FXML private TextField txtSessionTimeout;
-    @FXML private TextField txtMaxLoginAttempts;
-    @FXML private TextField txtLockoutDuration;
     @FXML private Button btnSaveSecurity;
     
     private final SettingsService settingsService = new SettingsService();
@@ -29,9 +26,6 @@ public class SecuritySettingsTabController extends BaseController {
     
     private void loadSecuritySettings() {
         txtPasswordMinLength.setText(String.valueOf(settingsService.getPasswordMinLength()));
-        txtSessionTimeout.setText(String.valueOf(settingsService.getSessionTimeout()));
-        txtMaxLoginAttempts.setText(String.valueOf(settingsService.getMaxLoginAttempts()));
-        txtLockoutDuration.setText(String.valueOf(settingsService.getLockoutDuration()));
     }
     
     private void saveSecuritySettings() {
@@ -41,24 +35,7 @@ public class SecuritySettingsTabController extends BaseController {
             return;
         }
         
-        Optional<Integer> sessionTimeoutOpt = parseInteger(txtSessionTimeout.getText());
-        if (sessionTimeoutOpt.isEmpty() || sessionTimeoutOpt.get() < 5 || sessionTimeoutOpt.get() > 120) {
-            showWarning("⚠️ Timeout must be 5-120 minutes!");
-            return;
-        }
-        
-        Optional<Integer> maxLoginAttemptsOpt = parseInteger(txtMaxLoginAttempts.getText());
-        Optional<Integer> lockoutDurationOpt = parseInteger(txtLockoutDuration.getText());
-        
-        if (maxLoginAttemptsOpt.isEmpty() || lockoutDurationOpt.isEmpty()) {
-            showWarning("⚠️ Please enter a valid number!");
-            return;
-        }
-        
-        boolean success = settingsService.setPasswordMinLength(passwordMinLengthOpt.get())
-                && settingsService.setSessionTimeout(sessionTimeoutOpt.get())
-                && settingsService.setMaxLoginAttempts(maxLoginAttemptsOpt.get())
-                && settingsService.setLockoutDuration(lockoutDurationOpt.get());
+        boolean success = settingsService.setPasswordMinLength(passwordMinLengthOpt.get());
         
         if (success) {
             showAlert("✅ Security configuration saved successfully!");

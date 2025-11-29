@@ -44,23 +44,27 @@ WHERE NOT EXISTS (SELECT 1 FROM payment_methods WHERE code = 'CARD');
 
 -- =====================================================================
 -- 5. SETTINGS (Cấu hình hệ thống)
+-- Chỉ giữ lại các settings đang được sử dụng trong UI
 -- =====================================================================
-INSERT INTO settings (key_name, value_str, value_num)
-SELECT 'GRACE_DAYS', NULL, 5
-WHERE NOT EXISTS (SELECT 1 FROM settings WHERE key_name = 'GRACE_DAYS');
-
-
+-- Member Code Prefix: Tiền tố cho mã hội viên (ví dụ: GYM-0001)
 INSERT INTO settings (key_name, value_str, value_num)
 SELECT 'MEMBER_CODE_PREFIX', 'GYM', NULL
 WHERE NOT EXISTS (SELECT 1 FROM settings WHERE key_name = 'MEMBER_CODE_PREFIX');
 
+-- Invoice Prefix: Tiền tố cho số hóa đơn (ví dụ: INV-0001)
 INSERT INTO settings (key_name, value_str, value_num)
 SELECT 'INVOICE_PREFIX', 'INV', NULL
 WHERE NOT EXISTS (SELECT 1 FROM settings WHERE key_name = 'INVOICE_PREFIX');
 
+-- Password Min Length: Độ dài tối thiểu của mật khẩu (6-20 ký tự)
 INSERT INTO settings (key_name, value_str, value_num)
-SELECT 'CURRENCY_SYMBOL', '₫', NULL
-WHERE NOT EXISTS (SELECT 1 FROM settings WHERE key_name = 'CURRENCY_SYMBOL');
+SELECT 'PASSWORD_MIN_LENGTH', NULL, 6
+WHERE NOT EXISTS (SELECT 1 FROM settings WHERE key_name = 'PASSWORD_MIN_LENGTH');
+
+-- Lưu ý: 
+-- - GRACE_DAYS đã được hardcoded = 5 trong SettingsService.DEFAULT_GRACE_DAYS
+-- - CURRENCY_SYMBOL đã được hardcoded = "VNĐ" trong SettingsService.DEFAULT_CURRENCY
+-- - Các settings khác (EXPIRING_REMINDER_DAYS, TAX_RATE, etc.) có methods nhưng không dùng trong UI
 
 -- =====================================================================
 -- 6. USERS (Người dùng - Test Accounts)
@@ -389,16 +393,16 @@ WHERE m.member_code = 'GYM-2024-110' AND p.code = 'PKG-001'
 -- =====================================================================
 
 -- Invoices từ V2
-INSERT INTO invoices (member_id, subscription_id, invoice_no, issue_date, subtotal_amount, discount_type, discount_value, total_amount, status, created_by)
-SELECT m.id, s.id, 'INV-0001', CURDATE(), 500000, 'NONE', 0, 500000, 'ISSUED', u.id
+INSERT INTO invoices (member_id, subscription_id, invoice_no, issue_date, subtotal_amount, total_amount, created_by)
+SELECT m.id, s.id, 'INV-0001', CURDATE(), 500000, 500000, u.id
 FROM members m
 JOIN subscriptions s ON s.member_id = m.id
 JOIN users u ON u.username = 'staff'
 WHERE m.member_code = 'MEM-0001'
   AND NOT EXISTS (SELECT 1 FROM invoices WHERE invoice_no = 'INV-0001');
 
-INSERT INTO invoices (member_id, subscription_id, invoice_no, issue_date, subtotal_amount, discount_type, discount_value, total_amount, status, created_by)
-SELECT m.id, s.id, 'INV-0002', DATE_ADD(CURDATE(), INTERVAL 1 DAY), 750000, 'PERCENT', 5, 712500, 'ISSUED', u.id
+INSERT INTO invoices (member_id, subscription_id, invoice_no, issue_date, subtotal_amount, total_amount, created_by)
+SELECT m.id, s.id, 'INV-0002', DATE_ADD(CURDATE(), INTERVAL 1 DAY), 750000, 750000, u.id
 FROM members m
 JOIN subscriptions s ON s.member_id = m.id
 JOIN users u ON u.username = 'staff'
@@ -406,8 +410,8 @@ WHERE m.member_code = 'MEM-0002'
   AND NOT EXISTS (SELECT 1 FROM invoices WHERE invoice_no = 'INV-0002');
 
 -- Invoices từ V3
-INSERT INTO invoices (member_id, subscription_id, invoice_no, issue_date, subtotal_amount, discount_type, discount_value, total_amount, status, created_by)
-SELECT m.id, s.id, 'INV-2024-001', DATE_SUB(CURDATE(), INTERVAL 70 DAY), 1300000, 'NONE', 0, 1300000, 'ISSUED', u.id
+INSERT INTO invoices (member_id, subscription_id, invoice_no, issue_date, subtotal_amount, total_amount, created_by)
+SELECT m.id, s.id, 'INV-2024-001', DATE_SUB(CURDATE(), INTERVAL 70 DAY), 1300000, 1300000, u.id
 FROM members m
 JOIN subscriptions s ON s.member_id = m.id AND s.status = 'ACTIVE' AND s.start_date = DATE_SUB(CURDATE(), INTERVAL 70 DAY)
 JOIN users u ON u.username = 'admin'
@@ -415,8 +419,8 @@ WHERE m.member_code = 'GYM-2024-001'
   AND NOT EXISTS (SELECT 1 FROM invoices WHERE invoice_no = 'INV-2024-001')
 LIMIT 1;
 
-INSERT INTO invoices (member_id, subscription_id, invoice_no, issue_date, subtotal_amount, discount_type, discount_value, total_amount, status, created_by)
-SELECT m.id, s.id, 'INV-2024-002', DATE_SUB(CURDATE(), INTERVAL 28 DAY), 500000, 'NONE', 0, 500000, 'ISSUED', u.id
+INSERT INTO invoices (member_id, subscription_id, invoice_no, issue_date, subtotal_amount, total_amount, created_by)
+SELECT m.id, s.id, 'INV-2024-002', DATE_SUB(CURDATE(), INTERVAL 28 DAY), 500000, 500000, u.id
 FROM members m
 JOIN subscriptions s ON s.member_id = m.id AND s.status = 'ACTIVE' AND s.start_date = DATE_SUB(CURDATE(), INTERVAL 28 DAY)
 JOIN users u ON u.username = 'admin'
@@ -424,8 +428,8 @@ WHERE m.member_code = 'GYM-2024-002'
   AND NOT EXISTS (SELECT 1 FROM invoices WHERE invoice_no = 'INV-2024-002')
 LIMIT 1;
 
-INSERT INTO invoices (member_id, subscription_id, invoice_no, issue_date, subtotal_amount, discount_type, discount_value, total_amount, status, created_by)
-SELECT m.id, s.id, 'INV-2024-003', DATE_SUB(CURDATE(), INTERVAL 80 DAY), 2400000, 'AMOUNT', 100000, 2300000, 'ISSUED', u.id
+INSERT INTO invoices (member_id, subscription_id, invoice_no, issue_date, subtotal_amount, total_amount, created_by)
+SELECT m.id, s.id, 'INV-2024-003', DATE_SUB(CURDATE(), INTERVAL 80 DAY), 2400000, 2400000, u.id
 FROM members m
 JOIN subscriptions s ON s.member_id = m.id AND s.status = 'ACTIVE' AND s.start_date = DATE_SUB(CURDATE(), INTERVAL 80 DAY)
 JOIN users u ON u.username = 'admin'
@@ -433,8 +437,8 @@ WHERE m.member_code = 'GYM-2024-003'
   AND NOT EXISTS (SELECT 1 FROM invoices WHERE invoice_no = 'INV-2024-003')
 LIMIT 1;
 
-INSERT INTO invoices (member_id, subscription_id, invoice_no, issue_date, subtotal_amount, discount_type, discount_value, total_amount, status, created_by)
-SELECT m.id, NULL, 'INV-2024-004', CURDATE(), 500000, 'NONE', 0, 500000, 'ISSUED', u.id
+INSERT INTO invoices (member_id, subscription_id, invoice_no, issue_date, subtotal_amount, total_amount, created_by)
+SELECT m.id, NULL, 'INV-2024-004', CURDATE(), 500000, 500000, u.id
 FROM members m
 JOIN users u ON u.username = 'admin'
 WHERE m.member_code = 'GYM-2024-004'
@@ -442,8 +446,8 @@ WHERE m.member_code = 'GYM-2024-004'
 LIMIT 1;
 
 -- Invoices từ V4
-INSERT INTO invoices (member_id, subscription_id, invoice_no, issue_date, subtotal_amount, discount_type, discount_value, total_amount, status, created_by)
-SELECT m.id, s.id, 'INV-2024-005', DATE_SUB(CURDATE(), INTERVAL 30 DAY), 500000, 'NONE', 0, 500000, 'ISSUED', u.id
+INSERT INTO invoices (member_id, subscription_id, invoice_no, issue_date, subtotal_amount, total_amount, created_by)
+SELECT m.id, s.id, 'INV-2024-005', DATE_SUB(CURDATE(), INTERVAL 30 DAY), 500000, 500000, u.id
 FROM members m
 JOIN subscriptions s ON s.member_id = m.id AND s.start_date = DATE_SUB(CURDATE(), INTERVAL 30 DAY)
 JOIN users u ON u.username = 'admin'
@@ -451,8 +455,8 @@ WHERE m.member_code = 'GYM-2024-001'
   AND NOT EXISTS (SELECT 1 FROM invoices WHERE invoice_no = 'INV-2024-005')
 LIMIT 1;
 
-INSERT INTO invoices (member_id, subscription_id, invoice_no, issue_date, subtotal_amount, discount_type, discount_value, total_amount, status, created_by)
-SELECT m.id, s.id, 'INV-2024-006', DATE_SUB(CURDATE(), INTERVAL 15 DAY), 1300000, 'PERCENT', 5, 1235000, 'ISSUED', u.id
+INSERT INTO invoices (member_id, subscription_id, invoice_no, issue_date, subtotal_amount, total_amount, created_by)
+SELECT m.id, s.id, 'INV-2024-006', DATE_SUB(CURDATE(), INTERVAL 15 DAY), 1300000, 1300000, u.id
 FROM members m
 JOIN subscriptions s ON s.member_id = m.id AND s.start_date = DATE_SUB(CURDATE(), INTERVAL 15 DAY)
 JOIN users u ON u.username = 'admin'
@@ -460,8 +464,8 @@ WHERE m.member_code = 'GYM-2024-002'
   AND NOT EXISTS (SELECT 1 FROM invoices WHERE invoice_no = 'INV-2024-006')
 LIMIT 1;
 
-INSERT INTO invoices (member_id, subscription_id, invoice_no, issue_date, subtotal_amount, discount_type, discount_value, total_amount, status, created_by)
-SELECT m.id, s.id, 'INV-2024-007', DATE_SUB(CURDATE(), INTERVAL 10 DAY), 2400000, 'AMOUNT', 200000, 2200000, 'ISSUED', u.id
+INSERT INTO invoices (member_id, subscription_id, invoice_no, issue_date, subtotal_amount, total_amount, created_by)
+SELECT m.id, s.id, 'INV-2024-007', DATE_SUB(CURDATE(), INTERVAL 10 DAY), 2400000, 2400000, u.id
 FROM members m
 JOIN subscriptions s ON s.member_id = m.id AND s.start_date = DATE_SUB(CURDATE(), INTERVAL 10 DAY)
 JOIN users u ON u.username = 'admin'
@@ -469,8 +473,8 @@ WHERE m.member_code = 'GYM-2024-003'
   AND NOT EXISTS (SELECT 1 FROM invoices WHERE invoice_no = 'INV-2024-007')
 LIMIT 1;
 
-INSERT INTO invoices (member_id, subscription_id, invoice_no, issue_date, subtotal_amount, discount_type, discount_value, total_amount, status, created_by)
-SELECT m.id, s.id, 'INV-2024-008', DATE_SUB(CURDATE(), INTERVAL 5 DAY), 500000, 'NONE', 0, 500000, 'ISSUED', u.id
+INSERT INTO invoices (member_id, subscription_id, invoice_no, issue_date, subtotal_amount, total_amount, created_by)
+SELECT m.id, s.id, 'INV-2024-008', DATE_SUB(CURDATE(), INTERVAL 5 DAY), 500000, 500000, u.id
 FROM members m
 JOIN subscriptions s ON s.member_id = m.id AND s.start_date = DATE_SUB(CURDATE(), INTERVAL 5 DAY)
 JOIN users u ON u.username = 'admin'
@@ -478,8 +482,8 @@ WHERE m.member_code = 'GYM-2024-005'
   AND NOT EXISTS (SELECT 1 FROM invoices WHERE invoice_no = 'INV-2024-008')
 LIMIT 1;
 
-INSERT INTO invoices (member_id, subscription_id, invoice_no, issue_date, subtotal_amount, discount_type, discount_value, total_amount, status, created_by)
-SELECT m.id, s.id, 'INV-2024-009', DATE_SUB(CURDATE(), INTERVAL 3 DAY), 1300000, 'NONE', 0, 1300000, 'ISSUED', u.id
+INSERT INTO invoices (member_id, subscription_id, invoice_no, issue_date, subtotal_amount, total_amount, created_by)
+SELECT m.id, s.id, 'INV-2024-009', DATE_SUB(CURDATE(), INTERVAL 3 DAY), 1300000, 1300000, u.id
 FROM members m
 JOIN subscriptions s ON s.member_id = m.id AND s.start_date = DATE_SUB(CURDATE(), INTERVAL 3 DAY)
 JOIN users u ON u.username = 'admin'
@@ -487,8 +491,8 @@ WHERE m.member_code = 'GYM-2024-001'
   AND NOT EXISTS (SELECT 1 FROM invoices WHERE invoice_no = 'INV-2024-009')
 LIMIT 1;
 
-INSERT INTO invoices (member_id, subscription_id, invoice_no, issue_date, subtotal_amount, discount_type, discount_value, total_amount, status, created_by)
-SELECT m.id, s.id, 'INV-2024-010', DATE_SUB(CURDATE(), INTERVAL 1 DAY), 4500000, 'PERCENT', 10, 4050000, 'ISSUED', u.id
+INSERT INTO invoices (member_id, subscription_id, invoice_no, issue_date, subtotal_amount, total_amount, created_by)
+SELECT m.id, s.id, 'INV-2024-010', DATE_SUB(CURDATE(), INTERVAL 1 DAY), 4500000, 4500000, u.id
 FROM members m
 JOIN subscriptions s ON s.member_id = m.id AND s.start_date = DATE_SUB(CURDATE(), INTERVAL 1 DAY)
 JOIN users u ON u.username = 'admin'
@@ -496,8 +500,8 @@ WHERE m.member_code = 'GYM-2024-003'
   AND NOT EXISTS (SELECT 1 FROM invoices WHERE invoice_no = 'INV-2024-010')
 LIMIT 1;
 
-INSERT INTO invoices (member_id, subscription_id, invoice_no, issue_date, subtotal_amount, discount_type, discount_value, total_amount, status, created_by)
-SELECT m.id, s.id, 'INV-2024-011', CURDATE(), 500000, 'NONE', 0, 500000, 'ISSUED', u.id
+INSERT INTO invoices (member_id, subscription_id, invoice_no, issue_date, subtotal_amount, total_amount, created_by)
+SELECT m.id, s.id, 'INV-2024-011', CURDATE(), 500000, 500000, u.id
 FROM members m
 JOIN subscriptions s ON s.member_id = m.id AND s.start_date = CURDATE()
 JOIN users u ON u.username = 'admin'
@@ -505,8 +509,8 @@ WHERE m.member_code = 'GYM-2024-002'
   AND NOT EXISTS (SELECT 1 FROM invoices WHERE invoice_no = 'INV-2024-011')
 LIMIT 1;
 
-INSERT INTO invoices (member_id, subscription_id, invoice_no, issue_date, subtotal_amount, discount_type, discount_value, total_amount, status, created_by)
-SELECT m.id, s.id, 'INV-2024-012', DATE_SUB(CURDATE(), INTERVAL 60 DAY), 1300000, 'NONE', 0, 1300000, 'ISSUED', u.id
+INSERT INTO invoices (member_id, subscription_id, invoice_no, issue_date, subtotal_amount, total_amount, created_by)
+SELECT m.id, s.id, 'INV-2024-012', DATE_SUB(CURDATE(), INTERVAL 60 DAY), 1300000, 1300000, u.id
 FROM members m
 JOIN subscriptions s ON s.member_id = m.id AND s.start_date = DATE_SUB(CURDATE(), INTERVAL 60 DAY)
 JOIN users u ON u.username = 'admin'
@@ -514,8 +518,8 @@ WHERE m.member_code = 'GYM-2024-001'
   AND NOT EXISTS (SELECT 1 FROM invoices WHERE invoice_no = 'INV-2024-012')
 LIMIT 1;
 
-INSERT INTO invoices (member_id, subscription_id, invoice_no, issue_date, subtotal_amount, discount_type, discount_value, total_amount, status, created_by)
-SELECT m.id, s.id, 'INV-2024-013', DATE_SUB(CURDATE(), INTERVAL 45 DAY), 2400000, 'AMOUNT', 100000, 2300000, 'ISSUED', u.id
+INSERT INTO invoices (member_id, subscription_id, invoice_no, issue_date, subtotal_amount, total_amount, created_by)
+SELECT m.id, s.id, 'INV-2024-013', DATE_SUB(CURDATE(), INTERVAL 45 DAY), 2400000, 2400000, u.id
 FROM members m
 JOIN subscriptions s ON s.member_id = m.id AND s.start_date = DATE_SUB(CURDATE(), INTERVAL 45 DAY)
 JOIN users u ON u.username = 'admin'
@@ -523,8 +527,8 @@ WHERE m.member_code = 'GYM-2024-003'
   AND NOT EXISTS (SELECT 1 FROM invoices WHERE invoice_no = 'INV-2024-013')
 LIMIT 1;
 
-INSERT INTO invoices (member_id, subscription_id, invoice_no, issue_date, subtotal_amount, discount_type, discount_value, total_amount, status, created_by)
-SELECT m.id, s.id, 'INV-2024-014', DATE_SUB(CURDATE(), INTERVAL 20 DAY), 500000, 'NONE', 0, 500000, 'ISSUED', u.id
+INSERT INTO invoices (member_id, subscription_id, invoice_no, issue_date, subtotal_amount, total_amount, created_by)
+SELECT m.id, s.id, 'INV-2024-014', DATE_SUB(CURDATE(), INTERVAL 20 DAY), 500000, 500000, u.id
 FROM members m
 JOIN subscriptions s ON s.member_id = m.id AND s.start_date = DATE_SUB(CURDATE(), INTERVAL 20 DAY)
 JOIN users u ON u.username = 'admin'

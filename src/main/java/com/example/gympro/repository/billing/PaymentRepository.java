@@ -1,19 +1,16 @@
 package com.example.gympro.repository.billing;
 
 import com.example.gympro.domain.billing.Invoice;
-import com.example.gympro.domain.billing.InvoiceStatus;
 import com.example.gympro.domain.billing.Payment;
 import com.example.gympro.domain.member.Member;
 import com.example.gympro.domain.member.MemberStatus;
 import com.example.gympro.domain.plan.Plan;
 import com.example.gympro.utils.DatabaseConnection;
 
-import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
@@ -46,8 +43,7 @@ public class PaymentRepository implements PaymentRepositoryInterface {
             JOIN members m ON i.member_id = m.id
             JOIN subscriptions s ON i.subscription_id = s.id
             JOIN plans p ON s.plan_id = p.id
-            WHERE i.status = 'ISSUED'
-              AND NOT EXISTS (
+            WHERE NOT EXISTS (
                     SELECT 1 FROM payments pay
                     WHERE pay.invoice_id = i.id
                       AND pay.is_refund = 0
@@ -63,6 +59,11 @@ public class PaymentRepository implements PaymentRepositoryInterface {
 
     private static final String UPDATE_SUBSCRIPTION_STATUS_SQL = """
             UPDATE subscriptions SET status = 'ACTIVE' WHERE id = ?
+            """;
+
+    private static final String UPDATE_MEMBER_STATUS_SQL = """
+            UPDATE members SET status = 'ACTIVE' 
+            WHERE id = ?
             """;
 
     @Override
@@ -110,6 +111,19 @@ public class PaymentRepository implements PaymentRepositoryInterface {
         }
     }
 
+    /**
+     * Update member status to ACTIVE when payment is completed
+     * @param conn Database connection
+     * @param memberId Member ID to update
+     * @return true if update successful
+     */
+    public boolean updateMemberStatus(Connection conn, long memberId) throws SQLException {
+        try (PreparedStatement pstmt = conn.prepareStatement(UPDATE_MEMBER_STATUS_SQL)) {
+            pstmt.setLong(1, memberId);
+            return pstmt.executeUpdate() > 0;
+        }
+    }
+
     private Invoice mapResultSetToInvoice(ResultSet rs) throws SQLException {
         java.sql.Date memberDobDate = rs.getDate("dob");
         Member member = new Member.Builder()
@@ -145,7 +159,6 @@ public class PaymentRepository implements PaymentRepositoryInterface {
                 .subscriptionId(subscriptionId == 0 ? null : subscriptionId)
                 .issueDate(rs.getDate("issue_date").toLocalDate())
                 .totalAmount(rs.getBigDecimal("total_amount"))
-                .status(InvoiceStatus.ISSUED)
                 .member(member)
                 .plan(plan)
                 .build();

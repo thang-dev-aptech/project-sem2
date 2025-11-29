@@ -12,7 +12,6 @@ public class Invoice {
     private final long id;
     private final String invoiceNo;
     private final Long subscriptionId;
-    private final Long shiftId;
     private final LocalDate issueDate;
     private final BigDecimal subtotalAmount;
     private final DiscountType discountType;
@@ -33,7 +32,6 @@ public class Invoice {
         this.id = builder.id;
         this.invoiceNo = builder.invoiceNo;
         this.subscriptionId = builder.subscriptionId;
-        this.shiftId = builder.shiftId;
         this.issueDate = builder.issueDate;
         this.subtotalAmount = builder.subtotalAmount;
         this.discountType = builder.discountType;
@@ -54,7 +52,6 @@ public class Invoice {
     public long getId() { return id; }
     public String getInvoiceNo() { return invoiceNo; }
     public Long getSubscriptionId() { return subscriptionId; }
-    public Long getShiftId() { return shiftId; }
     public LocalDate getIssueDate() { return issueDate; }
     public BigDecimal getSubtotalAmount() { return subtotalAmount; }
     public DiscountType getDiscountType() { return discountType; }
@@ -75,7 +72,6 @@ public class Invoice {
         private long id;
         private String invoiceNo;
         private Long subscriptionId;
-        private Long shiftId;
         private LocalDate issueDate;
         private BigDecimal subtotalAmount = BigDecimal.ZERO;
         private DiscountType discountType = DiscountType.NONE;
@@ -95,7 +91,6 @@ public class Invoice {
         public Builder id(long id) { this.id = id; return this; }
         public Builder invoiceNo(String invoiceNo) { this.invoiceNo = invoiceNo; return this; }
         public Builder subscriptionId(Long subscriptionId) { this.subscriptionId = subscriptionId; return this; }
-        public Builder shiftId(Long shiftId) { this.shiftId = shiftId; return this; }
         public Builder issueDate(LocalDate issueDate) { this.issueDate = issueDate; return this; }
         public Builder subtotalAmount(BigDecimal subtotalAmount) { this.subtotalAmount = subtotalAmount; return this; }
         public Builder discountType(DiscountType discountType) { this.discountType = discountType; return this; }

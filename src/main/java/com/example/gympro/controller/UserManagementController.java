@@ -3,6 +3,7 @@ package com.example.gympro.controller;
 import com.example.gympro.domain.Role;
 import com.example.gympro.service.AuthorizationService;
 import com.example.gympro.service.UserService;
+import com.example.gympro.utils.ValidationUtils;
 import com.example.gympro.viewModel.UserViewModel;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -302,9 +303,78 @@ public class UserManagementController {
     }
 
     private boolean isInputValid() {
-        return usernameField.getText() != null && !usernameField.getText().trim().isEmpty()
-                && fullNameField.getText() != null && !fullNameField.getText().trim().isEmpty()
-                && (selectedUser.getId() == 0 || passwordField.getText().trim().isEmpty() || passwordField.getText().length() >= 6);
+        // Validate Username
+        String username = usernameField.getText();
+        if (username == null || username.trim().isEmpty()) {
+            new Alert(Alert.AlertType.WARNING, "Username is required.").showAndWait();
+            return false;
+        }
+        if (!ValidationUtils.isValidCode(username)) {
+            new Alert(Alert.AlertType.WARNING, 
+                "Username must be 2-50 alphanumeric characters (may include dash/underscore).").showAndWait();
+            return false;
+        }
+        
+        // Validate Full Name
+        String fullName = fullNameField.getText();
+        if (!ValidationUtils.isValidName(fullName)) {
+            new Alert(Alert.AlertType.WARNING, 
+                "Full Name is required and must be 2-100 characters.").showAndWait();
+            return false;
+        }
+        
+        // Validate Email (optional but must be valid if provided)
+        String email = emailField.getText();
+        if (email != null && !email.trim().isEmpty()) {
+            if (!ValidationUtils.isValidEmail(email)) {
+                new Alert(Alert.AlertType.WARNING, 
+                    "Email format is invalid. Please enter a valid email address.").showAndWait();
+                return false;
+            }
+        }
+        
+        // Validate Phone (optional but must be valid if provided)
+        String phone = phoneField.getText();
+        if (phone != null && !phone.trim().isEmpty()) {
+            if (!ValidationUtils.isValidPhone(phone)) {
+                new Alert(Alert.AlertType.WARNING, 
+                    "Phone number format is invalid (e.g., 0123456789 or +84123456789).").showAndWait();
+                return false;
+            }
+        }
+        
+        // Validate Password (required for new users, optional for updates)
+        String password = passwordField.getText();
+        if (selectedUser.getId() == 0) {
+            // New user - password is required
+            com.example.gympro.service.settings.SettingsService settingsService = 
+                new com.example.gympro.service.settings.SettingsService();
+            int minLength = settingsService.getPasswordMinLength();
+            if (password == null || password.trim().isEmpty()) {
+                new Alert(Alert.AlertType.WARNING, 
+                    "Password is required for new users (minimum " + minLength + " characters).").showAndWait();
+                return false;
+            }
+            if (password.length() < minLength) {
+                new Alert(Alert.AlertType.WARNING, 
+                    "Password must be at least " + minLength + " characters.").showAndWait();
+                return false;
+            }
+        } else {
+            // Update user - password is optional but must be valid if provided
+            if (password != null && !password.trim().isEmpty()) {
+                com.example.gympro.service.settings.SettingsService settingsService = 
+                    new com.example.gympro.service.settings.SettingsService();
+                int minLength = settingsService.getPasswordMinLength();
+                if (password.length() < minLength) {
+                    new Alert(Alert.AlertType.WARNING, 
+                        "Password must be at least " + minLength + " characters.").showAndWait();
+                    return false;
+                }
+            }
+        }
+        
+        return true;
     }
 
     private void setFormEditable(boolean editable) {

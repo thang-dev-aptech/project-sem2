@@ -11,7 +11,7 @@ import java.sql.DatabaseMetaData;
 import java.util.Properties;
 
 /**
- * Controller cho Tab "Hệ thống" trong Settings
+ * Controller for "System" tab in Settings
  */
 public class SystemInfoTabController extends BaseController {
     

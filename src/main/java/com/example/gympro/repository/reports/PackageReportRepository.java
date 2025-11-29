@@ -23,27 +23,37 @@ public class PackageReportRepository {
             SELECT 
                 p.name AS package_name,
                 p.price,
-                COUNT(DISTINCT s.id) AS sold_count,
-                COALESCE(SUM(i.total_amount), 0) AS revenue,
+                COUNT(DISTINCT CASE WHEN s.start_date BETWEEN ? AND ? THEN s.id END) AS sold_count,
+                COALESCE(SUM(CASE WHEN s.start_date BETWEEN ? AND ? THEN i.total_amount ELSE 0 END), 0) AS revenue,
                 CASE 
-                    WHEN COUNT(DISTINCT s.id) > 0 
-                    THEN COALESCE(SUM(i.total_amount), 0) / COUNT(DISTINCT s.id)
+                    WHEN COUNT(DISTINCT CASE WHEN s.start_date BETWEEN ? AND ? THEN s.id END) > 0 
+                    THEN COALESCE(SUM(CASE WHEN s.start_date BETWEEN ? AND ? THEN i.total_amount ELSE 0 END), 0) 
+                         / COUNT(DISTINCT CASE WHEN s.start_date BETWEEN ? AND ? THEN s.id END)
                     ELSE 0 
                 END AS avg_revenue,
                 CASE WHEN p.is_active = 1 THEN 'Active' ELSE 'Inactive' END AS status
             FROM plans p
-            LEFT JOIN subscriptions s ON p.id = s.plan_id 
-                AND s.start_date BETWEEN ? AND ?
-            LEFT JOIN invoices i ON s.id = i.subscription_id 
-                AND i.status = 'ISSUED'
+            LEFT JOIN subscriptions s ON p.id = s.plan_id
+            LEFT JOIN invoices i ON s.id = i.subscription_id
             GROUP BY p.id, p.name, p.price, p.is_active
-            ORDER BY revenue DESC, sold_count DESC
+            ORDER BY revenue DESC, sold_count DESC, p.name ASC
         """;
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setDate(1, Date.valueOf(fromDate));
-            ps.setDate(2, Date.valueOf(toDate));
+            Date from = Date.valueOf(fromDate);
+            Date to = Date.valueOf(toDate);
+            // Set parameters for all 10 placeholders (5 pairs of fromDate, toDate)
+            ps.setDate(1, from);
+            ps.setDate(2, to);
+            ps.setDate(3, from);
+            ps.setDate(4, to);
+            ps.setDate(5, from);
+            ps.setDate(6, to);
+            ps.setDate(7, from);
+            ps.setDate(8, to);
+            ps.setDate(9, from);
+            ps.setDate(10, to);
 
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {

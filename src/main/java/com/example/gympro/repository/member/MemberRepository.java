@@ -30,6 +30,128 @@ public class MemberRepository implements MemberRepositoryInterface {
     private static final String DELETE_SQL =
             "UPDATE members SET is_deleted = 1, status = 'EXPIRED' WHERE id = ?";
 
+    /**
+     * Sync member status based on subscription expiration
+     * Update member status to EXPIRED if their latest subscription has expired
+     */
+    public void syncMemberStatusWithSubscription() {
+        String sql = """
+            UPDATE members m
+            INNER JOIN (
+                SELECT member_id, MAX(end_date) AS max_end_date
+                FROM subscriptions
+                WHERE status = 'ACTIVE'
+                GROUP BY member_id
+            ) latest ON m.id = latest.member_id
+            SET m.status = CASE
+                WHEN latest.max_end_date < CURDATE() THEN 'EXPIRED'
+                WHEN latest.max_end_date >= CURDATE() AND m.status = 'EXPIRED' THEN 'ACTIVE'
+                ELSE m.status
+            END
+            WHERE m.is_deleted = 0
+              AND (
+                  (latest.max_end_date < CURDATE() AND m.status != 'EXPIRED')
+                  OR (latest.max_end_date >= CURDATE() AND m.status = 'EXPIRED')
+              )
+        """;
+        
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            int updated = pstmt.executeUpdate();
+            if (updated > 0) {
+                System.out.println("Synced " + updated + " member statuses with subscription expiration");
+            }
+        } catch (SQLException e) {
+            System.err.println("Error syncing member status: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Get the first branch ID from database
+     * Used as default branch_id for new members
+     */
+    public long getDefaultBranchId() {
+        String sql = "SELECT id FROM branches ORDER BY id ASC LIMIT 1";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+            if (rs.next()) {
+                return rs.getLong("id");
+            }
+        } catch (SQLException e) {
+            System.err.println("Error getting default branch ID: " + e.getMessage());
+            e.printStackTrace();
+        }
+        // Fallback to 1 if no branch found (should not happen in production)
+        return 1;
+    }
+
+    /**
+     * Check if branch_id exists in database
+     */
+    private boolean branchExists(long branchId) {
+        String sql = "SELECT 1 FROM branches WHERE id = ? LIMIT 1";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setLong(1, branchId);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                return rs.next();
+            }
+        } catch (SQLException e) {
+            System.err.println("Error checking branch existence: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    /**
+     * Generate next member code based on prefix
+     * Format: PREFIX-XXXX (e.g., GYM-0001, MEM-0001)
+     */
+    public String generateNextMemberCode(String prefix) {
+        String sql = """
+            SELECT member_code 
+            FROM members 
+            WHERE member_code LIKE ? 
+            AND is_deleted = 0
+            ORDER BY CAST(SUBSTRING(member_code, ?) AS UNSIGNED) DESC, member_code DESC
+            LIMIT 1
+        """;
+        
+        String likePattern = prefix + "-%";
+        int prefixLength = prefix.length() + 1; // +1 for the dash
+        
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, likePattern);
+            pstmt.setInt(2, prefixLength);
+            
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    String lastCode = rs.getString("member_code");
+                    // Extract number part after prefix-
+                    String numberPart = lastCode.substring(prefixLength);
+                    try {
+                        int nextNumber = Integer.parseInt(numberPart) + 1;
+                        return String.format("%s-%04d", prefix, nextNumber);
+                    } catch (NumberFormatException e) {
+                        // If parsing fails, start from 1
+                        return String.format("%s-%04d", prefix, 1);
+                    }
+                } else {
+                    // No existing code with this prefix, start from 1
+                    return String.format("%s-%04d", prefix, 1);
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error generating member code: " + e.getMessage());
+            e.printStackTrace();
+            // Fallback: return prefix-0001
+            return String.format("%s-%04d", prefix, 1);
+        }
+    }
+
     @Override
     public List<Member> findAll() {
         return findAll(null, null);
@@ -81,14 +203,22 @@ public class MemberRepository implements MemberRepositoryInterface {
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)) {
 
-            setMemberParams(pstmt, member);
+            // Ensure branch_id is valid - use default branch if not set, invalid, or doesn't exist
+            Member memberToInsert = member;
+            if (member.getBranchId() <= 0 || !branchExists(member.getBranchId())) {
+                long defaultBranchId = getDefaultBranchId();
+                System.out.println("Using default branch_id: " + defaultBranchId + " (original was: " + member.getBranchId() + ")");
+                memberToInsert = member.toBuilder().branchId(defaultBranchId).build();
+            }
+            
+            setMemberParams(pstmt, memberToInsert);
 
             int affectedRows = pstmt.executeUpdate();
             if (affectedRows > 0) {
                 try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
                     if (generatedKeys.next()) {
                         long newId = generatedKeys.getLong(1);
-                        return Optional.of(member.toBuilder().id(newId).build());
+                        return Optional.of(memberToInsert.toBuilder().id(newId).build());
                     }
                 }
             }

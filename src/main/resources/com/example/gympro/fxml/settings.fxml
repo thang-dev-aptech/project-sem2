@@ -42,9 +42,6 @@
                         
                         <Label text="Phone:" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
                         <TextField fx:id="txtGymPhone" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
-                        
-                        <Label text="Email:" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
-                        <TextField fx:id="txtGymEmail" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
                     </GridPane>
                     
                     <HBox spacing="10" alignment="CENTER_RIGHT">
@@ -66,17 +63,11 @@
                             <ColumnConstraints hgrow="ALWAYS" minWidth="200"/>
                         </columnConstraints>
                         
-                        <Label text="Grace Days (Auto Renewal Days):" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
-                        <TextField fx:id="txtGraceDays" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                        <Label text="Member Code Prefix:" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                        <TextField fx:id="txtMemberCodePrefix" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
                         
-                        <Label text="Member Code Prefix:" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
-                        <TextField fx:id="txtMemberCodePrefix" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
-                        
-                        <Label text="Invoice Prefix:" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
-                        <TextField fx:id="txtInvoicePrefix" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
-                        
-                        <Label text="Currency Symbol:" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
-                        <TextField fx:id="txtCurrencySymbol" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+                        <Label text="Invoice Prefix:" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                        <TextField fx:id="txtInvoicePrefix" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
                     </GridPane>
                     
                     <HBox spacing="10" alignment="CENTER_RIGHT">
@@ -100,15 +91,8 @@
                         
                         <Label text="Minimum Password Length:" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
                         <TextField fx:id="txtPasswordMinLength" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
-                        
-                        <Label text="Session Timeout (minutes):" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
-                        <TextField fx:id="txtSessionTimeout" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
-                        
-                        <Label text="Maximum Login Attempts:" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
-                        <TextField fx:id="txtMaxLoginAttempts" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
-                        
-                        <Label text="Account Lockout Duration (minutes):" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
-                        <TextField fx:id="txtLockoutDuration" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+                        <Label text="(6-20 characters)" GridPane.columnIndex="1" GridPane.rowIndex="1" 
+                               style="-fx-font-size: 11; -fx-text-fill: #666;"/>
                     </GridPane>
                     
                     <HBox spacing="10" alignment="CENTER_RIGHT">

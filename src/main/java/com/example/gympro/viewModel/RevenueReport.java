@@ -14,7 +14,6 @@ public class RevenueReport {
     private String memberCode;
     private String packageName;
     private BigDecimal subtotal;
-    private BigDecimal discount;
     private BigDecimal total;
     private String status;
 
@@ -22,7 +21,7 @@ public class RevenueReport {
 
     public RevenueReport(long invoiceId, String invoiceNo, LocalDate invoiceDate,
                         String memberName, String memberCode, String packageName,
-                        BigDecimal subtotal, BigDecimal discount, BigDecimal total, String status) {
+                        BigDecimal subtotal, BigDecimal total, String status) {
         this.invoiceId = invoiceId;
         this.invoiceNo = invoiceNo;
         this.invoiceDate = invoiceDate;
@@ -30,7 +29,6 @@ public class RevenueReport {
         this.memberCode = memberCode;
         this.packageName = packageName;
         this.subtotal = subtotal;
-        this.discount = discount;
         this.total = total;
         this.status = status;
     }
@@ -43,7 +41,6 @@ public class RevenueReport {
     public String getMemberCode() { return memberCode; }
     public String getPackageName() { return packageName; }
     public BigDecimal getSubtotal() { return subtotal; }
-    public BigDecimal getDiscount() { return discount; }
     public BigDecimal getTotal() { return total; }
     public String getStatus() { return status; }
 
@@ -55,7 +52,6 @@ public class RevenueReport {
     public void setMemberCode(String memberCode) { this.memberCode = memberCode; }
     public void setPackageName(String packageName) { this.packageName = packageName; }
     public void setSubtotal(BigDecimal subtotal) { this.subtotal = subtotal; }
-    public void setDiscount(BigDecimal discount) { this.discount = discount; }
     public void setTotal(BigDecimal total) { this.total = total; }
     public void setStatus(String status) { this.status = status; }
 }

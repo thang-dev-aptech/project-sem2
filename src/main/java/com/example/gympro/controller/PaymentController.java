@@ -51,9 +51,25 @@ public class PaymentController {
 
     // BANK ACCOUNT CONFIGURATION FOR RECEIVING PAYMENTS
     private final VietQRService vietQRService = new VietQRService();
-    private final String MY_BANK_BIN = "970407"; // Change to your bank code
-    private final String MY_ACCOUNT_NO = "8930102003"; // Your account number
-    private final String MY_ACCOUNT_NAME = "TRUONG DUC THANH";
+    // Bank account info - should be moved to settings/config in production
+    private static final String DEFAULT_BANK_BIN = "970407";
+    private static final String DEFAULT_ACCOUNT_NO = "8930102003";
+    private static final String DEFAULT_ACCOUNT_NAME = "TRUONG DUC THANH";
+    
+    private String getBankBin() {
+        // TODO: Load from settings/config file
+        return DEFAULT_BANK_BIN;
+    }
+    
+    private String getAccountNo() {
+        // TODO: Load from settings/config file
+        return DEFAULT_ACCOUNT_NO;
+    }
+    
+    private String getAccountName() {
+        // TODO: Load from settings/config file
+        return DEFAULT_ACCOUNT_NAME;
+    }
 
     @FXML
     private void initialize() {
@@ -139,9 +155,9 @@ public class PaymentController {
 
                 // 1. Call Service to get image link
                 String qrDataUrl = vietQRService.generateQRCodeBase64(
-                        MY_BANK_BIN,
-                        MY_ACCOUNT_NO,
-                        MY_ACCOUNT_NAME,
+                        getBankBin(),
+                        getAccountNo(),
+                        getAccountName(),
                         invoice.getTotalAmount(),
                         content
                 );

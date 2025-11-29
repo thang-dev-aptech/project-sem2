@@ -31,7 +31,6 @@ public class RevenueReportTabController extends BaseController {
     @FXML private TableColumn<RevenueReport, String> colMemberCode;
     @FXML private TableColumn<RevenueReport, String> colPackageName;
     @FXML private TableColumn<RevenueReport, BigDecimal> colSubtotal;
-    @FXML private TableColumn<RevenueReport, BigDecimal> colDiscount;
     @FXML private TableColumn<RevenueReport, BigDecimal> colTotal;
     @FXML private TableColumn<RevenueReport, String> colStatus;
     @FXML private Button btnExportRevenue;
@@ -53,13 +52,11 @@ public class RevenueReportTabController extends BaseController {
         colMemberCode.setCellValueFactory(new PropertyValueFactory<>("memberCode"));
         colPackageName.setCellValueFactory(new PropertyValueFactory<>("packageName"));
         colSubtotal.setCellValueFactory(new PropertyValueFactory<>("subtotal"));
-        colDiscount.setCellValueFactory(new PropertyValueFactory<>("discount"));
         colTotal.setCellValueFactory(new PropertyValueFactory<>("total"));
         colStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
         
         // Format currency columns
         formatCurrencyColumn(colSubtotal);
-        formatCurrencyColumn(colDiscount);
         formatCurrencyColumn(colTotal);
         
         tblRevenue.setItems(revenueList);

@@ -14,7 +14,6 @@ public class BranchInfoTabController extends BaseController {
     @FXML private TextField txtGymName;
     @FXML private TextField txtGymAddress;
     @FXML private TextField txtGymPhone;
-    @FXML private TextField txtGymEmail;
     @FXML private Button btnSaveBranch;
     
     private final SettingsService settingsService = new SettingsService();

@@ -3,6 +3,7 @@ package com.example.gympro.controller;
 import com.example.gympro.service.RegistrationService;
 import com.example.gympro.service.RegistrationServiceInterface;
 import com.example.gympro.service.SessionManager;
+import com.example.gympro.utils.ValidationUtils;
 import com.example.gympro.viewModel.ExpiringMember;
 import com.example.gympro.viewModel.Member;
 import com.example.gympro.viewModel.Plan;
@@ -106,8 +107,38 @@ public class RegistrationController {
             // Skip, validation below will catch
         }
 
-        if (selectedMember == null || selectedPlan == null || startDate == null || endDate == null) {
-            showAlert(Alert.AlertType.WARNING, "Missing Information", "Please select member, package and dates.");
+        // Validate inputs
+        if (selectedMember == null) {
+            showAlert(Alert.AlertType.WARNING, "Validation Error", "Please select a member.");
+            return;
+        }
+        
+        if (selectedPlan == null) {
+            showAlert(Alert.AlertType.WARNING, "Validation Error", "Please select a package.");
+            return;
+        }
+        
+        if (startDate == null) {
+            showAlert(Alert.AlertType.WARNING, "Validation Error", "Please select a start date.");
+            return;
+        }
+        
+        if (endDate == null) {
+            showAlert(Alert.AlertType.WARNING, "Validation Error", "Please enter an end date.");
+            return;
+        }
+        
+        // Validate date range
+        if (!ValidationUtils.isValidDateRange(startDate, endDate)) {
+            showAlert(Alert.AlertType.WARNING, "Validation Error", 
+                "End date must be after or equal to start date.");
+            return;
+        }
+        
+        // Validate start date is not in the past (optional business rule)
+        if (startDate.isBefore(LocalDate.now())) {
+            showAlert(Alert.AlertType.WARNING, "Validation Error", 
+                "Start date cannot be in the past.");
             return;
         }
 
@@ -262,9 +293,8 @@ public class RegistrationController {
             ex.printStackTrace();
         }
 
-        // Get Grace Days from settings
-        com.example.gympro.service.settings.SettingsService settingsService = new com.example.gympro.service.settings.SettingsService();
-        int graceDays = settingsService.getGraceDays();
+        // Use default Grace Days (5 days)
+        int graceDays = com.example.gympro.service.settings.SettingsService.DEFAULT_GRACE_DAYS;
         
         LocalDate today = LocalDate.now();
         LocalDate startDate;

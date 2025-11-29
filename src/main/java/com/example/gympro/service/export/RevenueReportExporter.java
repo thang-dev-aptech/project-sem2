@@ -22,7 +22,7 @@ public class RevenueReportExporter extends BaseExcelExporter {
      */
     public void export(List<RevenueReport> reports, String filePath) throws IOException {
         try (Workbook workbook = new XSSFWorkbook()) {
-            Sheet sheet = workbook.createSheet("Báo cáo Doanh thu");
+            Sheet sheet = workbook.createSheet("Revenue Report");
             
             CellStyle headerStyle = createHeaderStyle(workbook);
             CellStyle dataStyle = createDataStyle(workbook);
@@ -30,8 +30,8 @@ public class RevenueReportExporter extends BaseExcelExporter {
             CellStyle dateStyle = createDateStyle(workbook);
             CellStyle totalStyle = createTotalStyle(workbook);
             
-            String[] headers = {"Số HĐ", "Ngày", "Hội viên", "Mã HV", "Gói tập", 
-                               "Tạm tính", "Giảm giá", "Tổng cộng", "Trạng thái"};
+            String[] headers = {"Invoice No", "Date", "Member", "Member Code", "Package", 
+                               "Subtotal", "Total"};
             createHeaderRow(sheet, headers, headerStyle);
             
             int rowNum = 1;
@@ -45,22 +45,20 @@ public class RevenueReportExporter extends BaseExcelExporter {
                 setCellValue(row, 3, report.getMemberCode(), dataStyle);
                 setCellValue(row, 4, report.getPackageName(), dataStyle);
                 setCellValue(row, 5, report.getSubtotal(), numberStyle);
-                setCellValue(row, 6, report.getDiscount(), numberStyle);
-                setCellValue(row, 7, report.getTotal(), numberStyle);
-                setCellValue(row, 8, report.getStatus(), dataStyle);
+                setCellValue(row, 6, report.getTotal(), numberStyle);
                 
                 if (report.getTotal() != null) {
                     totalRevenue = totalRevenue.add(report.getTotal());
                 }
             }
             
-            // Tổng cộng
+            // Total row
             Row totalRow = sheet.createRow(rowNum);
-            Cell totalLabelCell = totalRow.createCell(6);
-            totalLabelCell.setCellValue("TỔNG CỘNG:");
+            Cell totalLabelCell = totalRow.createCell(5);
+            totalLabelCell.setCellValue("TOTAL:");
             totalLabelCell.setCellStyle(totalStyle);
             
-            Cell totalValueCell = totalRow.createCell(7);
+            Cell totalValueCell = totalRow.createCell(6);
             totalValueCell.setCellValue(totalRevenue.doubleValue());
             totalValueCell.setCellStyle(totalStyle);
             

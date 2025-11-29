@@ -3,6 +3,7 @@ package com.example.gympro.controller;
 import com.example.gympro.controller.base.BaseController;
 import com.example.gympro.service.AuthorizationService;
 import com.example.gympro.service.settings.SettingsService;
+import com.example.gympro.utils.ValidationUtils;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 
@@ -23,21 +24,15 @@ public class SettingsController extends BaseController {
     @FXML private TextField txtGymName;
     @FXML private TextField txtGymAddress;
     @FXML private TextField txtGymPhone;
-    @FXML private TextField txtGymEmail;
     @FXML private Button btnSaveBranch;
 
     // Tab 2: Business configuration
-    @FXML private TextField txtGraceDays;
     @FXML private TextField txtMemberCodePrefix;
     @FXML private TextField txtInvoicePrefix;
-    @FXML private TextField txtCurrencySymbol;
     @FXML private Button btnSaveBusiness;
 
     // Tab 3: Security
     @FXML private TextField txtPasswordMinLength;
-    @FXML private TextField txtSessionTimeout;
-    @FXML private TextField txtMaxLoginAttempts;
-    @FXML private TextField txtLockoutDuration;
     @FXML private Button btnSaveSecurity;
 
     // Tab 4: System
@@ -98,73 +93,59 @@ public class SettingsController extends BaseController {
 
     // ========== Tab 2: Business configuration ==========
     private void loadBusinessSettings() {
-        txtGraceDays.setText(String.valueOf(settingsService.getGraceDays()));
         txtMemberCodePrefix.setText(settingsService.getMemberCodePrefix());
         txtInvoicePrefix.setText(settingsService.getInvoicePrefix());
-        txtCurrencySymbol.setText(settingsService.getCurrencySymbol());
     }
 
     private void saveBusinessSettings() {
-        try {
-            int graceDays = Integer.parseInt(txtGraceDays.getText().trim());
-            String memberPrefix = txtMemberCodePrefix.getText().trim();
-            String invoicePrefix = txtInvoicePrefix.getText().trim();
-            String currencySymbol = txtCurrencySymbol.getText().trim();
+        String memberPrefix = txtMemberCodePrefix.getText().trim();
+        String invoicePrefix = txtInvoicePrefix.getText().trim();
 
-            if (graceDays < 0) {
-                showAlert("⚠️ Days must be >= 0!");
-                return;
-            }
+        // Validate Member Code Prefix
+        if (memberPrefix.isEmpty()) {
+            showAlert("⚠️ Member Code Prefix cannot be empty!");
+            return;
+        }
+        if (!ValidationUtils.isValidCode(memberPrefix)) {
+            showAlert("⚠️ Member Code Prefix must be 2-50 alphanumeric characters (may include dash/underscore).");
+            return;
+        }
+        
+        // Validate Invoice Prefix
+        if (invoicePrefix.isEmpty()) {
+            showAlert("⚠️ Invoice Prefix cannot be empty!");
+            return;
+        }
+        if (!ValidationUtils.isValidCode(invoicePrefix)) {
+            showAlert("⚠️ Invoice Prefix must be 2-50 alphanumeric characters (may include dash/underscore).");
+            return;
+        }
 
-            if (memberPrefix.isEmpty() || invoicePrefix.isEmpty() || currencySymbol.isEmpty()) {
-                showAlert("⚠️ Please fill in all information!");
-                return;
-            }
+        // Save prefixes with detailed result (includes migration info)
+        SettingsService.PrefixUpdateResult result = settingsService.setPrefixesWithResult(memberPrefix, invoicePrefix);
 
-            boolean success = settingsService.setGraceDays(graceDays)
-                    && settingsService.setMemberCodePrefix(memberPrefix)
-                    && settingsService.setInvoicePrefix(invoicePrefix)
-                    && settingsService.setCurrencySymbol(currencySymbol);
-
-            if (success) {
-                showAlert("✅ Business configuration saved successfully!");
-            } else {
-                showAlert("❌ Error saving business configuration!");
-            }
-        } catch (NumberFormatException e) {
-            showAlert("⚠️ Please enter a valid number!");
+        if (result.isSuccess()) {
+            showAlert(result.getMessage());
+        } else {
+            showAlert(result.getMessage());
         }
     }
 
     // ========== Tab 3: Security ==========
     private void loadSecuritySettings() {
         txtPasswordMinLength.setText(String.valueOf(settingsService.getPasswordMinLength()));
-        txtSessionTimeout.setText(String.valueOf(settingsService.getSessionTimeout()));
-        txtMaxLoginAttempts.setText(String.valueOf(settingsService.getMaxLoginAttempts()));
-        txtLockoutDuration.setText(String.valueOf(settingsService.getLockoutDuration()));
     }
 
     private void saveSecuritySettings() {
         try {
             int passwordMinLength = Integer.parseInt(txtPasswordMinLength.getText().trim());
-            int sessionTimeout = Integer.parseInt(txtSessionTimeout.getText().trim());
-            int maxLoginAttempts = Integer.parseInt(txtMaxLoginAttempts.getText().trim());
-            int lockoutDuration = Integer.parseInt(txtLockoutDuration.getText().trim());
 
             if (passwordMinLength < 6 || passwordMinLength > 20) {
                 showAlert("⚠️ Password length must be 6-20 characters!");
                 return;
             }
 
-            if (sessionTimeout < 5 || sessionTimeout > 120) {
-                showAlert("⚠️ Timeout must be 5-120 minutes!");
-                return;
-            }
-
-            boolean success = settingsService.setPasswordMinLength(passwordMinLength)
-                    && settingsService.setSessionTimeout(sessionTimeout)
-                    && settingsService.setMaxLoginAttempts(maxLoginAttempts)
-                    && settingsService.setLockoutDuration(lockoutDuration);
+            boolean success = settingsService.setPasswordMinLength(passwordMinLength);
 
             if (success) {
                 showAlert("✅ Security configuration saved successfully!");
